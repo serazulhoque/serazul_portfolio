@@ -19,3 +19,9 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
 
 .down-diagonal{display:inline-flex;vertical-align:middle;transform:rotate(90deg)}.down-diagonal svg{width:13px;height:13px}.scenario-tabs button>span svg{width:13px;height:13px}.focus-symbol>svg{width:27px;height:27px;margin-inline:auto}
+
+/* Contact destination for the new navigation item. */
+.contact-section{border-top:1px solid var(--line)}
+.contact-section h2{font-family:var(--font-display);font-size:clamp(38px,5vw,58px);font-weight:400;margin:18px 0}
+.contact-section p{font-size:16px;line-height:1.65;color:var(--muted);margin-bottom:22px}
+.contact-section .contact-placeholder{font-size:13px}
