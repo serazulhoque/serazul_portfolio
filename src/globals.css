@@ -29,3 +29,21 @@
 /* Admin-managed page copy remains readable with long text and line breaks. */
 .about-main h2,.contact-section h2{overflow-wrap:anywhere}
 .about-columns p,.contact-section>p{white-space:pre-line;overflow-wrap:anywhere}
+
+/* Contact actions: keep email intact and reveal social profiles on demand. */
+.contact-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.contact-actions .contact-placeholder{margin:0 12px 0 0}
+.button-outline{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.button-outline:hover{background:var(--lime);border-color:#a5bb7c;color:#202b26}
+.follow-chevron{font-size:18px;line-height:1;font-weight:400;min-width:14px;text-align:center}
+.contact-social-links{margin-top:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:660px}
+.contact-social-links[hidden]{display:none}
+.contact-social-links a{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 18px;border:1px solid var(--line);border-radius:3px;font-family:var(--font-label);font-size:11px;letter-spacing:.5px;color:var(--ink);transition:background .2s,border-color .2s}
+.contact-social-links a:hover{background:var(--lime);border-color:#9fbc76;color:#202b26}
+.contact-social-links a svg{width:15px;height:15px;flex:0 0 15px}
+@media(max-width:600px){
+  .contact-actions{align-items:stretch}
+  .contact-actions .button{flex:1 1 170px;gap:12px}
+  .contact-social-links{grid-template-columns:minmax(0,1fr)}
+  .contact-social-links a{min-height:49px}
+}
