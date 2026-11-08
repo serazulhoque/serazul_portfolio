@@ -172,9 +172,21 @@ function PublishedArticles() {
 export default function Home() {
   const [scenario, setScenario] = useState(0);
   const [notice, setNotice] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const dialog = useRef<HTMLDialogElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const current = scenarios[scenario];
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("https://serazul-backend.vercel.app/api/public/settings", { signal: controller.signal, credentials: "omit" })
+      .then(response => response.ok ? response.json() : Promise.reject())
+      .then(settings => {
+        if (!controller.signal.aborted && typeof settings.contact_email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.contact_email)) {
+          setContactEmail(settings.contact_email);
+        }
+      }).catch(() => {/* No public address has been configured. */});
+    return () => controller.abort();
+  }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
@@ -245,6 +257,13 @@ export default function Home() {
         </div></div>
       </section>
       <PublishedArticles />
+      <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
+        <div className="section-label"><span>05 / GET IN TOUCH</span><span className="small-line" /></div>
+        <h2 id="contact-title">Let's connect.</h2>
+        <p>Have a question, idea, or something you'd like to discuss?</p>
+        {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
+          <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
+      </section>
       <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">STILL EARLY. ALREADY CURIOUS.</p><h2>Good software begins<br />with a <em>human question.</em></h2><p>Mine is how to help more people be understood.<br />This portfolio is a starting point for that journey.</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="#home">Back to top ↑</a></footer>
