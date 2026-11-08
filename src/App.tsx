@@ -190,6 +190,7 @@ const DEFAULT_PAGE_SECTIONS: PageSections = {
 export default function Home() {
   const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [followOpen, setFollowOpen] = useState(false);
   const [pageCopy, setPageCopy] = useState<PageSections>(DEFAULT_PAGE_SECTIONS);
   useEffect(() => {
     const controller = new AbortController();
@@ -276,8 +277,19 @@ export default function Home() {
         <div className="section-label"><span>04 / GET IN TOUCH</span><span className="small-line" /></div>
         <h2 id="contact-title">{pageCopy.contact_heading}</h2>
         <p>{pageCopy.contact_paragraph}</p>
-        {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
-          <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
+        <div className="contact-actions">
+          {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
+            <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
+          <button type="button" className="button button-outline" aria-expanded={followOpen} aria-controls="contact-social-links" onClick={() => setFollowOpen(open => !open)}>
+            Follow me <span className="follow-chevron" aria-hidden="true">{followOpen ? "−" : "+"}</span>
+          </button>
+        </div>
+        <nav id="contact-social-links" className="contact-social-links" aria-label="My social media profiles" hidden={!followOpen}>
+          <a href="https://www.facebook.com/iamserazulhoque" target="_blank" rel="noopener noreferrer">Facebook <Arrow diagonal /></a>
+          <a href="https://www.linkedin.com/in/iamserazulhoque" target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal /></a>
+          <a href="https://www.x.com/Serazul_Hoque" target="_blank" rel="noopener noreferrer">X (Twitter) <Arrow diagonal /></a>
+          <a href="https://www.instagram.com/iamserazulhoque" target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal /></a>
+        </nav>
       </section>
       <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">STILL EARLY. ALREADY CURIOUS.</p><h2>Good software begins<br />with a <em>human question.</em></h2><p>Mine is how to help more people be understood.<br />This portfolio is a starting point for that journey.</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
     </main>
