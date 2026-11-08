@@ -23,6 +23,34 @@ export default function SiteHeader() {
   const [dark, setDark] = useState(false);
   const [ready, setReady] = useState(false);
   const [themeFade, setThemeFade] = useState(0);
+  const [profilePhoto, setProfilePhoto] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let imageUrl = "";
+    fetch("https://serazul-backend.vercel.app/api/public/profile", {
+      signal: controller.signal, credentials: "omit", cache: "no-store"
+    }).then(response => {
+      if (!response.ok) throw new Error("Profile unavailable");
+      return response.json();
+    }).then(data => {
+      if (!controller.signal.aborted && typeof data.url === "string" && /^https:\/\//.test(data.url)) {
+        imageUrl = data.url;
+        setProfilePhoto(data.url);
+      }
+    }).catch(() => {/* The placeholder remains when no photo has been assigned. */});
+    return () => { controller.abort(); imageUrl = ""; };
+  }, []);
+
+  const brand = <><span className="brand-mark brand-avatar" aria-hidden="true">
+    {profilePhoto ? <img src={profilePhoto} alt="" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
+  </span><span className="brand-name">Serazul Hoque
+    <svg className="brand-check" viewBox="0 0 24 24" role="img" aria-label="Blue check decoration">
+      <path fill="#1877F2" d="m12 1.2 2.8 1.7 3.3-.1 1.5 3 3 1.6-.1 3.3 1.5 2.9-1.7 2.8.1 3.3-3 1.5-1.6 3-3.3-.1-2.5 1.5-2.9-1.7-3.3.1-1.5-3-3-1.6.1-3.3L1 13.2l1.7-2.8-.1-3.3 3-1.5 1.6-3 3.3.1L12 1.2Z" transform="translate(1.4 1.4) scale(.89)" />
+      <path d="m7.2 12.2 3.1 3.1 6.6-6.7" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  </span></>;
 
   useEffect(() => {
     let frame = 0;
@@ -106,9 +134,9 @@ export default function SiteHeader() {
 
   return <>
     <header className="site-header wrap">
-      <a className="wordmark" href="#home" aria-label="Serazul Hoque home"><span className="brand-mark">s<span>.</span></span><span>Serazul Hoque</span></a>
+      <a className="wordmark" href="#home" aria-label="Serazul Hoque home">{brand}</a>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
-        <a href="#about">About me</a><a href="#explorations">What I’m exploring</a><a className="desktop-project" href="#project"><span aria-hidden="true">→</span> The big idea</a>
+        <a href="#about">About me</a><a href="#contact">Get in touch</a><a href="#articles">Publication</a><a href="#explorations">What I’m exploring</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
       <button className="menu-orb" onClick={openMenu} disabled={!ready} aria-haspopup="dialog" aria-controls="portfolio-menu" aria-label="Open menu"><MenuIcon /></button>
     </header>
@@ -120,9 +148,10 @@ export default function SiteHeader() {
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
         <nav className="menu-links" aria-label="Portfolio navigation">
           <a href="#about" onClick={follow}>About me</a>
-          <div className="menu-link-group"><a href="#project" onClick={follow}>The big idea</a><a className="menu-sublink" href="#project" onClick={follow}>Rohingya Voice</a></div>
-          <div className="menu-link-group"><a href="#explorations" onClick={follow}>What I’m exploring</a><a className="menu-sublink" href="#explorations" onClick={follow}>Software · AI · Learning</a></div>
-          <a href="#home" onClick={follow}>Back to the beginning</a>
+          <a href="#contact" onClick={follow}>Get in touch</a>
+          <a href="#articles" onClick={follow}>Publication</a>
+          <a href="#explorations" onClick={follow}>What I am exploring</a>
+          <a href="#home" onClick={follow}>Back to start</a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>
