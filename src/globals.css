@@ -25,3 +25,7 @@
 .contact-section h2{font-family:var(--font-display);font-size:clamp(38px,5vw,58px);font-weight:400;margin:18px 0}
 .contact-section p{font-size:16px;line-height:1.65;color:var(--muted);margin-bottom:22px}
 .contact-section .contact-placeholder{font-size:13px}
+
+/* Admin-managed page copy remains readable with long text and line breaks. */
+.about-main h2,.contact-section h2{overflow-wrap:anywhere}
+.about-columns p,.contact-section>p{white-space:pre-line;overflow-wrap:anywhere}
