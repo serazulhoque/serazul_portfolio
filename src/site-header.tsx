@@ -140,7 +140,7 @@ export default function SiteHeader() {
     </header>
     <dialog ref={dialog} id="portfolio-menu" className={`menu-dialog${closing ? " is-closing" : ""}`} aria-labelledby="menu-title" onCancel={e => { e.preventDefault(); closeMenu(); }}>
       <div className="menu-panel">
-        <a className="wordmark menu-wordmark" href="#home" onClick={follow} aria-label="Serazul Hoque home"><span className="brand-mark">s<span>.</span></span><span>Serazul Hoque</span></a>
+        <a className="wordmark menu-wordmark" href="#home" onClick={follow} aria-label="Serazul Hoque home">{brand}</a>
         <button className="menu-orb menu-close" onClick={() => closeMenu()} aria-label="Close menu" autoFocus><MenuIcon close /></button>
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
