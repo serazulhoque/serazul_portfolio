@@ -169,10 +169,28 @@ function PublishedArticles() {
 }
 
 
+type PageSections = {
+  about_line_one: string;
+  about_line_two: string;
+  about_paragraph_one: string;
+  about_paragraph_two: string;
+  contact_heading: string;
+  contact_paragraph: string;
+};
+const DEFAULT_PAGE_SECTIONS: PageSections = {
+  about_line_one: "Learning the craft.",
+  about_line_two: "Keeping people in mind.",
+  about_paragraph_one: "I’m pursuing software engineering because I want to turn ideas into things people can use. Right now, that means learning the foundations, asking questions, and connecting the small steps to a bigger goal.",
+  about_paragraph_two: "One idea keeps me curious: an AI people can talk to in Rohingya. It brings together my interest in technology and a language that matters to me. This is where I’m beginning.",
+  contact_heading: "Let's connect.",
+  contact_paragraph: "Have a question, idea, or something you'd like to discuss?"
+};
+
 export default function Home() {
   const [scenario, setScenario] = useState(0);
   const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [pageCopy, setPageCopy] = useState<PageSections>(DEFAULT_PAGE_SECTIONS);
   const dialog = useRef<HTMLDialogElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const current = scenarios[scenario];
@@ -185,6 +203,26 @@ export default function Home() {
           setContactEmail(settings.contact_email);
         }
       }).catch(() => {/* No public address has been configured. */});
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("https://serazul-backend.vercel.app/api/public/sections", {
+      signal:controller.signal,credentials:"omit",cache:"no-store"
+    }).then(response => {
+      if(!response.ok)throw new Error("Sections unavailable");
+      return response.json();
+    }).then(data => {
+      if(controller.signal.aborted || !data || typeof data !== "object")return;
+      const next:PageSections = {...DEFAULT_PAGE_SECTIONS};
+      const keys=(Object.keys(DEFAULT_PAGE_SECTIONS) as Array<keyof PageSections>);
+      for(const key of keys) {
+        const value=data[key];
+        if(typeof value === "string" && value.trim().length > 0 &&
+           value.length <= (key.includes("paragraph") ? 2500 : 160)) next[key]=value;
+      }
+      setPageCopy(next);
+    }).catch(() => { /* Preserve existing text if the page-content API is unavailable. */ });
     return () => controller.abort();
   }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
@@ -231,7 +269,7 @@ export default function Home() {
       <div className="intro-strip wrap"><span>A PERSONAL CORNER OF THE INTERNET</span><p>Curiosity in the details. <em>Purpose in the bigger picture.</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
         <div className="section-label"><span>01 / A LITTLE CONTEXT</span><span className="small-line" /></div>
-        <div className="about-main" data-reveal><h2>Learning the craft.<br /><em>Keeping people in mind.</em></h2><div className="about-columns"><p>I’m pursuing software engineering because I want to turn ideas into things people can use. Right now, that means learning the foundations, asking questions, and connecting the small steps to a bigger goal.</p><p>One idea keeps me curious: an AI people can talk to in Rohingya. It brings together my interest in technology and a language that matters to me. This is where I’m beginning.</p></div><div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div></div>
+        <div className="about-main" data-reveal><h2>{pageCopy.about_line_one}<br /><em>{pageCopy.about_line_two}</em></h2><div className="about-columns"><p>{pageCopy.about_paragraph_one}</p><p>{pageCopy.about_paragraph_two}</p></div><div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div></div>
       </section>
       <section className="project-section" id="project" tabIndex={-1}><div className="wrap section-space">
         <div className="section-label light-label"><span>02 / THE IDEA I KEEP COMING BACK TO</span><span className="project-status"><span className="tiny-dot" /> CONCEPT & EXPLORATION</span></div>
@@ -259,8 +297,8 @@ export default function Home() {
       <PublishedArticles />
       <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span>05 / GET IN TOUCH</span><span className="small-line" /></div>
-        <h2 id="contact-title">Let's connect.</h2>
-        <p>Have a question, idea, or something you'd like to discuss?</p>
+        <h2 id="contact-title">{pageCopy.contact_heading}</h2>
+        <p>{pageCopy.contact_paragraph}</p>
         {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
           <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
       </section>
