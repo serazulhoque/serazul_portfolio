@@ -11,6 +11,12 @@
 <meta name="theme-color" content="#21332c" />
 <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
 <script>try{var t=localStorage.getItem("serazul-theme");document.documentElement.dataset.theme=t==="dark"||t==="light"?t:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}</script>
+
+<script>
+  const url = new URL(window.location.href);
+  url.searchParams.delete('utm_source');
+  window.history.replaceState({}, '', url.toString());
+</script>
 </head>
 <body>
 <div id="root"></div>
