@@ -1,0 +1,12 @@
+{
+  "typecheck": "passed",
+  "client_build": "passed",
+  "static_prerender": "passed",
+  "viewport_metadata": "passed",
+  "headline": "Engineering Student with a purpose.",
+  "relative_asset_links": "passed",
+  "font_files": "passed",
+  "admin_excluded_from_public_build": "passed",
+  "workflow_included": "passed",
+  "source_commit": "ee7b8cba2a436cdc5aa4137bf774da740052fec4"
+}

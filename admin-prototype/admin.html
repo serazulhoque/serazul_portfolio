@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<!-- Single-file demo only. Production: replace unsafe-inline with CSP hashes/
+nonces; send CSP frame-ancestors 'none', HSTS, nosniff and no-store as HTTP headers. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src blob:; connect-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'">
+<title>Serazul Hoque · Admin prototype</title>
+<style>
+:root{color-scheme:dark;--bg:#111a16;--panel:#1b2820;--field:#142019;--line:#42523f;--fg:#f0f3e9;--muted:#b0bfa6;--accent:#d5ed9c;--danger:#ffb3aa}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,sans-serif}h1,h2,p{margin:0}h1{font-size:clamp(27px,4vw,38px);letter-spacing:-1px}h2{font-size:20px}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}:focus-visible{outline:3px solid var(--accent);outline-offset:3px}a{color:var(--accent)}label{display:block;font-size:12px;color:var(--muted)}input,select,textarea{display:block;width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--fg)}textarea{resize:vertical;min-height:100px}input[type=checkbox]{width:auto;display:inline;accent-color:var(--accent)}input[type=color]{padding:3px;height:42px}.btn{border:1px solid var(--line);background:#293a2b;color:var(--fg);padding:9px 13px;border-radius:8px;min-height:42px}.btn:hover{filter:brightness(1.16)}.primary{background:var(--accent);color:#1c2a20;border-color:var(--accent);font-weight:650}.danger{color:var(--danger)}.muted,small{color:var(--muted)}.eyebrow{color:var(--accent);font-size:11px;letter-spacing:2px;text-transform:uppercase}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}.stack{display:grid;gap:17px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.spread{justify-content:space-between}.notice{padding:12px 15px;border-left:3px solid var(--accent);background:#293a2b;border-radius:5px;font-size:13px}.error{min-height:24px;color:var(--danger);font-size:13px}.center{min-height:100svh;display:grid;place-items:center;padding:22px}.login{width:min(100%,440px)}.brand{font-weight:750;font-size:18px}.brand span{display:inline-grid;place-items:center;background:var(--accent);color:#1c2a20;width:34px;height:34px;border-radius:10px;margin-right:9px}.password{display:flex;gap:8px}.password input{min-width:0}.check{display:flex;gap:10px;align-items:flex-start}.check input{margin-top:5px}.app{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:100svh}.sidebar{position:sticky;top:0;height:100svh;padding:24px 18px;background:#15221a;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:25px}.sidebar nav{display:grid;gap:8px}.nav{background:none;border:0;color:var(--muted);padding:12px;border-radius:8px;text-align:left}.nav[aria-current=page]{background:#2b3e2d;color:var(--accent)}.sidebar footer{margin-top:auto;display:grid;gap:15px}.main{padding:30px clamp(15px,3vw,40px);min-width:0}.heading{margin-bottom:22px}.pill{font-size:10px;letter-spacing:1.4px;border:1px solid #71865b;color:var(--accent);border-radius:30px;padding:5px 10px}.grid{display:grid;gap:18px}.stats{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:20px}.metric{font-size:35px;font-weight:700}.columns{grid-template-columns:minmax(190px,.7fr) minmax(0,2fr)}.settings-grid{grid-template-columns:1fr 1fr}.list{list-style:none;padding:0;margin:12px 0 0}.list li{padding:13px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.list strong{display:block}.list small{display:block}.editor-toolbar{display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin:16px 0 0;padding:12px;border:1px solid var(--line);border-radius:10px 10px 0 0;background:#243427}.editor-toolbar label{min-width:90px;flex:1}.editor-toolbar label.font-picker{min-width:170px}.editor-toolbar label.color-picker{max-width:65px;min-width:55px;flex:0}.editor-toolbar select{min-height:42px}.editor{min-height:320px;max-height:650px;overflow:auto;background:#fffdf6;color:#20251e;border:1px solid #75836a;border-top:0;border-radius:0 0 10px 10px;padding:22px;font:17px/1.7 Georgia,serif;overflow-wrap:anywhere;white-space:pre-wrap}.editor p,.editor div{margin:0 0 12px}.editor ul{padding-left:26px}.editor:focus{outline:2px solid var(--accent);outline-offset:2px}.editor-meta{display:flex;justify-content:space-between;gap:10px;margin:7px 0 16px;font-size:12px;color:var(--muted)}.drop{padding:30px;text-align:center;border:2px dashed #7d9168;border-radius:12px;background:#223225}.drop.over{border-color:var(--accent);background:#31472e}.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px;margin-top:18px}.media-card{min-width:0;border:1px solid var(--line);padding:10px;border-radius:10px}.media-card img{width:100%;height:125px;object-fit:cover;background:var(--field);border-radius:6px}.media-card p{font-size:12px;overflow-wrap:anywhere;margin:7px 0}.media-card button{width:100%}details{margin-top:20px;border-top:1px solid var(--line);padding-top:15px}summary{cursor:pointer;color:var(--accent)}li+li{margin-top:6px}#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 18px;background:var(--accent);color:#1c2a20;border-radius:9px;max-width:calc(100% - 30px);z-index:10;box-shadow:0 10px 35px #0006}#toast:empty{display:none}.preview-dialog{width:min(800px,calc(100% - 30px));max-height:85svh;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--fg);padding:22px}.preview-dialog::backdrop{background:#000a}.preview-copy{margin-top:16px;max-height:none;min-height:0}code{overflow-wrap:anywhere}
+@media(max-width:950px){.app{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.sidebar nav{grid-template-columns:repeat(4,minmax(0,1fr))}.sidebar footer{display:flex;align-items:center;justify-content:space-between}.nav{text-align:center;font-size:12px;padding:10px 6px}.columns{grid-template-columns:1fr}}
+@media(max-width:600px){.main{padding:20px 14px}.stats,.settings-grid{grid-template-columns:1fr}.sidebar nav{grid-template-columns:1fr 1fr}.card{padding:17px}.editor{padding:15px}.editor-toolbar{padding:9px}.editor-toolbar .btn{padding:8px 11px}.editor-meta{flex-direction:column}.sidebar footer small{max-width:65%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+<!--
+USAGE / ROUTING
+Save as admin.html. Open admin.html?access=hoque15062002 locally or on a host.
+For /hoque15062002, configure an INTERNAL hosting rewrite to serve admin.html
+at that exact path. A static file cannot create that server route by itself.
+Do not add this page to public navigation, footers or sitemaps.
+
+SECURITY BOUNDARY
+This is a UI prototype, NOT production authentication. The route key and every
+client check are readable/bypassable. Hidden paths are security through obscurity.
+Login intentionally accepts any valid demo email and a 12+ character dummy
+password after explicit demo consent. No credentials/tokens are saved. Articles
+and settings are memory-only; refresh/logout resets them. Nothing publishes live.
+
+ROBOTS.TXT (separate root file; not created by this HTML)
+  User-agent: *
+  Disallow: /admin.html
+  Disallow: /hoque15062002
+Disallow discourages compliant crawling; it DOES NOT guarantee non-indexing or
+confidentiality, and it reveals the paths publicly. A disallowed crawler may not
+see noindex. Use server authentication and X-Robots-Tag: noindex/no-store headers
+as appropriate. Keep the noindex meta tag above; use real access controls.
+
+PRODUCTION BACKEND / LIVE PUBLISHING: SUPABASE EXAMPLE
+1. Create a Supabase project (free tier subject to its current quotas). Configure
+   email Auth, invite-only admins, verified emails, exact redirect URLs and TOTP
+   MFA. Never treat knowledge of the hidden URL as admin authorization.
+2. Add a same-origin HTTPS backend. Replace handleLogin() with the backend's
+   login/MFA flow. Verify provider JWT signature, issuer, audience, expiry and MFA
+   assurance (aal2) server-side. Decoding JWT payloads is NOT verification.
+3. Keep approved admin IDs in protected server-managed data/trusted claims.
+   Never authorize using user-editable metadata or isAdmin supplied by a browser.
+   Authenticate AND authorize every read/write/upload/password API request.
+4. Store articles as {id,title,status,document,updated_at}. document is the
+   allowlisted JSON tree produced by readDocument(), including per-node font,
+   size, color, alignment and emphasis. Validate this schema and size/depth/node
+   limits again on the backend. Store site metadata in a separate settings table.
+5. Enable database RLS and private Storage policies, restricting mutations to
+   approved admin IDs with required MFA. Give the public site read access ONLY
+   to explicitly published articles and deliberately public metadata/media.
+6. Replace the demo save/delete handlers with authorized API operations. Public
+   pages fetch published documents and render them using the same allowlist-based
+   DOM renderer (or equivalent server renderer), NOT raw innerHTML from a DB.
+   An admin login alone does not grant database/storage permissions.
+7. Load the SAME font-face definitions on editor AND public site. Persist the
+   allowlisted font identifier/family with each node. Font CSS/files belong in
+   trusted, versioned assets; never accept arbitrary font CSS/URLs from articles.
+8. Prefer Secure, HttpOnly, SameSite session cookies via the backend. Protect
+   cookie-based mutations with CSRF tokens and Origin checks. Rate-limit login,
+   enforce server expiry/revocation, audit mutations, and require recent MFA for
+   credential changes. Never store a service-role key or password in this HTML.
+9. Upload to private storage via authorized APIs. Verify actual bytes/MIME, size,
+   image dimensions and access server-side; re-encode images, randomize filenames
+   and scan as appropriate. Client MIME checks are bypassable. Use signed URLs
+   for private assets. Serve untrusted content from a separate safe origin.
+10. Test anonymous/non-admin requests, direct API access, expired tokens, stored
+    XSS and authorization policies. Protect serving the admin HTML at the edge
+    too if even the UI source must be private. Add backups and monitoring.
+
+FONT SYNC (optional, NOT enabled; this file works offline with fallbacks)
+The dropdown includes Inter, Roboto, Playfair Display, Open Sans, Montserrat,
+Cardo and web-safe fonts. Named fonts use fallbacks until installed or loaded.
+For exact offline matching, embed licensed WOFF2 bytes as a data: font-face in
+this style block and allow font-src data: in CSP. Use the same CSS publicly:
+  @font-face { font-family: 'Cardo'; font-style: normal; font-weight: 400;
+    font-display: swap; src: url('data:font/woff2;base64,YOUR_FONT_BYTES') format('woff2'); }
+For hosted fonts, put trusted font files under /fonts and use font-src 'self'.
+Alternatively add a Google Fonts stylesheet to BOTH pages, e.g. Inter/Roboto/
+Playfair Display/Open Sans/Montserrat. Then permit https://fonts.googleapis.com
+in style-src and https://fonts.gstatic.com in font-src. Do not enable arbitrary
+remote origins or reuse another site's paid font kit without your own license.
+Keep the FONTS map and server/public renderer allowlists synchronized.
+
+Docs: https://supabase.com/docs/guides/auth
+https://supabase.com/docs/guides/database/postgres/row-level-security
+https://developers.google.com/search/docs/crawling-indexing/robots/intro
+-->
+</head>
+<body>
+<main id="root" class="center"><div><p class="eyebrow">404</p><h1>Page not found</h1><p class="muted">The requested page is unavailable.</p><a href="/index.html">Return home</a></div></main>
+<noscript>JavaScript is required for this prototype.</noscript>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<template id="login-template">
+<main class="center"><section class="login card stack" aria-labelledby="login-title">
+<div class="brand"><span>S</span>Serazul Hoque</div><div><p class="eyebrow">Administration · prototype</p><h1 id="login-title">Welcome back.</h1></div>
+<p class="notice">Local demo only. Use a dummy email/password. Any valid email and a 12+ character password pass this demo; no real account is authenticated.</p>
+<form id="login-form" class="stack"><label>Email<input id="email" type="email" autocomplete="username" required maxlength="254"></label><label>Dummy password<span class="password"><input id="password" type="password" autocomplete="off" required minlength="12" maxlength="128"><button id="show-password" class="btn" type="button" aria-controls="password" aria-pressed="false">Show</button></span></label><label class="check"><input id="consent" type="checkbox" required><span>I understand this is a browser-only demo.</span></label><p id="login-error" class="error" role="alert"></p><button id="login-submit" class="btn primary" disabled>Enter demo dashboard</button></form><small>Demo data resets on refresh/logout. No real credentials are stored.</small>
+</section></main>
+</template>
+
+<template id="dashboard-template">
+<div class="app"><aside class="sidebar"><div class="brand"><span>S</span>Site workspace</div><nav aria-label="Admin sections"><button class="nav" data-view="overview" aria-current="page">Overview</button><button class="nav" data-view="content">Create / Edit Content</button><button class="nav" data-view="media">Media Uploader</button><button class="nav" data-view="settings">Site Settings</button></nav><footer><small id="identity"></small><button id="logout" class="btn">Log out</button></footer></aside>
+<main class="main"><header class="heading"><div class="row spread"><div><p class="eyebrow">Serazul Hoque · administration</p><h1 id="view-title" tabindex="-1">Overview</h1></div><span class="pill">LOCAL DEMO</span></div><p class="muted">Edits stay in this tab. “Published” is a demo status; your live website is unchanged.</p></header>
+<section id="overview" class="view"><div class="grid stats"><article class="card"><small>Total articles</small><p id="total-count" class="metric">0</p></article><article class="card"><small>Drafts</small><p id="draft-count" class="metric">0</p></article><article class="card"><small>Media uploads</small><p id="media-count" class="metric">0</p></article></div><article class="card"><h2>Recent activity</h2><ul id="activity" class="list"></ul></article></section>
+<section id="content" class="view" hidden><div class="grid columns"><article class="card"><div class="row spread"><h2>Articles</h2><button id="new-article" class="btn">New</button></div><ul id="article-list" class="list"></ul></article><article class="card"><h2 id="editor-title">Create article</h2><form id="article-form"><div class="grid" style="margin-top:16px"><label>Title<input id="article-title" required maxlength="120"></label><label>Status<select id="article-status"><option value="draft">Draft</option><option value="published">Published (demo)</option></select></label></div>
+<div id="toolbar" class="editor-toolbar" role="group" aria-label="Rich text formatting">
+<label>Apply to<select id="scope"><option value="selection">Selection / current block</option><option value="all">Whole article</option></select></label>
+<label class="font-picker">Font<select id="font"></select></label><label>Size<select id="size"><option>12</option><option>14</option><option>16</option><option selected>18</option><option>20</option><option>24</option><option>32</option><option>40</option><option>48</option></select></label>
+<button class="btn" type="button" data-format="bold" aria-label="Toggle bold"><b>B</b></button><button class="btn" type="button" data-format="italic" aria-label="Toggle italic"><i>I</i></button><button class="btn" type="button" data-align="left">Left</button><button class="btn" type="button" data-align="center">Center</button><button class="btn" type="button" data-align="right">Right</button><button class="btn" type="button" id="bullets">• List</button><label class="color-picker">Color<input id="color" type="color" value="#20251e"></label><button id="undo" class="btn" type="button">Undo</button><button id="redo" class="btn" type="button">Redo</button>
+</div>
+<div id="editor" class="editor" contenteditable="true" role="textbox" aria-label="Article rich text editor" aria-multiline="true" spellcheck="true"></div><div class="editor-meta"><span id="word-count">0 words</span><span>Popular fonts fall back until loaded. Paste inserts plain text.</span></div><div class="row"><button class="btn primary">Save article</button><button id="preview" class="btn" type="button">Preview</button><button id="delete-article" class="btn danger" type="button" disabled>Delete</button></div></form></article></div></section>
+<section id="media" class="view" hidden><article class="card stack"><h2>Image library</h2><p class="muted">PNG, JPEG or WEBP. Maximum 5 MiB each, 12 images and 25 MiB total. Files are previewed locally, not uploaded.</p><div id="drop-zone" class="drop"><p>Drag and drop images here</p><button id="choose-files" class="btn" type="button">Choose images</button><input id="files" type="file" hidden multiple accept="image/png,image/jpeg,image/webp"></div><p id="media-error" class="error" role="alert"></p><div id="media-grid" class="media-grid"></div></article></section>
+<section id="settings" class="view" hidden><div class="grid settings-grid"><article class="card stack"><h2>Site details</h2><form id="settings-form" class="stack"><label>Site title<input id="site-title" required maxlength="120"></label><label>Description<textarea id="site-description" required maxlength="160"></textarea></label><label>Contact email<input id="site-email" type="email" maxlength="254"></label><button class="btn primary">Save demo settings</button></form></article><article class="card stack"><h2>Admin credentials</h2><p class="notice">Form validation only. Real account changes require a verified backend session and recent MFA.</p><form id="credentials-form" class="stack"><label>New admin email<input id="admin-email" type="email" required maxlength="254"></label><label>Current dummy password<input id="current-password" type="password" autocomplete="off" minlength="12" maxlength="128" required></label><label>New dummy password<input id="new-password" type="password" autocomplete="off" minlength="12" maxlength="128" required></label><label>Confirm new dummy password<input id="confirm-password" type="password" autocomplete="off" minlength="12" maxlength="128" required></label><p id="credentials-error" class="error" role="alert"></p><button class="btn">Validate credentials form</button></form></article></div><article class="card" style="margin-top:20px"><h2>Production integration</h2><details><summary>How publishing becomes persistent</summary><ol><li>Connect email authentication and MFA to an HTTPS backend.</li><li>Authorize every operation using trusted admin IDs and database/storage policies.</li><li>Store each article’s validated JSON document, including allowlisted font styles, in your database.</li><li>Render published documents on the public site with the same safe renderer and trusted font CSS.</li><li>Replace these in-memory demo operations with authenticated API calls. Full security, font-sync and robots.txt instructions are included in the source comments.</li></ol></details></article></section>
+</main></div><dialog id="preview-dialog" class="preview-dialog" aria-labelledby="preview-title"><div class="row spread"><h2 id="preview-title">Article preview</h2><button id="close-preview" class="btn">Close</button></div><div id="preview-content" class="editor preview-copy"></div></dialog>
+</template>
+<script>
+"use strict";
+(() => {
+const KEY="hoque15062002", root=document.getElementById("root"), $=id=>document.getElementById(id);
+const FONTS={system:"system-ui, sans-serif",arial:"Arial, sans-serif",georgia:"Georgia, serif",times:"Times New Roman, serif",verdana:"Verdana, sans-serif",courier:"Courier New, monospace",inter:"Inter, system-ui, sans-serif",roboto:"Roboto, Arial, sans-serif",playfair:"Playfair Display, Georgia, serif",opensans:"Open Sans, Arial, sans-serif",montserrat:"Montserrat, Arial, sans-serif",cardo:"Cardo, Georgia, serif"};
+const FONT_LABELS={system:"System UI",arial:"Arial",georgia:"Georgia",times:"Times New Roman",verdana:"Verdana",courier:"Courier New",inter:"Inter",roboto:"Roboto",playfair:"Playfair Display",opensans:"Open Sans",montserrat:"Montserrat",cardo:"Cardo (site heading font)"};
+const TAGS=new Set(["p","div","span","strong","b","em","i","br","ul","ol","li","h2","h3","blockquote"]);
+const BLOCKED=new Set(["script","style","iframe","object","embed","svg","math","img","video","audio","link","meta","template"]);
+let authenticated=false, editing=null, articles=[], media=[], activities=[], settings={title:"Serazul Hoque",description:"Software, with a human purpose.",email:""}, counter=0, selectionRange=null, snapshots=[], historyIndex=-1, idle=0, toastTimer=0;
+const blankDocument=()=>[{type:"p",styles:{},children:[{type:"br",styles:{},children:[]}]}];
+function allowed(){const u=new URL(location.href);return u.pathname.replace(/\/+$/,"")==="/"+KEY||u.searchParams.get("access")===KEY;}
+function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
+function clean(s,max=20000){return String(s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,"").trim().slice(0,max);}
+function mount(id){root.className="";root.replaceChildren($(id).content.cloneNode(true));}
+function notify(message){clearTimeout(toastTimer);$("toast").textContent=message;toastTimer=setTimeout(()=>$("toast").textContent="",4500);}
+function log(message){activities.unshift({message,time:new Date()});activities=activities.slice(0,20);renderStats();}
+function armIdle(){clearTimeout(idle);if(authenticated)idle=setTimeout(()=>logout("Demo session expired."),15*60*1000);}
+function loginValid(){return $("email").validity.valid&&$("email").value.trim()!==""&&$("password").value.length>=12&&$("password").value.length<=128&&$("consent").checked;}
+async function handleLogin(event){
+ event.preventDefault();if(!allowed()||!loginValid())return;
+ const email=clean($("email").value,254), password=$("password").value;$("login-submit").disabled=true;
+ try{
+  /* PRODUCTION REPLACEMENT:
+   const result=await fetch('/api/admin/login',{method:'POST',credentials:'same-origin',
+    headers:{'Content-Type':'application/json','X-CSRF-Token':csrfFromBackend},
+    body:JSON.stringify({email,password})});
+   Backend must authenticate via your provider, complete MFA, verify signed JWT/
+   OAuth identity, check trusted admin membership and issue a secure session.
+   Handle challenge/failure before mounting the dashboard. Recheck authorization
+   on EVERY subsequent API operation. Never embed secrets or trust this boolean.
+   Change CSP connect-src to the actual trusted API origin when integrating. */
+  await Promise.resolve(); // DEMO ONLY: no network, no JWT, any valid dummy credentials.
+  if(!allowed())return;$("password").value="";authenticated=true;showDashboard(email);
+ }catch{if($("login-error"))$("login-error").textContent="Unable to sign in.";}
+ finally{if($("password"))$("password").value="";if($("login-submit"))$("login-submit").disabled=!loginValid();}
+}
+function showLogin(){mount("login-template");$("login-form").addEventListener("submit",handleLogin);$("login-form").addEventListener("input",()=>$("login-submit").disabled=!loginValid());$("show-password").onclick=()=>{const show=$("password").type==="password";$("password").type=show?"text":"password";$("show-password").textContent=show?"Hide":"Show";$("show-password").setAttribute("aria-pressed",String(show));};}
+function logout(message="Logged out. Demo data cleared."){authenticated=false;clearTimeout(idle);media.forEach(m=>URL.revokeObjectURL(m.url));articles=[];media=[];activities=[];editing=null;selectionRange=null;snapshots=[];historyIndex=-1;settings={title:"Serazul Hoque",description:"Software, with a human purpose.",email:""};if(allowed())showLogin();else{root.className="center";root.replaceChildren(el("h1","404 — Page not found"));}notify(message);}
+
+// The persisted format is a restricted JSON tree, NOT arbitrary HTML.
+// All user strings use textContent/value. No user data enters innerHTML, eval,
+// URLs or CSS text. Paste is plain text; untrusted attributes are never copied.
+function safeStyles(style){
+ const out={}, norm=s=>String(s).replace(/["']/g,"").replace(/\s+/g," ").trim().toLowerCase();
+ const font=Object.values(FONTS).find(f=>norm(f)===norm(style.fontFamily));if(font)out.fontFamily=font;
+ if(/^\d+(\.\d+)?px$/.test(style.fontSize)&&parseFloat(style.fontSize)>=8&&parseFloat(style.fontSize)<=96)out.fontSize=style.fontSize;
+ if(["normal","bold","400","700"].includes(style.fontWeight))out.fontWeight=style.fontWeight;
+ if(["normal","italic"].includes(style.fontStyle))out.fontStyle=style.fontStyle;
+ if(["left","center","right","justify"].includes(style.textAlign))out.textAlign=style.textAlign;
+ const color=String(style.color||"");
+ if(/^#[0-9a-f]{6}$/i.test(color))out.color=color;
+ else{const m=color.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/);if(m&&m.slice(1).every(v=>+v<=255))out.color=color;}
+ return out;
+}
+function readDocument(){
+ let count=0,remaining=20000;
+ function visit(n,depth){
+  if(++count>3000||depth>20||remaining<=0)return [];
+  if(n.nodeType===Node.TEXT_NODE){const text=n.data.slice(0,remaining).replace(/\u0000/g,"");remaining-=text.length;return [{type:"text",text}];}
+  if(n.nodeType!==Node.ELEMENT_NODE)return [];
+  const type=n.tagName.toLowerCase();if(BLOCKED.has(type))return [];
+  const children=Array.from(n.childNodes).flatMap(c=>visit(c,depth+1));
+  return TAGS.has(type)?[{type,styles:safeStyles(n.style),children}]:children;
+ }
+ return Array.from($("editor").childNodes).flatMap(n=>visit(n,0));
+}
+function renderDocument(target,doc){
+ target.replaceChildren();let count=0,remaining=20000;
+ function build(item,depth){
+  if(!item||++count>3000||depth>20||remaining<=0)return document.createTextNode("");
+  if(item.type==="text"){const text=String(item.text||"").slice(0,remaining);remaining-=text.length;return document.createTextNode(text);}
+  if(!TAGS.has(item.type))return document.createTextNode("");
+  const n=el(item.type);Object.assign(n.style,safeStyles(item.styles||{}));
+  (Array.isArray(item.children)?item.children:[]).forEach(child=>n.append(build(child,depth+1)));return n;
+ }
+ (Array.isArray(doc)?doc:[]).forEach(item=>target.append(build(item,0)));
+}
+function rememberSelection(){const s=window.getSelection();if(s.rangeCount&&$("editor")&&$("editor").contains(s.getRangeAt(0).commonAncestorContainer))selectionRange=s.getRangeAt(0).cloneRange();}
+function caretAtEnd(){const r=document.createRange();r.selectNodeContents($("editor"));r.collapse(false);const s=window.getSelection();s.removeAllRanges();s.addRange(r);selectionRange=r.cloneRange();}
+function activeRange(){const ed=$("editor");ed.focus();let r=selectionRange?.cloneRange();if(!r||!ed.contains(r.commonAncestorContainer)){r=document.createRange();r.selectNodeContents(ed);r.collapse(false);}if($("scope").value==="all")r.selectNodeContents(ed);const s=window.getSelection();s.removeAllRanges();s.addRange(r);return r;}
+function selectedBlocks(r){
+ const ed=$("editor"), all=Array.from(ed.querySelectorAll("p,div,h2,h3,blockquote,li")).filter(n=>n.parentElement===ed||(n.tagName==="LI"&&n.parentElement.parentElement===ed));
+ if(r.collapsed){let n=r.startContainer.nodeType===3?r.startContainer.parentElement:r.startContainer;while(n&&n!==ed){if(all.includes(n))return[n];n=n.parentElement;}if(!ed.firstChild){const p=el("p");p.append(el("br"));ed.append(p);return[p];}return all.length?[all[all.length-1]]:[];}
+ return all.filter(n=>r.intersectsNode(n));
+}
+function commit(){const snapshot=JSON.stringify(readDocument());if(snapshots[historyIndex]!==snapshot){snapshots=snapshots.slice(0,historyIndex+1);snapshots.push(snapshot);if(snapshots.length>50)snapshots.shift();historyIndex=snapshots.length-1;}updateEditorMeta();}
+function updateEditorMeta(){const words=($("editor").innerText||$("editor").textContent).trim().split(/\s+/).filter(Boolean).length;$("word-count").textContent=words+" words · "+$("editor").textContent.length+" / 20,000 characters";$("undo").disabled=historyIndex<=0;$("redo").disabled=historyIndex>=snapshots.length-1;}
+function applyStyle(property,value){
+ const r=activeRange(),blocks=selectedBlocks(r);
+ if(r.collapsed||$("scope").value==="all"){blocks.forEach(b=>{b.style[property]=value;b.querySelectorAll("*").forEach(child=>child.style[property]=value);});rememberSelection();commit();return;}
+ // Wrap individual selected text fragments, never place block elements in spans.
+ const walker=document.createTreeWalker($("editor"),NodeFilter.SHOW_TEXT),parts=[];let n;
+ while(n=walker.nextNode())if(r.intersectsNode(n)){const start=n===r.startContainer?r.startOffset:0,end=n===r.endContainer?r.endOffset:n.length;if(end>start)parts.push({n,start,end});}
+ let first=null,last=null;
+ for(const part of parts){let t=part.n;if(part.end<t.length)t.splitText(part.end);if(part.start)t=t.splitText(part.start);if(t.parentElement.tagName==="SPAN"&&t.parentElement.childNodes.length===1){t.parentElement.style[property]=value;}else{const span=el("span");span.style[property]=value;t.replaceWith(span);span.append(t);}first=first||t;last=t;}
+ if(first){const nr=document.createRange();nr.setStart(first,0);nr.setEnd(last,last.length);const s=window.getSelection();s.removeAllRanges();s.addRange(nr);selectionRange=nr.cloneRange();}commit();
+}
+function toggleEmphasis(kind){const r=activeRange();const n=r.startContainer.nodeType===3?r.startContainer.parentElement:r.startContainer;const style=getComputedStyle(n);if(kind==="bold")applyStyle("fontWeight",+style.fontWeight>=600?"400":"700");else applyStyle("fontStyle",style.fontStyle==="italic"?"normal":"italic");}
+function align(value){selectedBlocks(activeRange()).forEach(b=>b.style.textAlign=value);rememberSelection();commit();}
+function bullets(){
+ const blocks=selectedBlocks(activeRange());if(!blocks.length)return;
+ const lists=[...new Set(blocks.filter(b=>b.tagName==="LI").map(b=>b.parentElement))];
+ if(lists.length){
+  // List toggling operates on the entire selected list block.
+  lists.forEach(list=>{const f=document.createDocumentFragment();Array.from(list.children).forEach(li=>{const p=el("p");Object.assign(p.style,safeStyles(li.style));p.append(...li.childNodes);f.append(p);});list.replaceWith(f);});
+ }else{const roots=blocks.filter(b=>b.parentElement===$("editor"));if(!roots.length)return;const ul=el("ul");roots[0].before(ul);roots.forEach(b=>{const li=el("li");Object.assign(li.style,safeStyles(b.style));li.append(...b.childNodes);ul.append(li);b.remove();});}
+ caretAtEnd();commit();
+}
+function historyStep(delta){const next=historyIndex+delta;if(next<0||next>=snapshots.length)return;historyIndex=next;renderDocument($("editor"),JSON.parse(snapshots[next]));caretAtEnd();updateEditorMeta();}
+function resetEditor(doc=blankDocument()){selectionRange=null;renderDocument($("editor"),doc);snapshots=[];historyIndex=-1;commit();}
+function newArticle(){editing=null;$("article-form").reset();$("editor-title").textContent="Create article";$("delete-article").disabled=true;resetEditor();$("article-title").focus();}
+function installEditor(){
+ Object.entries(FONTS).forEach(([key,font])=>{const o=el("option",FONT_LABELS[key]);o.value=key;o.style.fontFamily=font;$("font").append(o);});$("font").value="georgia";
+ $("toolbar").addEventListener("pointerdown",e=>{if(e.target.closest("button"))e.preventDefault();});
+ $("font").onchange=()=>applyStyle("fontFamily",FONTS[$("font").value]);$("size").onchange=()=>applyStyle("fontSize",$("size").value+"px");$("color").onchange=()=>applyStyle("color",$("color").value);
+ document.querySelectorAll("[data-format]").forEach(b=>b.onclick=()=>toggleEmphasis(b.dataset.format));document.querySelectorAll("[data-align]").forEach(b=>b.onclick=()=>align(b.dataset.align));$("bullets").onclick=bullets;$("undo").onclick=()=>historyStep(-1);$("redo").onclick=()=>historyStep(1);
+ $("editor").addEventListener("input",()=>{if($("editor").textContent.length>20000){renderDocument($("editor"),JSON.parse(snapshots[historyIndex]));caretAtEnd();notify("Article limit: 20,000 characters.");}rememberSelection();commit();});
+ $("editor").addEventListener("keydown",e=>{if(e.ctrlKey||e.metaKey){const k=e.key.toLowerCase();if(["b","i","z","y"].includes(k)){e.preventDefault();if(k==="b"||k==="i")toggleEmphasis(k==="b"?"bold":"italic");else historyStep(k==="y"||e.shiftKey?1:-1);}}});
+ $("editor").addEventListener("paste",e=>{e.preventDefault();const text=(e.clipboardData?.getData("text/plain")||"").slice(0,20000-$("editor").textContent.length);const s=window.getSelection();if(!s.rangeCount)return;const r=s.getRangeAt(0);if(!$("editor").contains(r.commonAncestorContainer))return;r.deleteContents();const f=document.createDocumentFragment();text.split(/\r?\n/).forEach((line,i)=>{if(i)f.append(el("br"));f.append(document.createTextNode(line));});const last=f.lastChild;if(last){r.insertNode(f);r.setStartAfter(last);r.collapse(true);s.removeAllRanges();s.addRange(r);}rememberSelection();commit();});
+ $("editor").addEventListener("drop",e=>e.preventDefault());
+ $("preview").onclick=()=>{$("preview-title").textContent=clean($("article-title").value,120)||"Article preview";renderDocument($("preview-content"),readDocument());$("preview-dialog").showModal();};$("close-preview").onclick=()=>$("preview-dialog").close();resetEditor();
+}
+function renderStats(){if(!$("total-count"))return;$("total-count").textContent=articles.length;$("draft-count").textContent=articles.filter(a=>a.status==="draft").length;$("media-count").textContent=media.length;$("activity").replaceChildren();activities.forEach(a=>{const li=el("li");li.append(el("p",a.message),el("small",a.time.toLocaleString()));$("activity").append(li);});}
+function renderArticles(){$("article-list").replaceChildren();if(!articles.length)$("article-list").append(el("li","No articles yet.","muted"));articles.forEach(a=>{const li=el("li"),b=el("button","Edit","btn");li.append(el("strong",a.title),el("small",a.status+" · "+a.updated.toLocaleString()));b.type="button";b.setAttribute("aria-label","Edit "+a.title);b.onclick=()=>{editing=a.id;$("article-title").value=a.title;$("article-status").value=a.status;$("editor-title").textContent="Edit article";$("delete-article").disabled=false;resetEditor(a.document);$("article-title").focus();};li.append(b);$("article-list").append(li);});}
+function receiveImages(files){const errors=[],types={png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",webp:"image/webp"};for(const file of files){const ext=file.name.split(".").pop().toLowerCase();if(types[ext]!==file.type||!types[ext]){errors.push(file.name+": PNG, JPEG or WEBP only.");continue;}if(!file.size||file.size>5*1024*1024){errors.push(file.name+": maximum 5 MiB, nonempty.");continue;}if(media.length>=12||media.reduce((s,m)=>s+m.file.size,0)+file.size>25*1024*1024){errors.push("Image library limit reached.");break;}media.push({id:++counter,file,url:URL.createObjectURL(file)});log("Added demo image: "+clean(file.name,150));}$("media-error").textContent=errors.join(" ");$("files").value="";renderMedia();}
+function renderMedia(){$("media-grid").replaceChildren();media.forEach(m=>{const card=el("article",undefined,"media-card"),img=el("img"),remove=el("button","Remove","btn danger");img.src=m.url;img.alt=clean(m.file.name,150);img.onerror=()=>img.replaceWith(el("p","Invalid image / preview unavailable."));remove.onclick=()=>{URL.revokeObjectURL(m.url);media=media.filter(x=>x.id!==m.id);renderMedia();log("Removed a demo image.");};card.append(img,el("p",clean(m.file.name,150)),remove);$("media-grid").append(card);});}
+function switchView(name){if(!authenticated)return;const titles={overview:"Overview",content:"Create / Edit Content",media:"Media Uploader",settings:"Site Settings"};document.querySelectorAll(".view").forEach(n=>n.hidden=n.id!==name);document.querySelectorAll(".nav").forEach(n=>{if(n.dataset.view===name)n.setAttribute("aria-current","page");else n.removeAttribute("aria-current");});$("view-title").textContent=titles[name];$("view-title").focus();}
+function showDashboard(email){
+ mount("dashboard-template");$("identity").textContent="Demo: "+email;$("logout").onclick=()=>logout();document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>switchView(b.dataset.view));installEditor();renderArticles();renderMedia();$("new-article").onclick=newArticle;
+ $("article-form").onsubmit=e=>{e.preventDefault();const title=clean($("article-title").value,120),doc=readDocument();if(!title||!$("editor").textContent.trim())return notify("A title and article content are required.");const a={id:editing??++counter,title,status:$("article-status").value==="published"?"published":"draft",document:doc,updated:new Date()};const index=articles.findIndex(x=>x.id===a.id);if(index<0)articles.unshift(a);else articles[index]=a;log("Saved demo article: "+title);renderArticles();editing=a.id;$("delete-article").disabled=false;$("editor-title").textContent="Edit article";notify("Article and font styles saved in this tab only.");};
+ $("delete-article").onclick=()=>{if(editing===null||!confirm("Delete this demo article?"))return;articles=articles.filter(a=>a.id!==editing);newArticle();renderArticles();log("Deleted a demo article.");};
+ $("choose-files").onclick=()=>$("files").click();$("files").onchange=e=>receiveImages(e.target.files);$("drop-zone").ondragover=e=>{e.preventDefault();$("drop-zone").classList.add("over");};$("drop-zone").ondragleave=()=>$("drop-zone").classList.remove("over");$("drop-zone").ondrop=e=>{e.preventDefault();$("drop-zone").classList.remove("over");receiveImages(e.dataTransfer.files);};
+ $("site-title").value=settings.title;$("site-description").value=settings.description;$("site-email").value=settings.email;$("admin-email").value=email;
+ $("settings-form").onsubmit=e=>{e.preventDefault();const title=clean($("site-title").value,120),description=clean($("site-description").value,160);if(!title||!description)return notify("Title and description cannot be blank.");settings={title,description,email:clean($("site-email").value,254)};log("Saved demo site settings.");notify("Settings saved in this tab only.");};
+ $("credentials-form").onsubmit=e=>{e.preventDefault();const next=$("new-password").value;if(next!==$("confirm-password").value){$("credentials-error").textContent="New passwords do not match.";return;}if(next===$("current-password").value){$("credentials-error").textContent="Use a different new dummy password.";return;}/* Production: reauthenticate + MFA, then call provider-backed credential APIs. */$("credentials-form").reset();$("credentials-error").textContent="";notify("Validation passed. No account or password was changed.");};
+ log("Opened the rich-text admin demo.");armIdle();$("view-title").focus();
+}
+document.addEventListener("selectionchange",rememberSelection);document.addEventListener("pointerdown",armIdle,{passive:true});document.addEventListener("keydown",armIdle);document.addEventListener("dragover",e=>e.preventDefault());document.addEventListener("drop",e=>e.preventDefault());window.addEventListener("beforeunload",()=>media.forEach(m=>URL.revokeObjectURL(m.url)));
+function routeChanged(){if(!allowed())logout("Access route closed.");else if(!authenticated)showLogin();}window.addEventListener("popstate",routeChanged);window.addEventListener("hashchange",routeChanged);if(allowed())showLogin();
+})();
+</script>
+</body>
+</html>
