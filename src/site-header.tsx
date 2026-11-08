@@ -27,7 +27,6 @@ export default function SiteHeader() {
 
   useEffect(() => {
     const controller = new AbortController();
-    let imageUrl = "";
     fetch("https://serazul-backend.vercel.app/api/public/profile", {
       signal: controller.signal, credentials: "omit", cache: "no-store"
     }).then(response => {
@@ -35,11 +34,10 @@ export default function SiteHeader() {
       return response.json();
     }).then(data => {
       if (!controller.signal.aborted && typeof data.url === "string" && /^https:\/\//.test(data.url)) {
-        imageUrl = data.url;
         setProfilePhoto(data.url);
       }
     }).catch(() => {/* The placeholder remains when no photo has been assigned. */});
-    return () => { controller.abort(); imageUrl = ""; };
+    return () => controller.abort();
   }, []);
 
   const brand = <><span className="brand-mark brand-avatar" aria-hidden="true">
