@@ -32,6 +32,143 @@ const scenarios = [
   { label: "A first conversation", title: "Make the first interaction feel welcoming.", text: "A short greeting and a clear prompt could help someone take their first step with AI. Before adding features, the experience would need to work for the people it aims to serve.", input: "A simple hello", output: "A welcoming next step", note: "Observe a first-time user and listen to what feels unclear." },
 ];
 
+// Public content needs no password, Supabase key or admin token.
+const ARTICLES_API = "https://serazul-backend.vercel.app/api/public/articles";
+type PublishedArticle = { id: string; title: string; document: unknown; published_at: string | null };
+
+function ArticleDocument({ content }: { content: unknown }) {
+  const container = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!container.current) return;
+    const tags = new Set(["p", "div", "span", "strong", "b", "em", "i", "br", "ul", "ol", "li", "h2", "h3", "blockquote"]);
+    const fonts = ["system-ui, sans-serif", "Arial, sans-serif", "Georgia, serif", "Times New Roman, serif", "Verdana, sans-serif", "Courier New, monospace", "Inter, system-ui, sans-serif", "Roboto, Arial, sans-serif", "Playfair Display, Georgia, serif", "Open Sans, Arial, sans-serif", "Montserrat, Arial, sans-serif", "Cardo, Georgia, serif"];
+    const normalize = (value: string) => value.replace(/["'\s]/g, "").toLowerCase();
+    let nodes = 0, characters = 0;
+    function append(parent: Node, item: unknown, depth: number) {
+      if (nodes >= 3000 || depth > 20 || !item || typeof item !== "object" || Array.isArray(item)) return;
+      nodes++;
+      const node = item as Record<string, unknown>;
+      if (node.type === "text") {
+        const text = typeof node.text === "string" ? node.text.slice(0, Math.max(0, 20000 - characters)) : "";
+        characters += text.length;
+        parent.appendChild(document.createTextNode(text));
+        return;
+      }
+      if (typeof node.type !== "string" || !tags.has(node.type)) return;
+      const element = document.createElement(node.type);
+      if (node.styles && typeof node.styles === "object" && !Array.isArray(node.styles)) {
+        const styles = node.styles as Record<string, unknown>;
+        // Deliberately copy only these style properties. No raw HTML, CSS or URLs.
+        if (typeof styles.fontFamily === "string") {
+          const family = fonts.find(font => normalize(font) === normalize(styles.fontFamily as string));
+          if (family) element.style.fontFamily = family;
+        }
+        if (typeof styles.fontSize === "string" && /^\d+(\.\d+)?px$/.test(styles.fontSize) && parseFloat(styles.fontSize) >= 8 && parseFloat(styles.fontSize) <= 96) element.style.fontSize = styles.fontSize;
+        if (typeof styles.fontWeight === "string" && ["normal", "bold", "400", "700"].includes(styles.fontWeight)) element.style.fontWeight = styles.fontWeight;
+        if (typeof styles.fontStyle === "string" && ["normal", "italic"].includes(styles.fontStyle)) element.style.fontStyle = styles.fontStyle;
+        if (typeof styles.textAlign === "string" && ["left", "center", "right", "justify"].includes(styles.textAlign)) element.style.textAlign = styles.textAlign;
+        if (typeof styles.color === "string") {
+          const rgb = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/.exec(styles.color);
+          if (/^#[\da-f]{6}$/i.test(styles.color) || (rgb && rgb.slice(1).every(value => Number(value) <= 255))) element.style.color = styles.color;
+        }
+      }
+      if (node.type !== "br" && Array.isArray(node.children)) {
+        for (const child of node.children) { if (nodes >= 3000) break; append(element, child, depth + 1); }
+      }
+      parent.appendChild(element);
+    }
+    const fragment = document.createDocumentFragment();
+    for (const item of Array.isArray(content) ? content : [content]) { if (nodes >= 3000) break; append(fragment, item, 0); }
+    container.current.replaceChildren(fragment);
+  }, [content]);
+  return <div ref={container} className="published-article-body" />;
+}
+
+function PublishedArticles() {
+  const [articles, setArticles] = useState<PublishedArticle[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [retry, setRetry] = useState(0);
+  const limit = 8;
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    setLoading(true); setError(""); setArticles([]);
+    async function load() {
+      try {
+        const response = await fetch(`${ARTICLES_API}?page=${page}&limit=${limit}`, { signal: controller.signal, credentials: "omit", cache: "no-store" });
+        if (!response.ok) throw new Error("Articles unavailable");
+        const data = await response.json();
+        if (!Array.isArray(data.items) || !Number.isInteger(data.total) || data.total < 0) throw new Error("Invalid article response");
+        const items: PublishedArticle[] = data.items.slice(0, limit).filter((item: unknown) => {
+          if (!item || typeof item !== "object") return false;
+          const article = item as Record<string, unknown>;
+          return typeof article.id === "string" && typeof article.title === "string" && article.status === "published";
+        });
+        if (active) { setArticles(items); setTotal(data.total); }
+      } catch {
+        if (active) setError("Articles couldn’t load right now. Please try again.");
+      } finally {
+        clearTimeout(timeout);
+        if (active) setLoading(false);
+      }
+    }
+    void load();
+    return () => { active = false; clearTimeout(timeout); controller.abort(); };
+  }, [page, retry]);
+
+  return <section id="articles" className="published-articles wrap section-space" aria-labelledby="articles-title" tabIndex={-1}>
+    <style>{`
+      .published-articles{border-top:1px solid var(--line)}
+      .published-articles>h2{font-family:var(--font-display);font-size:clamp(36px,5vw,58px);font-weight:400;line-height:1.15;margin:24px 0 12px}
+      .published-articles-intro{color:var(--muted);font-size:17px;line-height:1.6;margin-bottom:30px}
+      .published-articles-list{display:grid;gap:24px}
+      .published-article{min-width:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+      .published-article-heading{padding:24px clamp(18px,4vw,32px)}
+      .published-article-heading h3{font-family:var(--font-display);font-size:clamp(26px,3vw,36px);font-weight:400;line-height:1.25;overflow-wrap:anywhere}
+      .published-article-heading time{display:block;font-size:12px;color:var(--muted);margin-top:10px}
+      .published-article-body{padding:24px clamp(18px,4vw,32px);background:#fffdf6;color:#20251e;font:17px/1.7 Georgia,serif;overflow-wrap:anywhere;white-space:pre-wrap}
+      .published-article-body p,.published-article-body div{margin:0 0 12px}
+      .published-article-body>:last-child{margin-bottom:0}
+      .published-article-body ul{list-style:disc;padding-left:1.5em}
+      .published-article-body ol{list-style:decimal;padding-left:1.5em}
+      .published-article-body strong,.published-article-body b{font-weight:700}
+      .published-article-body em,.published-article-body i{font-style:italic}
+      .published-article-body h2{font-size:1.5em;margin:16px 0 10px}
+      .published-article-body h3{font-size:1.25em;margin:16px 0 10px}
+      .published-article-body blockquote{border-left:3px solid #a6be79;padding-left:16px;margin:16px 0}
+      .published-articles-status{padding:20px 0;color:var(--muted);line-height:1.6}
+      .published-articles-pagination{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px}
+      .published-articles-pagination button:disabled{opacity:.45;cursor:default}
+    `}</style>
+    <div className="section-label"><span>04 / NOTES ALONG THE WAY</span><span className="small-line" /></div>
+    <h2 id="articles-title">Latest writing.</h2>
+    <p className="published-articles-intro">Thoughts, discoveries, and things I’m learning.</p>
+    <div aria-busy={loading}>
+      {loading && <p className="published-articles-status" role="status">Loading articles…</p>}
+      {error && <div className="published-articles-status" role="status"><p>{error}</p><button type="button" className="button button-dark" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
+      {!loading && !error && articles.length === 0 && <p className="published-articles-status">No articles on this page yet.</p>}
+      <div className="published-articles-list">{articles.map(article => {
+        const date = typeof article.published_at === "string" ? new Date(article.published_at) : null;
+        const validDate = date && !Number.isNaN(date.getTime());
+        return <article className="published-article" key={article.id}>
+          <header className="published-article-heading"><h3>{article.title}</h3>{validDate && <time dateTime={date.toISOString()}>{date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</time>}</header>
+          <ArticleDocument content={article.document} />
+        </article>;
+      })}</div>
+    </div>
+    {!error && (page > 1 || total > limit) && <nav className="published-articles-pagination" aria-label="Article pages">
+      <button type="button" className="button button-dark" disabled={loading || page === 1} onClick={() => setPage(value => value - 1)}>Previous</button>
+      <span>Page {page}</span>
+      <button type="button" className="button button-dark" disabled={loading || page * limit >= total} onClick={() => setPage(value => value + 1)}>Next</button>
+    </nav>}
+  </section>;
+}
+
+
 export default function Home() {
   const [scenario, setScenario] = useState(0);
   const [notice, setNotice] = useState("");
@@ -107,6 +244,7 @@ export default function Home() {
           <article data-reveal><span className="focus-index">03</span><div><h3>Clearer ways to learn</h3><p>Interactive examples, visual explanations, and making complicated ideas easier to approach.</p><span className="focus-tag">A PERSONAL INTEREST</span></div><span className="focus-symbol" aria-hidden="true"><Arrow diagonal /></span></article>
         </div></div>
       </section>
+      <PublishedArticles />
       <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">STILL EARLY. ALREADY CURIOUS.</p><h2>Good software begins<br />with a <em>human question.</em></h2><p>Mine is how to help more people be understood.<br />This portfolio is a starting point for that journey.</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="#home">Back to top ↑</a></footer>
