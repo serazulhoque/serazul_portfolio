@@ -246,13 +246,55 @@ const DEFAULT_PAGE_SECTIONS: PageSections = {
   contact_paragraph: "Have a question, idea, or something you’d like to discuss with me? I’d love to get back to you..."
 };
 
+
+function useLivePageCopy() {
+  // Don't render stale build-time copy before the actual saved content is loaded.
+  const [copy,setCopy]=useState<PageSections|null>(null);
+  useEffect(()=>{
+    const controller=new AbortController();
+    const api="https://serazul-backend.vercel.app/api/public/sections";
+    const direct="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/page_sections?select=*&id=eq.1";
+    async function load(){
+      try{
+        let data:Record<string,unknown>;
+        try{
+          const response=await fetch(api,{signal:controller.signal,credentials:"omit",cache:"no-store"});
+          if(!response.ok)throw new Error("Page text API unavailable");
+          data=await response.json();
+        }catch(error){
+          if(controller.signal.aborted)return;
+          const response=await fetch(direct,{signal:controller.signal,credentials:"omit",cache:"no-store",
+            headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"}});
+          if(!response.ok)throw error;
+          const rows=await response.json();
+          if(!Array.isArray(rows)||!rows[0])throw error;
+          data=rows[0];
+        }
+        if(controller.signal.aborted)return;
+        const next={...DEFAULT_PAGE_SECTIONS};
+        for(const key of Object.keys(next) as Array<keyof PageSections>){
+          const value=data[key];
+          if(typeof value==="string"&&value.trim()&&value.length<=(key.includes("paragraph")||key==="hero_intro"?2500:160))
+            next[key]=value;
+        }
+        setCopy(next);
+      }catch{
+        if(!controller.signal.aborted)setCopy(DEFAULT_PAGE_SECTIONS);
+      }
+    }
+    void load();
+    return ()=>controller.abort();
+  },[]);
+  return copy;
+}
+
 function Home() {
   const {items,entriesLoaded,labels}=useSiteContent();
   const t=(key:string,fallback:string)=>textValue(labels,key,fallback);
   const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
-  const [pageCopy, setPageCopy] = useState<PageSections>(DEFAULT_PAGE_SECTIONS);
+  const pageCopy=useLivePageCopy();
   useEffect(() => {
     const controller = new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/settings", { signal: controller.signal, credentials: "omit" })
@@ -262,26 +304,6 @@ function Home() {
           setContactEmail(settings.contact_email);
         }
       }).catch(() => {/* No public address has been configured. */});
-    return () => controller.abort();
-  }, []);
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch("https://serazul-backend.vercel.app/api/public/sections", {
-      signal:controller.signal,credentials:"omit",cache:"no-store"
-    }).then(response => {
-      if(!response.ok)throw new Error("Sections unavailable");
-      return response.json();
-    }).then(data => {
-      if(controller.signal.aborted || !data || typeof data !== "object")return;
-      const next:PageSections = {...DEFAULT_PAGE_SECTIONS};
-      const keys=(Object.keys(DEFAULT_PAGE_SECTIONS) as Array<keyof PageSections>);
-      for(const key of keys) {
-        const value=data[key];
-        if(typeof value === "string" && value.trim().length > 0 &&
-           value.length <= (key.includes("paragraph") || key === "hero_intro" ? 2500 : 160)) next[key]=value;
-      }
-      setPageCopy(next);
-    }).catch(() => { /* Use the latest saved fallback if the API is temporarily unavailable. */ });
     return () => controller.abort();
   }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
@@ -315,8 +337,8 @@ function Home() {
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
           <p className="eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
-          <h1>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
-          <p className="hero-intro">{pageCopy.hero_intro}</p>
+          <h1>{pageCopy?.hero_line_one}{" "}<br />{pageCopy?.hero_line_two}{" "}<span className="hero-purpose">{pageCopy?.hero_phrase} <em>{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
+          <p className="hero-intro">{pageCopy?.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
@@ -341,8 +363,8 @@ function Home() {
       <ContentStories items={items} section="publications" />
       <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span>{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
-        <h2 id="contact-title">{pageCopy.contact_heading}</h2>
-        <p>{pageCopy.contact_paragraph}</p>
+        <h2 id="contact-title">{pageCopy?.contact_heading}</h2>
+        <p>{pageCopy?.contact_paragraph}</p>
         <div className="contact-actions">
           {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
             <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
@@ -445,32 +467,7 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
 function AboutPage() {
   const {items,entriesLoaded,labels}=useSiteContent();
   const t=(key:string,fallback:string)=>textValue(labels,key,fallback);
-  const [copy,setCopy] = useState({
-    about_line_one: DEFAULT_PAGE_SECTIONS.about_line_one,
-    about_line_two: DEFAULT_PAGE_SECTIONS.about_line_two,
-    about_paragraph_one: DEFAULT_PAGE_SECTIONS.about_paragraph_one,
-    about_paragraph_two: DEFAULT_PAGE_SECTIONS.about_paragraph_two
-  });
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch("https://serazul-backend.vercel.app/api/public/sections", {
-      signal: controller.signal, credentials: "omit", cache: "no-store"
-    }).then(response => {
-      if (!response.ok) throw new Error("About text unavailable");
-      return response.json();
-    }).then(data => {
-      if (controller.signal.aborted || !data) return;
-      setCopy(previous => {
-        const next = {...previous};
-        for (const key of Object.keys(next) as Array<keyof typeof next>) {
-          if (typeof data[key] === "string" && data[key].trim() &&
-              data[key].length <= (key.includes("paragraph") ? 2500 : 160)) next[key] = data[key];
-        }
-        return next;
-      });
-    }).catch(() => {/* Use the existing wording when offline. */});
-    return () => controller.abort();
-  }, []);
+  const copy=useLivePageCopy();
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
@@ -479,8 +476,8 @@ function AboutPage() {
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
         <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
         <div className="about-main">
-          <h2>{copy.about_line_one}<br /><em>{copy.about_line_two}</em></h2>
-          <div className="about-columns"><p>{copy.about_paragraph_one}</p><p>{copy.about_paragraph_two}</p></div>
+          <h2>{copy?.about_line_one}<br /><em>{copy?.about_line_two}</em></h2>
+          <div className="about-columns"><p>{copy?.about_paragraph_one}</p><p>{copy?.about_paragraph_two}</p></div>
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
