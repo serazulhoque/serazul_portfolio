@@ -40,6 +40,10 @@ export default function SiteHeader() {
     return () => controller.abort();
   }, []);
 
+  const isAboutPage = typeof window !== "undefined" && window.location.pathname.endsWith("/about.html");
+  const homeHref = isAboutPage ? "/" : "#home";
+  const sectionHref = (section: string) => isAboutPage ? `/${section}` : section;
+
   const brand = <><span className="brand-mark brand-avatar" aria-hidden="true">
     {profilePhoto ? <img src={profilePhoto} alt="" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
       <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
@@ -126,15 +130,17 @@ export default function SiteHeader() {
   }, []);
 
   function follow(event: React.MouseEvent<HTMLAnchorElement>) {
+    const href = event.currentTarget.getAttribute("href") || "#home";
+    if (!href.startsWith("#")) return;
     event.preventDefault();
-    closeMenu(event.currentTarget.getAttribute("href") || "#home");
+    closeMenu(href);
   }
 
   return <>
     <header className="site-header wrap">
-      <a className="wordmark" href="#home" aria-label="Serazul Hoque home">{brand}</a>
+      <a className="wordmark" href={homeHref} aria-label="Serazul Hoque home">{brand}</a>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
-        <a href="#about">About me</a><a href="#contact">Get in touch</a><a href="#articles">Publication</a><a href="#explorations">What I’m exploring</a>
+        <a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href={sectionHref("#articles")}>Publication</a><a href={sectionHref("#explorations")}>What I’m exploring</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
       <button className="menu-orb" onClick={openMenu} disabled={!ready} aria-haspopup="dialog" aria-controls="portfolio-menu" aria-label="Open menu"><MenuIcon /></button>
     </header>
@@ -145,11 +151,11 @@ export default function SiteHeader() {
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
         <nav className="menu-links" aria-label="Portfolio navigation">
-          <a href="#about" onClick={follow}>About me</a>
-          <a href="#contact" onClick={follow}>Get in touch</a>
-          <a href="#articles" onClick={follow}>Publication</a>
-          <a href="#explorations" onClick={follow}>What I am exploring</a>
-          <a href="#home" onClick={follow}>Back to start</a>
+          <a href="/about.html">About me</a>
+          <a href={sectionHref("#contact")} onClick={follow}>Get in touch</a>
+          <a href={sectionHref("#articles")} onClick={follow}>Publication</a>
+          <a href={sectionHref("#explorations")} onClick={follow}>What I am exploring</a>
+          <a href={homeHref} onClick={follow}>Back to start</a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>

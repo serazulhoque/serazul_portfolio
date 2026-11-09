@@ -241,7 +241,7 @@ const DEFAULT_PAGE_SECTIONS: PageSections = {
   contact_paragraph: "Have a question, idea, or something you'd like to discuss?"
 };
 
-export default function Home() {
+function Home() {
   const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
@@ -310,14 +310,10 @@ export default function Home() {
           <h1>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
           <p className="hero-intro">{pageCopy.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
-          <a className="subtle-link" href="#about">A little about me <span aria-hidden="true">↓</span></a>
+          <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
       </section>
       <div className="intro-strip wrap"><span>A PERSONAL CORNER OF THE INTERNET</span><p>Curiosity in the details. <em>Purpose in the bigger picture.</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
-      <section className="about-section wrap section-space" id="about" tabIndex={-1}>
-        <div className="section-label"><span>01 / A LITTLE CONTEXT</span><span className="small-line" /></div>
-        <div className="about-main" data-reveal><h2>{pageCopy.about_line_one}<br /><em>{pageCopy.about_line_two}</em></h2><div className="about-columns"><p>{pageCopy.about_paragraph_one}</p><p>{pageCopy.about_paragraph_two}</p></div><div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div></div>
-      </section>
       <section className="focus-section wrap section-space" id="explorations" tabIndex={-1}>
         <div className="section-label"><span>02 / BUILDING THE FOUNDATIONS</span><span className="small-line" /></div>
         <div className="focus-main"><div className="focus-heading" data-reveal><h2>Small steps.<br /><em>A bigger direction.</em></h2><p>The things I’m learning and the questions I want to keep exploring.</p></div><div className="focus-list">
@@ -350,4 +346,54 @@ export default function Home() {
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="#home">Back to top ↑</a></footer>
     <div className={notice ? "toast visible" : "toast"} role="status" aria-live="polite">{notice}</div>
   </>;
+}
+
+function AboutPage() {
+  const [copy,setCopy] = useState({
+    about_line_one: DEFAULT_PAGE_SECTIONS.about_line_one,
+    about_line_two: DEFAULT_PAGE_SECTIONS.about_line_two,
+    about_paragraph_one: DEFAULT_PAGE_SECTIONS.about_paragraph_one,
+    about_paragraph_two: DEFAULT_PAGE_SECTIONS.about_paragraph_two
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("https://serazul-backend.vercel.app/api/public/sections", {
+      signal: controller.signal, credentials: "omit", cache: "no-store"
+    }).then(response => {
+      if (!response.ok) throw new Error("About text unavailable");
+      return response.json();
+    }).then(data => {
+      if (controller.signal.aborted || !data) return;
+      setCopy(previous => {
+        const next = {...previous};
+        for (const key of Object.keys(next) as Array<keyof typeof next>) {
+          if (typeof data[key] === "string" && data[key].trim() &&
+              data[key].length <= (key.includes("paragraph") ? 2500 : 160)) next[key] = data[key];
+        }
+        return next;
+      });
+    }).catch(() => {/* Use the existing wording when offline. */});
+    return () => controller.abort();
+  }, []);
+  return <>
+    <a className="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main">
+      <section className="about-section wrap section-space" id="about" tabIndex={-1}>
+        <div className="section-label"><span>01 / A LITTLE CONTEXT</span><span className="small-line" /></div>
+        <div className="about-main">
+          <h2>{copy.about_line_one}<br /><em>{copy.about_line_two}</em></h2>
+          <div className="about-columns"><p>{copy.about_paragraph_one}</p><p>{copy.about_paragraph_two}</p></div>
+          <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
+        </div>
+        <a className="subtle-link" href="/">← Back to homepage</a>
+      </section>
+    </main>
+    <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
+  </>;
+}
+
+export default function App() {
+  return typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
+    ? <AboutPage /> : <Home />;
 }
