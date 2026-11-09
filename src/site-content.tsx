@@ -4,12 +4,13 @@ export type SiteEntry={
   id:string;section:"home"|"about"|"contact"|"publications"|"exploring";
   kind:"story"|"timeline"|"experience";title:string;subtitle:string;body:string;date_label:string;sort_order:number
 };
-type SiteData={items:SiteEntry[];entriesLoaded:boolean;labels:Record<string,string>};
+type SiteData={items:SiteEntry[];entriesLoaded:boolean;labels:Record<string,string>;labelsLoaded:boolean};
 const BASE="https://serazul-backend.vercel.app/api/public";
 export function useSiteContent():SiteData{
   const [items,setItems]=useState<SiteEntry[]>([]);
   const [entriesLoaded,setEntriesLoaded]=useState(false);
   const [labels,setLabels]=useState<Record<string,string>>({});
+  const [labelsLoaded,setLabelsLoaded]=useState(false);
   useEffect(()=>{
     const controller=new AbortController();
     fetch(BASE+"/content-entries",{signal:controller.signal,cache:"no-store"})
@@ -18,14 +19,14 @@ export function useSiteContent():SiteData{
         if(controller.signal.aborted||!Array.isArray(data.items))return;
         setItems(data.items.filter((item:SiteEntry)=>item&&typeof item.title==="string"));
         setEntriesLoaded(true);
-      }).catch(()=>{});
+      }).catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setEntriesLoaded(true);});
     fetch(BASE+"/content-text",{signal:controller.signal,cache:"no-store"})
       .then(r=>r.ok?r.json():Promise.reject())
       .then(data=>{if(!controller.signal.aborted&&data&&typeof data==="object")setLabels(data);})
-      .catch(()=>{});
+      .catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setLabelsLoaded(true);});
     return ()=>controller.abort();
   },[]);
-  return {items,entriesLoaded,labels};
+  return {items,entriesLoaded,labels,labelsLoaded};
 }
 export function textValue(values:Record<string,string>,key:string,fallback:string):string{
   return typeof values[key]==="string"?values[key]:fallback;
