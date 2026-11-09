@@ -366,7 +366,7 @@ const journeyMilestones = [
     number:"01", phase:"THE SPARK", title:"Curiosity became a direction",
     short:"Finding the question worth pursuing",
     detail:"I began with a simple interest in what technology could make possible. Over time, that curiosity became a bigger question: how can the things I build be genuinely useful to people?",
-    symbol:"✳"
+    symbol:"𝒮"
   },
   {
     number:"02", phase:"THE CHOICE", title:"Choosing software engineering",
