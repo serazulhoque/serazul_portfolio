@@ -567,3 +567,6 @@
   white-space:pre-wrap;
   overflow-wrap:anywhere;
 }
+
+/* Timeline titles use the full row after removing their serial numbers. */
+.journey-inline .journey-step{grid-template-columns:minmax(0,1fr) 20px}
