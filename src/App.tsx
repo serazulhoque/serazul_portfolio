@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import SiteHeader from "./site-header";
+import SiteDesign from "./site-design";
 import PortfolioAssistant from "./portfolio-assistant";
 import VisitorWall from "./visitor-wall";
 import VisitAnalytics from "./visit-analytics";
@@ -495,6 +496,9 @@ function AboutPage() {
 }
 
 export default function App() {
-  return typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
-    ? <AboutPage /> : <Home />;
+  return <>
+    <SiteDesign />
+    {typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
+      ? <AboutPage /> : <Home />}
+  </>;
 }
