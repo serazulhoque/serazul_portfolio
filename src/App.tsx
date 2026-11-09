@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import SiteHeader from "./site-header";
 import PortfolioAssistant from "./portfolio-assistant";
+import VisitAnalytics from "./visit-analytics";
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -304,6 +305,7 @@ function Home() {
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
+    <VisitAnalytics />
     <main id="main">
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
@@ -461,6 +463,7 @@ function AboutPage() {
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
+    <VisitAnalytics />
     <main id="main">
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
         <div className="section-label"><span>01 / A LITTLE CONTEXT</span><span className="small-line" /></div>
