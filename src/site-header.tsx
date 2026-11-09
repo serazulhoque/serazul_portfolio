@@ -39,7 +39,7 @@ export default function SiteHeader() {
   useEffect(() => {
     const controller = new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/profile", {
-      signal: controller.signal, credentials: "omit", cache: "no-store"
+      signal: controller.signal, credentials: "omit", cache: "default"
     }).then(response => {
       if (!response.ok) throw new Error("Profile unavailable");
       return response.json();
@@ -56,7 +56,7 @@ export default function SiteHeader() {
   const sectionHref = (section: string) => isAboutPage ? `/${section}` : section;
 
   const brand = <><span className="brand-mark brand-avatar" aria-hidden="true">
-    {profilePhoto ? <img src={profilePhoto} alt="" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
+    {profilePhoto ? <img src={profilePhoto} alt="" decoding="async" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
       <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
   </span><span className="brand-name">Serazul Hoque
     <svg className="brand-check" viewBox="0 0 24 24" role="img" aria-label="Blue check decoration">

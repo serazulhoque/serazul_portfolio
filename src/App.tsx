@@ -13,7 +13,7 @@ function HeroPhoto() {
   useEffect(()=>{
     const controller=new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/homepage-photo",{
-      signal:controller.signal,credentials:"omit",cache:"no-store"
+      signal:controller.signal,credentials:"omit",cache:"default"
     }).then(response=>{
       if(!response.ok)throw new Error("Photo unavailable");
       return response.json();
@@ -27,7 +27,7 @@ function HeroPhoto() {
   },[]);
   return <div className="hero-photo" data-reveal>
     {photo
-      ? <img src={photo.url} alt={photo.alt} referrerPolicy="no-referrer" onError={()=>setPhoto(null)} />
+      ? <img src={photo.url} alt={photo.alt} decoding="async" fetchPriority="high" referrerPolicy="no-referrer" onError={()=>setPhoto(null)} />
       : <div className="hero-photo-placeholder" role="img" aria-label="A personal photo will appear here">
           <span className="hero-photo-placeholder-mark" aria-hidden="true">SH.</span>
           <span className="hero-photo-placeholder-note">A PERSONAL PORTRAIT</span>
