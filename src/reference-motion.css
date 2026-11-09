@@ -3,7 +3,7 @@
 .hero h1,.about-main h2,.focus-heading h2,.project-heading h2,.scenario-copy h3,.focus-list h3,.closing-section h2,.brief-dialog h2,.brief-block h3,.art-title{letter-spacing:normal;font-weight:400;line-height:1.1}
 .hero h1 em,.about-main h2 em,.focus-heading h2 em,.project-heading h2 em,.closing-section h2 em,.brief-dialog h2 em,.art-title em{font-style:normal}
 .hero h1{font-size:clamp(64px,6.3vw,95px)}
-.hero h1 .hero-purpose{display:block;font-size:.61em;line-height:1.2;margin-top:.28em}
+.hero h1 .hero-purpose{display:block;font-size:1em;line-height:1.1;margin-top:.12em}
 .hero-intro{font-size:18px;line-height:1.5;max-width:415px}
 .about-columns p{font-size:16px;line-height:1.6}.project-heading p{font-size:16px;line-height:1.5}.scenario-copy p{font-size:15px;line-height:1.6}.focus-list p{font-size:15px;line-height:1.6}.focus-heading p{font-size:15px;line-height:1.6}.closing-section>p:not(.eyebrow){font-size:16px;line-height:1.6}.brief-block p{font-size:15px;line-height:1.6}.brief-lead{font-size:17px;line-height:1.5}
 .scenario-copy h3{font-size:36px}.art-title{font-size:51px}.intro-strip p{font-size:20px}.handwriting{letter-spacing:normal}
