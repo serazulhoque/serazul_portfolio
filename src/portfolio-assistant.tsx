@@ -7,7 +7,7 @@ type PreparedAnswer = {
   id: string; question: string; answer: string; keywords: string;
   is_suggested: boolean; sort_order: number;
 };
-const welcome = "Hi! I'm Serazul's portfolio guide. Ask about his studies, interests, writing, or how to contact him. I use prepared website information, not a generative AI model.";
+const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
 const fallback = "I don't have a prepared answer to that yet. Try a suggested question, or visit the About Me and Get in touch sections.";
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
 const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
