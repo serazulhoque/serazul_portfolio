@@ -47,3 +47,10 @@
   .contact-social-links{grid-template-columns:minmax(0,1fr)}
   .contact-social-links a{min-height:49px}
 }
+
+
+/* Mobile: keep the document within the viewport when swiping horizontally.
+   overflow-x:clip avoids creating a horizontal scroll container. */
+@media(max-width:1000px){
+  html,body{max-width:100%;overflow-x:clip}
+}
