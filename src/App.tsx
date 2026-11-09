@@ -248,29 +248,29 @@ const DEFAULT_PAGE_SECTIONS: PageSections = {
 
 
 function useLivePageCopy() {
-  // Don't render stale build-time copy before the actual saved content is loaded.
   const [copy,setCopy]=useState<PageSections|null>(null);
   useEffect(()=>{
     const controller=new AbortController();
-    const api="https://serazul-backend.vercel.app/api/public/sections";
-    const direct="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/page_sections?select=*&id=eq.1";
+    // Use the last successful version immediately on refresh. Do not show
+    // the old hard-coded text while waiting for the network.
+    const storageKey="serazul:page-copy:v1";
+    try{
+      const stored=JSON.parse(localStorage.getItem(storageKey)||"null") as Record<string,unknown>|null;
+      if(stored&&Object.keys(DEFAULT_PAGE_SECTIONS).every(key=>typeof stored[key]==="string"))
+        setCopy(stored as PageSections);
+    }catch{/* Private browsing or disabled storage: load directly from the database. */}
     async function load(){
       try{
-        let data:Record<string,unknown>;
-        try{
-          const response=await fetch(api,{signal:controller.signal,credentials:"omit",cache:"no-store"});
-          if(!response.ok)throw new Error("Page text API unavailable");
-          data=await response.json();
-        }catch(error){
-          if(controller.signal.aborted)return;
-          const response=await fetch(direct,{signal:controller.signal,credentials:"omit",cache:"no-store",
-            headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"}});
-          if(!response.ok)throw error;
-          const rows=await response.json();
-          if(!Array.isArray(rows)||!rows[0])throw error;
-          data=rows[0];
-        }
-        if(controller.signal.aborted)return;
+        // Read the published copy directly, without waiting for a backend
+        // function to start up and then making a second request.
+        const response=await fetch("https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/page_sections?select=*&id=eq.1",{
+          signal:controller.signal,credentials:"omit",cache:"no-store",
+          headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"}
+        });
+        if(!response.ok)throw new Error("Saved page text unavailable");
+        const rows=await response.json();
+        if(controller.signal.aborted||!Array.isArray(rows)||!rows[0])return;
+        const data=rows[0] as Record<string,unknown>;
         const next={...DEFAULT_PAGE_SECTIONS};
         for(const key of Object.keys(next) as Array<keyof PageSections>){
           const value=data[key];
@@ -278,8 +278,13 @@ function useLivePageCopy() {
             next[key]=value;
         }
         setCopy(next);
+        try{localStorage.setItem(storageKey,JSON.stringify(next));}catch{/* Cache is an optional speed improvement. */}
       }catch{
-        if(!controller.signal.aborted)setCopy(DEFAULT_PAGE_SECTIONS);
+        // A network outage must not replace previously saved copy with old text.
+        if(controller.signal.aborted)return;
+        try{
+          if(!localStorage.getItem(storageKey))setCopy(DEFAULT_PAGE_SECTIONS);
+        }catch{setCopy(DEFAULT_PAGE_SECTIONS);}
       }
     }
     void load();
