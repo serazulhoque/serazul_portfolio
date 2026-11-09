@@ -477,3 +477,22 @@
  .journey-inline.experience-section{padding-top:40px}
 }
 @media(prefers-reduced-motion:reduce){.journey-inline .journey-entry>.journey-detail{animation:none}}
+
+
+/* More compact visitor notes section, while keeping the same design. */
+.visitor-wall{padding-top:56px;padding-bottom:58px}
+.visitor-wall .section-label{margin-bottom:24px}
+.visitor-wall-intro{gap:30px;margin-bottom:23px}
+.visitor-wall-intro h2{font-size:clamp(31px,4vw,52px)}
+.visitor-wall-cards{gap:12px;margin-bottom:22px}
+.visitor-wall-card{padding:18px 17px}
+.visitor-wall-quote{font-size:17px;line-height:1.45;margin:14px 0}
+.visitor-wall-compose{gap:clamp(20px,3vw,45px);padding:clamp(18px,3vw,30px)}
+.visitor-wall-compose h3{font-size:clamp(26px,3vw,38px);margin:10px 0 12px}
+@media(max-width:600px){
+  .visitor-wall{padding-top:40px;padding-bottom:42px}
+  .visitor-wall-intro{gap:15px}
+  .visitor-wall-card{padding:16px}
+  .visitor-wall-quote{font-size:17px}
+  .visitor-wall-compose{padding:17px;gap:17px}
+}
