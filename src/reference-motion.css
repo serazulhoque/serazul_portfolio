@@ -376,3 +376,12 @@
 .extra-story-subtitle{font-family:var(--font-display);font-style:italic;font-size:17px;margin-top:13px;color:var(--muted)}
 .extra-story-body{font-size:15px;line-height:1.8;margin-top:17px;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:600px){.extra-stories{grid-template-columns:minmax(0,1fr);gap:12px;padding-bottom:45px}}
+
+
+/* Cardo body typography, matching the existing editorial headings. */
+.hero-intro,
+.about-page-main .about-columns p{
+  font-family:var(--font-display);
+  font-weight:400;
+  letter-spacing:normal;
+}
