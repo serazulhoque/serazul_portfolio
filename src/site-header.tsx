@@ -15,6 +15,17 @@ function ThemeToggle({ dark, ready, onToggle, inMenu = false, fade = 0 }: { dark
   </button>;
 }
 
+function MenuSymbol({ name }: { name: "about" | "contact" | "publication" | "explore" | "home" }) {
+  const paths = {
+    about: <><circle cx="12" cy="8" r="3.5" /><path d="M5 21v-2a7 7 0 0 1 14 0v2" /></>,
+    contact: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></>,
+    publication: <><path d="M12 6c-3.4-2-6.3-2-9-1v14c3-.9 6-.8 9 1 3-1.8 6-1.9 9-1V5c-2.7-1-5.6-1-9 1Z" /><path d="M12 6v14" /></>,
+    explore: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2.5 4.5-4.5 2.5 2.5-4.5 4.5-2.5Z" /></>,
+    home: <><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z" /><path d="M9 21v-8h6v8" /></>
+  };
+  return <svg className="menu-symbol" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
+
 export default function SiteHeader() {
   const dialog = useRef<HTMLDialogElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -151,11 +162,11 @@ export default function SiteHeader() {
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
         <nav className="menu-links" aria-label="Portfolio navigation">
-          <a href="/about.html">About me</a>
-          <a href={sectionHref("#contact")} onClick={follow}>Get in touch</a>
-          <a href={sectionHref("#articles")} onClick={follow}>Publication</a>
-          <a href={sectionHref("#explorations")} onClick={follow}>What I am exploring</a>
-          <a href={homeHref} onClick={follow}>HOME</a>
+          <a href="/about.html">About me <MenuSymbol name="about" /></a>
+          <a href={sectionHref("#contact")} onClick={follow}>Get in touch <MenuSymbol name="contact" /></a>
+          <a href={sectionHref("#articles")} onClick={follow}>Publication <MenuSymbol name="publication" /></a>
+          <a href={sectionHref("#explorations")} onClick={follow}>What I am exploring <MenuSymbol name="explore" /></a>
+          <a href={homeHref} onClick={follow}>HOME <MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>

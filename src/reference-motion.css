@@ -187,30 +187,27 @@
   .hero-photo{height:112vw;min-height:320px}
 }
 
-/* Aligned animated arrows beside each mobile menu option. */
+/* Distinct, right-aligned navigation symbols with gentle hover motion. */
 .menu-links>a{
   display:flex;
   align-items:center;
   justify-content:flex-end;
   gap:14px;
 }
-.menu-links>a::before{
-  content:"↗";
-  order:2;
-  display:inline-block;
-  width:20px;
-  flex:0 0 20px;
-  text-align:center;
+.menu-links>a::before{content:none}
+.menu-links>a .menu-symbol{
+  display:block;
+  flex:0 0 22px;
   color:var(--lime);
-  opacity:.55;
-  transform:translate(-3px,3px);
+  opacity:.75;
+  transform:translateY(0);
   transition:opacity .22s ease,transform .22s ease;
 }
-.menu-links>a:hover::before,.menu-links>a:focus-visible::before{
+.menu-links>a:hover .menu-symbol,.menu-links>a:focus-visible .menu-symbol{
   opacity:1;
-  transform:translate(2px,-2px);
+  transform:translateY(-3px) scale(1.08);
 }
 @media(prefers-reduced-motion:reduce){
-  .menu-links>a::before{transform:none;transition:none}
-  .menu-links>a:hover::before,.menu-links>a:focus-visible::before{transform:none}
+  .menu-links>a .menu-symbol{transition:none;transform:none}
+  .menu-links>a:hover .menu-symbol,.menu-links>a:focus-visible .menu-symbol{transform:none}
 }
