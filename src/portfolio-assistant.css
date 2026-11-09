@@ -101,3 +101,8 @@
 }
 @media(max-height:510px){.assistant-panel{height:calc(100dvh - 75px)}.assistant-topics{max-height:54px}}
 @media(prefers-reduced-motion:reduce){.assistant-launch{transition:none}.assistant-launch:hover{transform:none}}
+
+/* Small, optional chat-history notice and consent control. */
+.assistant-history-choice{display:flex;align-items:flex-start;gap:8px;padding:9px 15px 8px;font-size:11px;line-height:1.4;color:#656775;background:#fff;cursor:pointer}
+.assistant-history-choice input{accent-color:#6653ef;width:14px;height:14px;margin:1px 0 0;flex:none}
+.assistant-history-choice span{flex:1}
