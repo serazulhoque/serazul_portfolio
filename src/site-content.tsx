@@ -13,17 +13,42 @@ export function useSiteContent():SiteData{
   const [labelsLoaded,setLabelsLoaded]=useState(false);
   useEffect(()=>{
     const controller=new AbortController();
+    // Restore the last published content immediately after hydration.
+    try{
+      const stored=JSON.parse(localStorage.getItem("serazul:site-content:v1")||"null");
+      if(stored&&Array.isArray(stored.items)){
+        setItems(stored.items);
+        setEntriesLoaded(true);
+      }
+      if(stored&&stored.labels&&typeof stored.labels==="object"){
+        setLabels(stored.labels);
+        setLabelsLoaded(true);
+      }
+    }catch{/* Cached content is optional. */}
+
+    // Refresh cached content without blocking the visible page.
+    const write=(name:"items"|"labels",value:unknown)=>{
+      try{
+        const key="serazul:site-content:v1";
+        const cached=JSON.parse(localStorage.getItem(key)||"{}")||{};
+        localStorage.setItem(key,JSON.stringify({...cached,[name]:value}));
+      }catch{/* Storage may be unavailable. */}
+    };
     fetch(BASE+"/content-entries",{signal:controller.signal,cache:"no-store"})
       .then(r=>r.ok?r.json():Promise.reject())
       .then(data=>{
         if(controller.signal.aborted||!Array.isArray(data.items))return;
-        setItems(data.items.filter((item:SiteEntry)=>item&&typeof item.title==="string"));
-        setEntriesLoaded(true);
+        const valid=data.items.filter((item:SiteEntry)=>item&&typeof item.title==="string");
+        setItems(valid);
+        write("items",valid);
       }).catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setEntriesLoaded(true);});
     fetch(BASE+"/content-text",{signal:controller.signal,cache:"no-store"})
       .then(r=>r.ok?r.json():Promise.reject())
-      .then(data=>{if(!controller.signal.aborted&&data&&typeof data==="object")setLabels(data);})
-      .catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setLabelsLoaded(true);});
+      .then(data=>{
+        if(controller.signal.aborted||!data||typeof data!=="object"||Array.isArray(data))return;
+        setLabels(data);
+        write("labels",data);
+      }).catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setLabelsLoaded(true);});
     return ()=>controller.abort();
   },[]);
   return {items,entriesLoaded,labels,labelsLoaded};
