@@ -361,6 +361,76 @@ function DesignerSignature() {
   </div>;
 }
 
+const journeyMilestones = [
+  {
+    number:"01", phase:"THE SPARK", title:"Curiosity became a direction",
+    short:"Finding the question worth pursuing",
+    detail:"I began with a simple interest in what technology could make possible. Over time, that curiosity became a bigger question: how can the things I build be genuinely useful to people?",
+    symbol:"✳"
+  },
+  {
+    number:"02", phase:"THE CHOICE", title:"Choosing software engineering",
+    short:"Turning curiosity into a craft",
+    detail:"I chose software engineering as the place to turn ideas into working tools. My focus is not just learning how to code, but understanding how to solve problems thoughtfully.",
+    symbol:"{ }"
+  },
+  {
+    number:"03", phase:"RIGHT NOW", title:"Building the foundations",
+    short:"Learning the logic behind the code",
+    detail:"I'm strengthening my foundations through C, pseudocode, flowcharts, and programming logic. Each small step is part of a much bigger direction.",
+    symbol:"</>"
+  },
+  {
+    number:"04", phase:"LOOKING AHEAD", title:"Making more voices understood",
+    short:"Exploring useful, accessible AI",
+    detail:"One idea I want to explore is conversational AI that can communicate in Rohingya. It brings together my interest in technology, language, and helping people feel understood. This is an ambition, not a completed project.",
+    symbol:"↗"
+  }
+];
+
+function JourneyTimeline() {
+  const [selected,setSelected]=useState(0);
+  const current=journeyMilestones[selected];
+  return <section className="journey-section wrap section-space" id="my-journey" aria-labelledby="journey-title">
+    <div className="section-label"><span>02 / THE PATH SO FAR</span><span className="small-line" /></div>
+    <div className="journey-intro">
+      <div><p className="journey-eyebrow">A JOURNEY STILL UNFOLDING</p><h2 id="journey-title">Every step<br/><em>has a story.</em></h2></div>
+      <p>No perfect straight line. Just curiosity, choices, lessons, and a direction worth following.</p>
+    </div>
+    <div className="journey-layout">
+      <div className="journey-steps" aria-label="Explore journey milestones">
+        {journeyMilestones.map((step,index)=><button type="button" key={step.number}
+          className={"journey-step"+(selected===index?" is-active":"")}
+          onClick={()=>setSelected(index)}
+          aria-pressed={selected===index}
+          aria-controls="journey-detail">
+          <span className="journey-step-number">{step.number}</span>
+          <span className="journey-step-copy"><small>{step.phase}</small><strong>{step.title}</strong></span>
+          <span className="journey-step-arrow" aria-hidden="true">{selected===index?"↗":"→"}</span>
+        </button>)}
+      </div>
+      <article className="journey-detail" id="journey-detail" aria-live="polite" aria-atomic="true">
+        <div className="journey-detail-top"><span>CHAPTER {current.number} / 04</span><span className="journey-detail-symbol" aria-hidden="true">{current.symbol}</span></div>
+        <div className="journey-detail-body" key={current.number}>
+          <p className="journey-detail-phase">{current.phase}</p>
+          <h3>{current.title}</h3>
+          <p className="journey-detail-short">{current.short}</p>
+          <p className="journey-detail-description">{current.detail}</p>
+        </div>
+        <div className="journey-detail-bottom">
+          <div className="journey-progress" aria-label={`Step ${selected+1} of ${journeyMilestones.length}`}>
+            {journeyMilestones.map((step,index)=><span key={step.number} className={index<=selected?"filled":""} />)}
+          </div>
+          <div className="journey-controls">
+            <button type="button" aria-label="Previous chapter" disabled={selected===0} onClick={()=>setSelected(v=>v-1)}>←</button>
+            <button type="button" aria-label="Next chapter" disabled={selected===journeyMilestones.length-1} onClick={()=>setSelected(v=>v+1)}>→</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>;
+}
+
 function AboutPage() {
   const [copy,setCopy] = useState({
     about_line_one: DEFAULT_PAGE_SECTIONS.about_line_one,
@@ -399,8 +469,9 @@ function AboutPage() {
           <div className="about-columns"><p>{copy.about_paragraph_one}</p><p>{copy.about_paragraph_two}</p></div>
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
-        <a className="subtle-link" href="/">← Back to homepage</a>
       </section>
+      <JourneyTimeline />
+      <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
     <DesignerSignature />
