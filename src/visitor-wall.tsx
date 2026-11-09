@@ -1,7 +1,9 @@
 import {useEffect,useState,type FormEvent} from "react";
 
 type VisitorMessage={id:string;display_name:string;message:string;created_at:string};
-const API="https://serazul-backend.vercel.app/api/public/visitor-wall";
+const API="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/visitor_wall_messages";
+const PUBLIC_KEY="sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N";
+const HEADERS={"apikey":PUBLIC_KEY,"Content-Type":"application/json"};
 
 export default function VisitorWall(){
   const [items,setItems]=useState<VisitorMessage[]>([]);
@@ -11,9 +13,10 @@ export default function VisitorWall(){
   const [status,setStatus]=useState("");
   useEffect(()=>{
     const controller=new AbortController();
-    fetch(API,{signal:controller.signal,credentials:"omit",cache:"no-store"})
+    fetch(API+"?select=id,display_name,message,created_at&status=eq.approved&order=created_at.desc&limit=40",
+      {signal:controller.signal,credentials:"omit",cache:"no-store",headers:HEADERS})
       .then(r=>r.ok?r.json():Promise.reject())
-      .then(data=>{if(!controller.signal.aborted&&Array.isArray(data.items))setItems(data.items);})
+      .then(data=>{if(!controller.signal.aborted&&Array.isArray(data))setItems(data);})
       .catch(()=>{});
     return ()=>controller.abort();
   },[]);
@@ -23,11 +26,11 @@ export default function VisitorWall(){
     setBusy(true);setStatus("");
     try{
       const response=await fetch(API,{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        credentials:"omit",body:JSON.stringify({display_name:name.trim(),message:message.trim()})
+        method:"POST",headers:{...HEADERS,"Prefer":"return=minimal"},
+        credentials:"omit",body:JSON.stringify({display_name:name.trim(),message:message.trim(),status:"pending"})
       });
-      const result=await response.json().catch(()=>({}));
-      if(!response.ok)throw new Error(result.error||"Could not submit your message.");
+      const result=await response.ok?{}:await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error((result as {message?:string}).message||"Could not submit your message.");
       setName("");setMessage("");
       setStatus("Thank you! Your note has been sent for review. It will appear here only if approved.");
     }catch(error){
