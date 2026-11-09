@@ -93,7 +93,7 @@ export default function PortfolioAssistant() {
           <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         </button>
         {avatar("large")}
-        <div className="assistant-heading"><strong>Serazul Hoque</strong><small>Portfolio guide</small></div>
+        <div className="assistant-heading"><a className="assistant-name-link" href="/" aria-label="Go to Serazul Hoque homepage"><strong>Serazul Hoque</strong></a><small>Portfolio guide</small></div>
         <button type="button" className="assistant-icon-button assistant-info-button" aria-label="About this chatbot" aria-expanded={showInfo} onClick={()=>setShowInfo(v=>!v)}>
           <svg viewBox="0 0 24 24" width="25" height="25" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 10.5v6m0-10v.6" stroke="white" strokeWidth="2.2" strokeLinecap="round"/></svg>
         </button>
