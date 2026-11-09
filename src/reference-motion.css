@@ -347,3 +347,23 @@
 @media(min-width:1001px){
   .site-header.about-page-header{padding-right:86px}
 }
+
+/* About Me only: constrain timeline and text to the mobile viewport. */
+@media(max-width:1000px){
+  .about-page-main{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+  .about-page-main .about-section,
+  .about-page-main .journey-section,
+  .about-page-main .journey-return{max-width:calc(100% - 40px);min-width:0}
+  .about-page-main .about-main,
+  .about-page-main .about-columns,
+  .about-page-main .journey-layout,
+  .about-page-main .journey-steps,
+  .about-page-main .journey-detail,
+  .about-page-main .journey-detail-body{min-width:0;max-width:100%}
+  .about-page-main .about-main p,
+  .about-page-main .journey-detail-description,
+  .about-page-main .journey-step-copy{overflow-wrap:anywhere}
+}
+@media(max-width:780px){
+  .about-page-main .journey-layout{grid-template-columns:minmax(0,1fr)}
+}
