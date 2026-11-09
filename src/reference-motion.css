@@ -547,3 +547,23 @@
 @media(max-width:380px){
   .brand-avatar{width:calc(40px * var(--site-profile-scale,1));height:calc(40px * var(--site-profile-scale,1));flex-basis:calc(40px * var(--site-profile-scale,1))}
 }
+
+
+/* Preserve paragraph breaks and blank lines typed in the admin editor. */
+.hero-intro,
+.about-page-main .about-columns p,
+.contact-section p,
+.closing-section>p:not(.eyebrow),
+.focus-heading p,
+.project-heading p,
+.extra-story-body,
+.journey-detail-description,
+.journey-detail-short,
+.visitor-wall-quote,
+.visitor-wall-intro>p,
+.visitor-wall-compose>div>p:last-child,
+.focus-list p,
+.scenario-copy p {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
