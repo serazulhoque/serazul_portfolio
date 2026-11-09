@@ -155,7 +155,7 @@ export default function SiteHeader() {
           <a href={sectionHref("#contact")} onClick={follow}>Get in touch</a>
           <a href={sectionHref("#articles")} onClick={follow}>Publication</a>
           <a href={sectionHref("#explorations")} onClick={follow}>What I am exploring</a>
-          <a href={homeHref} onClick={follow}>Back to start</a>
+          <a href={homeHref} onClick={follow}>HOME</a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>
