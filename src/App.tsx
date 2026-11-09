@@ -345,9 +345,20 @@ function Home() {
       <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">STILL EARLY. ALREADY CURIOUS.</p><h2>Good software begins<br />with a <em>human question.</em></h2><p>Mine is how to help more people be understood.<br />This portfolio is a starting point for that journey.</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="#home">Back to top ↑</a></footer>
+    <DesignerSignature />
     <div className={notice ? "toast visible" : "toast"} role="status" aria-live="polite">{notice}</div>
     <PortfolioAssistant />
   </>;
+}
+
+function DesignerSignature() {
+  return <div className="designer-signature wrap" aria-label="Designed by Serazul Hoque">
+    <span className="designer-signature-line" aria-hidden="true" />
+    <div className="designer-signature-mark" aria-hidden="true">✳</div>
+    <span className="designer-signature-label">DESIGNED BY</span>
+    <span className="designer-signature-name">Serazul <em>Hoque</em><span className="designer-signature-dot">.</span></span>
+    <span className="designer-signature-line" aria-hidden="true" />
+  </div>;
 }
 
 function AboutPage() {
@@ -392,6 +403,7 @@ function AboutPage() {
       </section>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
+    <DesignerSignature />
     <PortfolioAssistant />
   </>;
 }

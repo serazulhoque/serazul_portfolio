@@ -232,3 +232,59 @@
   .menu-links>a .menu-symbol{transition:none}
   .menu-links>a:hover .menu-symbol,.menu-links>a:focus-visible .menu-symbol{transform:none}
 }
+
+/* Quiet, custom-designed signature beneath the site footer. */
+.designer-signature{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(8px,2vw,19px);
+  padding:13px 0 34px;
+  color:var(--ink);
+}
+.designer-signature-line{
+  flex:1;
+  max-width:150px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--line));
+}
+.designer-signature-line:last-child{transform:scaleX(-1)}
+.designer-signature-mark{
+  display:grid;
+  place-items:center;
+  flex:0 0 28px;
+  height:28px;
+  border-radius:50%;
+  border:1px solid #97b678;
+  color:#6b9452;
+  font-size:16px;
+  transition:transform .5s ease;
+}
+.designer-signature:hover .designer-signature-mark{transform:rotate(90deg)}
+.designer-signature-label{
+  font-family:var(--font-label);
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:1.9px;
+  white-space:nowrap;
+  opacity:.7;
+}
+.designer-signature-name{
+  font-family:var(--font-display);
+  font-size:clamp(16px,2.4vw,22px);
+  white-space:nowrap;
+  letter-spacing:-.3px;
+}
+.designer-signature-name em{font-style:italic}
+.designer-signature-dot{color:#719c4c}
+@media(max-width:420px){
+  .designer-signature{gap:8px;padding-bottom:27px}
+  .designer-signature-line{max-width:26px}
+  .designer-signature-mark{flex-basis:24px;height:24px;font-size:13px}
+  .designer-signature-label{font-size:8px;letter-spacing:1px}
+  .designer-signature-name{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .designer-signature-mark{transition:none}
+  .designer-signature:hover .designer-signature-mark{transform:none}
+}
