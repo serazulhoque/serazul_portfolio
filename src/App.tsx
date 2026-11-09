@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import SiteHeader from "./site-header";
 import PortfolioAssistant from "./portfolio-assistant";
+import VisitorWall from "./visitor-wall";
 import VisitAnalytics from "./visit-analytics";
 import {useSiteContent,textValue,ContentStories,type SiteEntry} from "./site-content";
 
@@ -356,6 +357,7 @@ function Home() {
         </nav>
       </section>
       <ContentStories items={items} section="contact" />
+      <VisitorWall />
       <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2>{t("closing_heading_one","Good software begins")}<br /><em>{t("closing_heading_two","with a human question.")}</em></h2><p>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br />{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span>{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="#home">Back to top ↑</a></footer>

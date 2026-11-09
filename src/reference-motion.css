@@ -385,3 +385,35 @@
   font-weight:400;
   letter-spacing:normal;
 }
+
+/* Visitor wall / moderated guestbook */
+.visitor-wall{border-top:1px solid var(--line)}
+.visitor-wall .section-label{margin-bottom:38px}
+.visitor-wall-intro{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);align-items:end;gap:50px;margin-bottom:35px}
+.visitor-wall-kicker,.visitor-wall-number{font-family:var(--font-label);font-size:10px;letter-spacing:1.4px;color:#76934c}
+.visitor-wall-intro h2{font:400 clamp(37px,5vw,65px)/1.12 var(--font-display);margin:13px 0 0;letter-spacing:-1.2px}
+.visitor-wall-intro h2 em{font-weight:400;color:#738a60}
+.visitor-wall-intro>p,.visitor-wall-compose>div>p:last-child{font-size:15px;line-height:1.75;color:var(--muted)}
+.visitor-wall-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:34px}
+.visitor-wall-card{min-width:0;border:1px solid var(--line);background:var(--paper);padding:25px 22px;border-radius:4px}
+.visitor-wall-quote{font:400 20px/1.55 var(--font-display);margin:22px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.visitor-wall-author{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.visitor-wall-compose{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(25px,5vw,80px);padding:clamp(24px,4vw,45px);border:1px solid var(--line);border-radius:4px}
+.visitor-wall-compose h3{font:400 clamp(30px,4vw,47px)/1.15 var(--font-display);margin:15px 0 20px}
+.visitor-wall-compose form{display:grid;gap:10px;min-width:0}
+.visitor-wall-compose label{font-size:12px;font-weight:600;margin-top:3px}
+.visitor-wall-compose input,.visitor-wall-compose textarea{display:block;width:100%;min-width:0;max-width:100%;border:1px solid var(--line);border-radius:3px;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font-body);padding:11px 13px;resize:vertical}
+.visitor-wall-compose input:focus-visible,.visitor-wall-compose textarea:focus-visible{outline:2px solid #7d9b4e;outline-offset:2px}
+.visitor-wall-submit{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:6px}
+.visitor-wall-submit>span{font-size:11px;color:var(--muted)}
+.visitor-wall-submit .button:disabled{opacity:.6;cursor:wait}
+.visitor-wall-feedback{font-size:12px;line-height:1.6;min-height:1.4em;color:var(--muted)}
+@media(max-width:800px){.visitor-wall-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .visitor-wall-intro,.visitor-wall-compose{grid-template-columns:minmax(0,1fr);gap:20px}
+ .visitor-wall-cards{grid-template-columns:minmax(0,1fr)}
+ .visitor-wall-card{padding:20px}
+ .visitor-wall-quote{font-size:20px}
+ .visitor-wall-compose{padding:20px}
+ .visitor-wall-submit{align-items:start;flex-wrap:wrap}
+}
