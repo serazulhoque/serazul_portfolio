@@ -235,14 +235,14 @@ const DEFAULT_PAGE_SECTIONS: PageSections = {
   hero_line_one: "Engineering",
   hero_line_two: "Student",
   hero_phrase: "with a",
-  hero_emphasis: "purpose",
-  hero_intro: "Hi, I’m Serazul. A software engineering student drawn to useful AI, accessible technology, and the possibilities of a voice being understood.",
+  hero_emphasis: "Purpose",
+  hero_intro: "Hi, I’m Serazul Hoque, studying Bachelor of Science in Software Engineering at Istanbul Sabahattin Zaim University.",
   about_line_one: "Learning the craft.",
   about_line_two: "Keeping people in mind.",
   about_paragraph_one: "I’m pursuing software engineering because I want to turn ideas into things people can use. Right now, that means learning the foundations, asking questions, and connecting the small steps to a bigger goal.",
   about_paragraph_two: "One idea keeps me curious: an AI people can talk to in Rohingya. It brings together my interest in technology and a language that matters to me. This is where I’m beginning.",
-  contact_heading: "Let's connect.",
-  contact_paragraph: "Have a question, idea, or something you'd like to discuss?"
+  contact_heading: "Let’s Connect.",
+  contact_paragraph: "Have a question, idea, or something you’d like to discuss with me? I’d love to get back to you..."
 };
 
 function Home() {
@@ -252,6 +252,7 @@ function Home() {
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
   const [pageCopy, setPageCopy] = useState<PageSections>(DEFAULT_PAGE_SECTIONS);
+  const [sectionsReady,setSectionsReady] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/settings", { signal: controller.signal, credentials: "omit" })
@@ -280,7 +281,8 @@ function Home() {
            value.length <= (key.includes("paragraph") || key === "hero_intro" ? 2500 : 160)) next[key]=value;
       }
       setPageCopy(next);
-    }).catch(() => { /* Preserve existing text if the page-content API is unavailable. */ });
+    }).catch(() => { /* Use the latest saved fallback if the API is temporarily unavailable. */ })
+      .finally(() => { if(!controller.signal.aborted)setSectionsReady(true); });
     return () => controller.abort();
   }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
@@ -314,8 +316,8 @@ function Home() {
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
           <p className="eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
-          <h1>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
-          <p className="hero-intro">{pageCopy.hero_intro}</p>
+          <h1 style={sectionsReady?undefined:{visibility:"hidden"}}>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
+          <p className="hero-intro" style={sectionsReady?undefined:{visibility:"hidden"}}>{pageCopy.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
