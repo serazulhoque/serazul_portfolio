@@ -417,3 +417,22 @@
  .visitor-wall-compose{padding:20px}
  .visitor-wall-submit{align-items:start;flex-wrap:wrap}
 }
+
+
+/* Keep the avatar and name anchored to the exact same header coordinates
+   in the home header and the open full-screen navigation. */
+@media(min-width:1001px){
+  .menu-wordmark{top:26px;left:max(56px,calc((100vw - 1280px)/2))}
+}
+@media(min-width:801px) and (max-width:1000px){
+  .menu-wordmark{top:26px;left:36px}
+}
+@media(min-width:601px) and (max-width:800px){
+  .menu-wordmark{top:26px;left:24px}
+}
+@media(min-width:381px) and (max-width:600px){
+  .menu-wordmark{top:15px;left:20px}
+}
+@media(max-width:380px){
+  .menu-wordmark{top:18px;left:20px;gap:7px;font-size:12.5px}
+}
