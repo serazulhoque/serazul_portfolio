@@ -21,3 +21,19 @@
 .assistant-disclaimer{margin:0;padding:8px 14px 12px;color:#59685c;font-size:10px;line-height:1.35}
 .assistant-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 @media(prefers-reduced-motion:reduce){.assistant-launch{transition:none}.assistant-launch:hover{transform:none}}
+
+/* Mobile only: smaller, translucent Ask me button. */
+@media(max-width:600px){
+  .assistant-launch{
+    gap:6px;
+    padding:8px 12px;
+    background:rgba(33,51,44,.55);
+    border-color:rgba(213,237,156,.65);
+    color:#fff;
+    font-size:12px;
+    box-shadow:0 4px 14px #12251c25;
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+  }
+  .assistant-launch span:first-child{font-size:16px}
+}
