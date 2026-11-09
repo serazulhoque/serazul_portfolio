@@ -186,3 +186,31 @@
 @media(max-width:380px){
   .hero-photo{height:112vw;min-height:320px}
 }
+
+/* Aligned animated arrows beside each mobile menu option. */
+.menu-links>a{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:14px;
+}
+.menu-links>a::before{
+  content:"↗";
+  order:2;
+  display:inline-block;
+  width:20px;
+  flex:0 0 20px;
+  text-align:center;
+  color:var(--lime);
+  opacity:.55;
+  transform:translate(-3px,3px);
+  transition:opacity .22s ease,transform .22s ease;
+}
+.menu-links>a:hover::before,.menu-links>a:focus-visible::before{
+  opacity:1;
+  transform:translate(2px,-2px);
+}
+@media(prefers-reduced-motion:reduce){
+  .menu-links>a::before{transform:none;transition:none}
+  .menu-links>a:hover::before,.menu-links>a:focus-visible::before{transform:none}
+}
