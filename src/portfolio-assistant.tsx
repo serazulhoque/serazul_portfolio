@@ -3,42 +3,73 @@ import { useEffect, useRef, useState } from "react";
 import "./portfolio-assistant.css";
 
 type Message = { role: "visitor" | "guide"; text: string };
+type PreparedAnswer = {
+  id: string; question: string; answer: string; keywords: string;
+  is_suggested: boolean; sort_order: number;
+};
 const welcome = "Hi! I'm Serazul's portfolio guide. Ask about his studies, interests, writing, or how to contact him. I use prepared website information, not a generative AI model.";
-const topics = ["Who is Serazul?", "What is he learning?", "What is his AI idea?", "How can I contact him?"];
-
-function answer(question: string): string {
-  const q = question.toLowerCase().replace(/[^a-z0-9\s]/g, " ");
-  if (/hello|^hi$|^hey$|good morning|good evening/.test(q)) return "Hello! Feel free to ask about Serazul's software engineering journey, his interests, or his writing.";
-  if (/rohingya|language|voice|speech|translation/.test(q)) return "Serazul is interested in making technology more accessible. One idea he's exploring is a conversational AI experience that can communicate in Rohingya. This is an idea in development, not a finished product.";
-  if (/ai|artificial intelligence|machine learning/.test(q)) return "He's interested in useful AI, especially language-centered experiences and making technology easier for people to use. His Rohingya-language assistant concept is one area of curiosity.";
-  if (/skill|programming|code|technology|stack|learn|study|studies|software|education|university|career/.test(q)) return "Serazul is studying software engineering. His current learning interests include C programming, pseudocode, flowcharts, foundational programming logic, and practical AI. His portfolio describes him as a student who is still building his skills.";
-  if (/article|publication|writing|blog|read/.test(q)) return "You can browse his published articles in the Publication section on the homepage. Select a title to read it and swipe to move between articles on mobile.";
-  if (/project|portfolio|build|work/.test(q)) return "His portfolio focuses on learning software engineering and exploring practical technology. One longer-term project idea is a Rohingya-language conversational AI. For completed work, check the projects and publications shown on this website.";
-  if (/contact|email|message|reach|social|facebook|linkedin|instagram|twitter/.test(q)) return "Go to Get in touch on the homepage. There you can use Send an email or Follow me to find Serazul's social profiles.";
-  if (/about|who|serazul|background|goal|purpose|yourself/.test(q)) return "Serazul Hoque is a software engineering student interested in useful AI, accessible technology, and helping people be understood. Read the separate About Me page to learn more about his journey.";
-  if (/thank/.test(q)) return "You're welcome! You can ask about his interests, studies, writing, or contact options.";
-  return "I don't have a verified answer to that yet. Try asking about Serazul's studies, AI idea, writing, or contact details. You can also explore his About Me page.";
+const fallback = "I don't have a prepared answer to that yet. Try a suggested question, or visit the About Me and Get in touch sections.";
+const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
+const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
+function findAnswer(question: string, entries: PreparedAnswer[]) {
+  const q = normalize(question);
+  if(!q) return fallback;
+  const qWords = q.split(" ").filter(word => word.length > 1 && !ignore.has(word));
+  let best: PreparedAnswer | null = null;
+  let highest = 0;
+  for(const entry of entries){
+    const exact = normalize(entry.question);
+    const keywords = entry.keywords.split(",").map(normalize).filter(Boolean);
+    let score = q===exact ? 100 : 0;
+    if(exact.includes(q) && qWords.length>=2)score=Math.max(score,7);
+    for(const keyword of keywords){
+      if(q===keyword)score=Math.max(score,90);
+      else if((" "+q+" ").includes(" "+keyword+" "))score=Math.max(score,5+keyword.split(" ").length);
+    }
+    const entryWords = new Set(exact.split(" ").filter(w=>w.length>1&&!ignore.has(w)));
+    const shared = qWords.filter(w=>entryWords.has(w)).length;
+    if(qWords.length>=2 && shared>=2 && shared/qWords.length>=.6) score=Math.max(score,4+shared);
+    if(score>highest){highest=score;best=entry;}
+  }
+  return best && highest>=5 ? best.answer : fallback;
 }
 
 export default function PortfolioAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [entries,setEntries] = useState<PreparedAnswer[]>([]);
   const [messages, setMessages] = useState<Message[]>([{ role: "guide", text: welcome }]);
   const lastMessage = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const controller=new AbortController();
+    fetch("https://serazul-backend.vercel.app/api/public/ask-me",{signal:controller.signal,credentials:"omit",cache:"no-store"})
+      .then(response=>response.ok?response.json():Promise.reject())
+      .then(data=>{
+        if(!controller.signal.aborted && Array.isArray(data.items)){
+          setEntries(data.items.filter((item:unknown)=>{
+            if(!item||typeof item!=="object")return false;
+            const v=item as Record<string,unknown>;
+            return typeof v.question==="string"&&typeof v.answer==="string"&&typeof v.keywords==="string";
+          }).slice(0,300));
+        }
+      }).catch(()=>{/* Show a useful fallback if answers are temporarily unavailable. */});
+    return ()=>controller.abort();
+  },[]);
   useEffect(() => { if (open) { field.current?.focus(); lastMessage.current?.scrollIntoView({ block: "end" }); } }, [open, messages]);
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  }, []);
   function send(value: string) {
     const question = value.trim().slice(0, 300);
     if (!question) return;
-    setMessages(previous => [...previous, { role: "visitor", text: question }, { role: "guide", text: answer(question) }]);
+    setMessages(previous => [...previous, { role: "visitor", text: question }, { role: "guide", text: findAnswer(question, entries) }]);
     setInput("");
   }
+  const topics=entries.filter(entry=>entry.is_suggested).slice(0,5);
   return <div className="portfolio-assistant">
     {open && <section className="assistant-panel" role="dialog" aria-modal="false" aria-label="Ask about Serazul">
       <header className="assistant-header">
@@ -49,7 +80,7 @@ export default function PortfolioAssistant() {
         {messages.map((message, index) => <p key={index} className={"assistant-message assistant-" + message.role}>{message.text}</p>)}
         <div ref={lastMessage} />
       </div>
-      {messages.length === 1 && <div className="assistant-topics">{topics.map(topic => <button type="button" key={topic} onClick={() => send(topic)}>{topic}</button>)}</div>}
+      {messages.length === 1 && topics.length>0 && <div className="assistant-topics">{topics.map(topic => <button type="button" key={topic.id} onClick={() => send(topic.question)}>{topic.question}</button>)}</div>}
       <form className="assistant-form" onSubmit={event => { event.preventDefault(); send(input); }}>
         <label className="assistant-sr" htmlFor="assistant-question">Ask a question</label>
         <input id="assistant-question" ref={field} value={input} onChange={event => setInput(event.target.value)} maxLength={300} placeholder="Ask me anything about Serazul…" autoComplete="off" />
