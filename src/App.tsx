@@ -275,20 +275,7 @@ function Home() {
         </div><HeroPhoto />
       </section>
       <div className="intro-strip wrap"><span>{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p>{t("intro_first","Curiosity in the details.")} <em>{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
-      <section className="focus-section wrap section-space" id="explorations" tabIndex={-1}>
-        <div className="section-label"><span>{t("exploring_label","02 / BUILDING THE FOUNDATIONS")}</span><span className="small-line" /></div>
-        <div className="focus-main"><div className="focus-heading" data-reveal><h2>{t("exploring_heading_one","Small steps.")}<br /><em>{t("exploring_heading_two","A bigger direction.")}</em></h2><p>{t("exploring_intro","The things I’m learning and the questions I want to keep exploring.")}</p></div><div className="focus-list">
-          {entriesLoaded ? items.filter(i=>i.section==="exploring"&&i.kind==="story").map((item,index)=><article key={item.id}>
-            <span className="focus-index">{String(index+1).padStart(2,"0")}</span>
-            <div><h3>{item.title}</h3>{item.body&&<p>{item.body}</p>}{item.subtitle&&<p>{item.subtitle}</p>}<span className="focus-tag">{item.date_label}</span></div>
-            <span className="focus-symbol" aria-hidden="true">{index===0?"{ }":index===1?"𝒮":"↗"}</span>
-          </article>) : <>          <article data-reveal><span className="focus-index">01</span><div><h3>Software foundations</h3><p>C, pseudocode, flowcharts, and the logic that helps turn a problem into a program.</p><span className="focus-tag">CURRENT LEARNING</span></div><span className="focus-symbol" aria-hidden="true">{`{ }`}</span></article>
-          <article data-reveal><span className="focus-index">02</span><div><h3>AI with a practical purpose</h3><p>How could existing AI models become part of a useful, language-centered experience?</p><span className="focus-tag">AN OPEN QUESTION</span></div><span className="focus-symbol" aria-hidden="true">✳</span></article>
-          <article data-reveal><span className="focus-index">03</span><div><h3>Clearer ways to learn</h3><p>Interactive examples, visual explanations, and making complicated ideas easier to approach.</p><span className="focus-tag">A PERSONAL INTEREST</span></div><span className="focus-symbol" aria-hidden="true"><Arrow diagonal /></span></article>
-
-          </>}
-        </div></div>
-      </section>
+      <div id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" /></div>
       <ContentStories items={items} section="home" />
       <PublishedArticles labels={labels} />
       <ContentStories items={items} section="publications" />
