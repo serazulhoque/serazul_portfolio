@@ -8,7 +8,7 @@ type PreparedAnswer = {
   is_suggested: boolean; sort_order: number;
 };
 const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
-const fallback = "I don't have a prepared answer to that yet. Try a suggested question, or visit the About Me and Get in touch sections.";
+const fallback = "Hey I am sorry I can answer to you right now. Instead, send here ";
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
 const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
 function findAnswer(question: string, entries: PreparedAnswer[]) {
@@ -98,7 +98,7 @@ export default function PortfolioAssistant() {
       <div className="assistant-messages" role="log" aria-live="polite" aria-label="Conversation">
         {messages.map((message,index)=><div className={"assistant-message-row assistant-row-"+message.role} key={index}>
           {message.role==="guide"&&avatar()}
-          <p className={"assistant-message assistant-"+message.role}>{message.text}</p>
+          <p className={"assistant-message assistant-"+message.role}>{message.text}{message.role==="guide"&&message.text===fallback&&<a href="mailto:info.serazulh@gmail.com" aria-label="Email Serazul Hoque" style={{color:"inherit",fontWeight:700,textDecoration:"underline",textUnderlineOffset:"2px"}}>EMAIL</a>}</p>
         </div>)}
         <div ref={lastMessage}/>
       </div>
