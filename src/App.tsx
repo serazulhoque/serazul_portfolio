@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import SiteHeader from "./site-header";
+import PortfolioAssistant from "./portfolio-assistant";
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -345,6 +346,7 @@ function Home() {
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="#home">Back to top ↑</a></footer>
     <div className={notice ? "toast visible" : "toast"} role="status" aria-live="polite">{notice}</div>
+    <PortfolioAssistant />
   </>;
 }
 
@@ -390,6 +392,7 @@ function AboutPage() {
       </section>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
+    <PortfolioAssistant />
   </>;
 }
 
