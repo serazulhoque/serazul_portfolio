@@ -368,7 +368,7 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
   if(!entriesLoaded)return null;
   const id=experience?"experience":"education";
   return <section className={"journey-section journey-inline wrap section-space"+(experience?" experience-section":"")} id={id} aria-labelledby={id+"-title"}>
-    <div className="section-label"><span>{experience?"03 / EXPERIENCE":textValue(labels,"journey_label","02 / THE PATH SO FAR")}</span><span className="small-line" /></div>
+    <div className="section-label"><span>{experience?"EXPERIENCE":textValue(labels,"journey_label","THE PATH SO FAR").replace(/^\s*\d+\s*\/\s*/,"")}</span><span className="small-line" /></div>
     <div className="journey-intro">
       <div><p className="journey-eyebrow">{experience?"WHAT I'VE WORKED ON":textValue(labels,"journey_eyebrow","A JOURNEY STILL UNFOLDING")}</p>
         <h2 id={id+"-title"}>{experience?"Experience":"Education"}</h2></div>
@@ -379,12 +379,11 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
         <button type="button" className={"journey-step"+(selected===index?" is-active":"")}
           onClick={()=>setSelected(selected===index?null:index)} aria-expanded={selected===index}
           aria-controls={id+"-detail-"+index}>
-          <span className="journey-step-number">{step.number}</span>
           <span className="journey-step-copy"><small>{step.phase}</small><strong>{step.title}</strong></span>
           <span className="journey-step-arrow" aria-hidden="true">{selected===index?"↘":"→"}</span>
         </button>
         {selected===index&&<article className="journey-detail" id={id+"-detail-"+index}>
-          <div className="journey-detail-top"><span>{experience?"EXPERIENCE":"CHAPTER"} {step.number} / {String(timeline.length).padStart(2,"0")}</span><span className="journey-detail-symbol" aria-hidden="true">{step.symbol}</span></div>
+          <div className="journey-detail-top"><span>{experience?"EXPERIENCE":"EDUCATION"}</span><span className="journey-detail-symbol" aria-hidden="true">{step.symbol}</span></div>
           <div className="journey-detail-body">
             <p className="journey-detail-phase">{step.phase}</p><h3>{step.title}</h3>
             {step.short&&<p className="journey-detail-short">{step.short}</p>}
