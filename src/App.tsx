@@ -354,7 +354,7 @@ function Home() {
 function DesignerSignature() {
   return <div className="designer-signature wrap" aria-label="Designed by Serazul Hoque">
     <span className="designer-signature-line" aria-hidden="true" />
-    <div className="designer-signature-mark" aria-hidden="true">✳</div>
+    
     <span className="designer-signature-label">DESIGNED BY</span>
     <span className="designer-signature-name">Serazul <em>Hoque</em><span className="designer-signature-dot">.</span></span>
     <span className="designer-signature-line" aria-hidden="true" />
