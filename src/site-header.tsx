@@ -188,7 +188,7 @@ export default function SiteHeader() {
     <header className={`site-header wrap${isAboutPage ? " about-page-header" : ""}`}>
       <div className="wordmark">{brand()}</div>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
-        <a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href={sectionHref("#articles")}>Publication</a><a href={sectionHref("#explorations")}>What I’m exploring</a>
+        <a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href={sectionHref("#articles")}>Blog</a><a href={sectionHref("#explorations")}>What I’m exploring</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
       <button className="menu-orb" onClick={openMenu} disabled={!ready} aria-haspopup="dialog" aria-controls="portfolio-menu" aria-label="Open menu"><MenuIcon /></button>
     </header>
@@ -201,7 +201,7 @@ export default function SiteHeader() {
         <nav className="menu-links" aria-label="Portfolio navigation">
           <a href="/about.html"><span className="menu-item-label">About me</span><MenuSymbol name="about" /></a>
           <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
-          <a href={sectionHref("#articles")} onClick={follow}><span className="menu-item-label">Publication</span><MenuSymbol name="publication" /></a>
+          <a href={sectionHref("#articles")} onClick={follow}><span className="menu-item-label">Blog</span><MenuSymbol name="publication" /></a>
           <a href={sectionHref("#explorations")} onClick={follow}><span className="menu-item-label">What I am exploring</span><MenuSymbol name="explore" /></a>
           <a href={homeHref} onClick={follow}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
