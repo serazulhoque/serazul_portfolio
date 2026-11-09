@@ -496,3 +496,54 @@
   .visitor-wall-quote{font-size:17px}
   .visitor-wall-compose{padding:17px;gap:17px}
 }
+
+
+/* Live design preferences saved through the Website Design dashboard.
+   Defaults are the existing site design; no deployment is required for later edits. */
+.hero h1{font-size:calc(clamp(64px,6.3vw,95px) * var(--site-hero-scale,1))}
+.hero-intro{font-size:calc(18px * var(--site-intro-scale,1))}
+.visitor-wall-intro h2{font-size:calc(clamp(31px,4vw,52px) * var(--site-visitor-scale,1))}
+.visitor-wall-compose h3{font-size:calc(clamp(26px,3vw,38px) * var(--site-visitor-scale,1))}
+.visitor-wall-quote{font-size:calc(17px * var(--site-visitor-scale,1))}
+.visitor-wall{padding-top:calc(56px * var(--site-visitor-spacing,1));padding-bottom:calc(58px * var(--site-visitor-spacing,1))}
+.visitor-wall .section-label{margin-bottom:calc(24px * var(--site-visitor-spacing,1))}
+.visitor-wall-intro{margin-bottom:calc(23px * var(--site-visitor-spacing,1))}
+.visitor-wall-card{padding:calc(18px * var(--site-visitor-spacing,1)) calc(17px * var(--site-visitor-spacing,1))}
+.visitor-wall-cards{gap:calc(12px * var(--site-visitor-spacing,1));margin-bottom:calc(22px * var(--site-visitor-spacing,1))}
+.visitor-wall-compose{padding:calc(30px * var(--site-visitor-spacing,1))}
+.section-space:not(.visitor-wall):not(.journey-section){
+  padding-top:calc(99px * var(--site-section-spacing,1));
+  padding-bottom:calc(104px * var(--site-section-spacing,1));
+}
+.brand-avatar{width:calc(52px * var(--site-profile-scale,1));height:calc(52px * var(--site-profile-scale,1));flex-basis:calc(52px * var(--site-profile-scale,1))}
+:root[data-site-show-visitor-wall="false"] .visitor-wall,
+:root[data-site-show-education="false"] #education,
+:root[data-site-show-experience="false"] #experience,
+:root[data-site-show-ask-me="false"] .portfolio-assistant,
+:root[data-site-show-home-photo="false"] .hero-photo{display:none!important}
+:root[data-site-show-home-photo="false"] .hero{grid-template-columns:minmax(0,1fr)}
+:root[data-site-menu-name-animation="false"] .menu-dialog[open] .menu-wordmark .brand-name{animation:none!important}
+@media(max-width:1100px){
+  .hero h1{font-size:calc(clamp(62px,6.7vw,77px) * var(--site-hero-scale,1))}
+}
+@media(max-width:1000px){
+  .hero h1{font-size:calc(clamp(55px,7.3vw,72px) * var(--site-hero-scale,1))}
+}
+@media(max-width:760px){
+  .hero h1{font-size:calc(clamp(48px,8vw,67px) * var(--site-hero-scale,1))}
+}
+@media(max-width:600px){
+  .hero h1{font-size:calc(clamp(42px,10.8vw,61px) * var(--site-hero-scale,1))}
+  .hero-intro{font-size:calc(16px * var(--site-intro-scale,1))}
+  .visitor-wall{padding-top:calc(40px * var(--site-visitor-spacing,1));padding-bottom:calc(42px * var(--site-visitor-spacing,1))}
+  .visitor-wall-card{padding:calc(16px * var(--site-visitor-spacing,1))}
+  .visitor-wall-compose{padding:calc(17px * var(--site-visitor-spacing,1))}
+  .section-space:not(.visitor-wall):not(.journey-section){
+    padding-top:calc(56px * var(--site-section-spacing,1));
+    padding-bottom:calc(60px * var(--site-section-spacing,1));
+  }
+  .brand-avatar{width:calc(46px * var(--site-profile-scale,1));height:calc(46px * var(--site-profile-scale,1));flex-basis:calc(46px * var(--site-profile-scale,1))}
+}
+@media(max-width:380px){
+  .brand-avatar{width:calc(40px * var(--site-profile-scale,1));height:calc(40px * var(--site-profile-scale,1));flex-basis:calc(40px * var(--site-profile-scale,1))}
+}
