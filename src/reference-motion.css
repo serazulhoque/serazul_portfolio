@@ -452,3 +452,28 @@
 @media(prefers-reduced-motion:reduce){
   .menu-dialog[open] .menu-wordmark .brand-name{animation:none!important}
 }
+
+
+/* Education and Experience: open each illustrated chapter below its own title. */
+.journey-inline .journey-layout{display:block}
+.journey-inline .journey-steps{width:100%;max-width:100%;display:block}
+.journey-inline .journey-step{min-height:88px}
+.journey-inline .journey-entry>.journey-detail{
+  position:relative;top:auto;width:100%;min-height:0;margin:14px 0 26px;
+  animation:journey-reveal .3s ease both;
+}
+.journey-inline .journey-detail-body{padding:22px 0 6px}
+.journey-inline .journey-detail h3{max-width:none}
+.journey-inline .journey-detail-description{max-width:850px}
+.journey-inline .journey-step:before{top:44px}
+.journey-inline .journey-step-arrow{transition:transform .2s,opacity .2s}
+.journey-inline .journey-step.is-active .journey-step-arrow{transform:rotate(45deg)}
+.journey-inline.experience-section{padding-top:55px}
+.journey-empty{font:400 17px/1.7 var(--font-display);color:var(--muted);padding:8px 0 20px}
+@media(max-width:600px){
+ .journey-inline .journey-step{min-height:78px}
+ .journey-inline .journey-step:before{top:39px}
+ .journey-inline .journey-entry>.journey-detail{margin:10px 0 22px;padding:24px}
+ .journey-inline.experience-section{padding-top:40px}
+}
+@media(prefers-reduced-motion:reduce){.journey-inline .journey-entry>.journey-detail{animation:none}}
