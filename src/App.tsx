@@ -87,46 +87,68 @@ function ArticleDocument({ content }: { content: unknown }) {
 
 function PublishedArticles() {
   const [articles, setArticles] = useState<PublishedArticle[]>([]);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
-  const limit = 8;
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
   useEffect(() => {
     const controller = new AbortController();
-    let active = true;
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    setLoading(true); setError(""); setArticles([]);
+    setLoading(true); setError("");
     async function load() {
       try {
-        const response = await fetch(`${ARTICLES_API}?page=${page}&limit=${limit}`, { signal: controller.signal, credentials: "omit", cache: "no-store" });
-        if (!response.ok) throw new Error("Articles unavailable");
-        const data = await response.json();
-        if (!Array.isArray(data.items) || !Number.isInteger(data.total) || data.total < 0) throw new Error("Invalid article response");
-        const items: PublishedArticle[] = data.items.slice(0, limit).filter((item: unknown) => {
-          if (!item || typeof item !== "object") return false;
-          const article = item as Record<string, unknown>;
-          return typeof article.id === "string" && typeof article.title === "string" && article.status === "published";
-        });
-        if (active) { setArticles(items); setTotal(data.total); }
+        const all: PublishedArticle[] = [];
+        for (let page = 1; page <= 200; page++) {
+          const response = await fetch(`${ARTICLES_API}?page=${page}&limit=50`, {
+            signal: controller.signal, credentials: "omit", cache: "no-store"
+          });
+          if (!response.ok) throw new Error("Articles unavailable");
+          const data = await response.json();
+          if (!Array.isArray(data.items) || !Number.isInteger(data.total) || data.total < 0)
+            throw new Error("Invalid article response");
+          for (const item of data.items) {
+            if (item && typeof item.id === "string" && typeof item.title === "string" && item.status === "published")
+              all.push(item as PublishedArticle);
+          }
+          if (all.length >= data.total || data.items.length === 0) break;
+        }
+        if (!controller.signal.aborted) {
+          setArticles(all);
+          setSelected(null);
+        }
       } catch {
-        if (active) setError("Articles couldn’t load right now. Please try again.");
+        if (!controller.signal.aborted) setError("Articles couldn’t load right now. Please try again.");
       } finally {
-        clearTimeout(timeout);
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     void load();
-    return () => { active = false; clearTimeout(timeout); controller.abort(); };
-  }, [page, retry]);
+    return () => controller.abort();
+  }, [retry]);
+
+  const current = selected === null ? null : articles[selected];
+  const move = (direction: number) => setSelected(index =>
+    index === null ? null : Math.max(0, Math.min(articles.length - 1, index + direction))
+  );
+  const displayDate = (value: string | null) => {
+    const date = typeof value === "string" ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime())
+      ? date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })
+      : null;
+  };
 
   return <section id="articles" className="published-articles wrap section-space" aria-labelledby="articles-title" tabIndex={-1}>
     <style>{`
       .published-articles{border-top:1px solid var(--line)}
       .published-articles>h2{font-family:var(--font-display);font-size:clamp(36px,5vw,58px);font-weight:400;line-height:1.15;margin:24px 0 12px}
       .published-articles-intro{color:var(--muted);font-size:17px;line-height:1.6;margin-bottom:30px}
-      .published-articles-list{display:grid;gap:24px}
+      .published-articles-list{display:grid;gap:0}
+      .published-article-title{display:flex;width:100%;align-items:center;justify-content:space-between;gap:20px;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);color:inherit;padding:22px 4px;cursor:pointer}
+      .published-article-title:first-child{border-top:1px solid var(--line)}
+      .published-article-title:hover,.published-article-title:focus-visible{color:var(--accent)}
+      .published-article-title strong{font-family:var(--font-display);font-size:clamp(21px,2.8vw,30px);font-weight:400;overflow-wrap:anywhere}
+      .published-article-title small{display:block;color:var(--muted);font-size:12px;margin-top:7px}
       .published-article{min-width:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
       .published-article-heading{padding:24px clamp(18px,4vw,32px)}
       .published-article-heading h3{font-family:var(--font-display);font-size:clamp(26px,3vw,36px);font-weight:400;line-height:1.25;overflow-wrap:anywhere}
@@ -142,8 +164,10 @@ function PublishedArticles() {
       .published-article-body h3{font-size:1.25em;margin:16px 0 10px}
       .published-article-body blockquote{border-left:3px solid #a6be79;padding-left:16px;margin:16px 0}
       .published-articles-status{padding:20px 0;color:var(--muted);line-height:1.6}
-      .published-articles-pagination{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px}
-      .published-articles-pagination button:disabled{opacity:.45;cursor:default}
+      .published-reader-controls{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 18px}
+      .published-reader-navigation{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:18px}
+      .published-reader-navigation button:disabled{opacity:.4;cursor:default}
+      .published-reader-hint{font-size:12px;color:var(--muted)}
     `}</style>
     <div className="section-label"><span>03 / NOTES ALONG THE WAY</span><span className="small-line" /></div>
     <h2 id="articles-title">Latest writing.</h2>
@@ -151,21 +175,41 @@ function PublishedArticles() {
     <div aria-busy={loading}>
       {loading && <p className="published-articles-status" role="status">Loading articles…</p>}
       {error && <div className="published-articles-status" role="status"><p>{error}</p><button type="button" className="button button-dark" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
-      {!loading && !error && articles.length === 0 && <p className="published-articles-status">No articles on this page yet.</p>}
-      <div className="published-articles-list">{articles.map(article => {
-        const date = typeof article.published_at === "string" ? new Date(article.published_at) : null;
-        const validDate = date && !Number.isNaN(date.getTime());
-        return <article className="published-article" key={article.id}>
-          <header className="published-article-heading"><h3>{article.title}</h3>{validDate && <time dateTime={date.toISOString()}>{date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}</time>}</header>
-          <ArticleDocument content={article.document} />
-        </article>;
-      })}</div>
+      {!loading && !error && articles.length === 0 && <p className="published-articles-status">No published articles yet.</p>}
+      {!loading && !error && selected === null && <div className="published-articles-list">
+        {articles.map((article, index) => <button key={article.id} type="button" className="published-article-title" onClick={() => setSelected(index)}>
+          <span><strong>{article.title}</strong>{displayDate(article.published_at) && <small>{displayDate(article.published_at)}</small>}</span>
+          <span aria-hidden="true">↗</span>
+        </button>)}
+      </div>}
+      {!loading && !error && current && <div>
+        <div className="published-reader-controls">
+          <button type="button" className="button button-dark" onClick={() => setSelected(null)}>← All article titles</button>
+          <span className="published-reader-hint">Article {selected! + 1} of {articles.length}</span>
+        </div>
+        <article className="published-article"
+          onTouchStart={event => {const t=event.touches[0];touchStart.current=t?{x:t.clientX,y:t.clientY}:null;}}
+          onTouchEnd={event => {
+            const first=touchStart.current;
+            const t=event.changedTouches[0];
+            touchStart.current=null;
+            if (!first || !t) return;
+            const dx=t.clientX-first.x,dy=t.clientY-first.y;
+            if (Math.abs(dx)>65 && Math.abs(dx)>Math.abs(dy)*1.4) move(dx<0?1:-1);
+          }}>
+          <header className="published-article-heading">
+            <h3>{current.title}</h3>
+            {displayDate(current.published_at) && <time>{displayDate(current.published_at)}</time>}
+          </header>
+          <ArticleDocument content={current.document} />
+        </article>
+        <nav className="published-reader-navigation" aria-label="Article navigation">
+          <button type="button" className="button button-dark" disabled={selected === 0} onClick={() => move(-1)}>← Previous</button>
+          <span className="published-reader-hint">Swipe left or right to read another article</span>
+          <button type="button" className="button button-dark" disabled={selected === articles.length-1} onClick={() => move(1)}>Next →</button>
+        </nav>
+      </div>}
     </div>
-    {!error && (page > 1 || total > limit) && <nav className="published-articles-pagination" aria-label="Article pages">
-      <button type="button" className="button button-dark" disabled={loading || page === 1} onClick={() => setPage(value => value - 1)}>Previous</button>
-      <span>Page {page}</span>
-      <button type="button" className="button button-dark" disabled={loading || page * limit >= total} onClick={() => setPage(value => value + 1)}>Next</button>
-    </nav>}
   </section>;
 }
 
