@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Test public content loading
+        run: npm test
+
       - name: Build website
         run: npm run build
 
@@ -50,3 +53,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
   
+

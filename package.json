@@ -10,7 +10,8 @@
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender && node scripts/prerender.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types --test test/*.test.js"
   },
   "dependencies": {
     "@fontsource/cardo": "5.3.0",
@@ -27,6 +28,6 @@
     "@vitejs/plugin-react": "6.0.2",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
-    "vite": "8.0.13"
+    "vite": "8.3.7"
   }
 }

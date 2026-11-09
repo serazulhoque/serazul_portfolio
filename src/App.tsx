@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import {useLivePageCopy} from "./page-copy";
+import {API_URL,requestJSON} from "./public-api";
 import SiteHeader from "./site-header";
 import SiteDesign from "./site-design";
 import PortfolioAssistant from "./portfolio-assistant";
@@ -39,7 +41,7 @@ function HeroPhoto() {
 }
 
 // Public content needs no password, Supabase key or admin token.
-const ARTICLES_API = "https://serazul-backend.vercel.app/api/public/articles";
+const ARTICLES_API = API_URL + "/articles";
 type PublishedArticle = { id: string; title: string; document: unknown; published_at: string | null };
 
 function ArticleDocument({ content }: { content: unknown }) {
@@ -105,11 +107,9 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
       try {
         const all: PublishedArticle[] = [];
         for (let page = 1; page <= 200; page++) {
-          const response = await fetch(`${ARTICLES_API}?page=${page}&limit=50`, {
-            signal: controller.signal, credentials: "omit", cache: "no-store"
+          const data = await requestJSON<{items: Array<PublishedArticle & {status:string}>;total:number}>(`${ARTICLES_API}?page=${page}&limit=50`, {
+            signal: controller.signal
           });
-          if (!response.ok) throw new Error("Articles unavailable");
-          const data = await response.json();
           if (!Array.isArray(data.items) || !Number.isInteger(data.total) || data.total < 0)
             throw new Error("Invalid article response");
           for (const item of data.items) {
@@ -218,80 +218,6 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
   </section>;
 }
 
-
-type PageSections = {
-  hero_line_one: string;
-  hero_line_two: string;
-  hero_phrase: string;
-  hero_emphasis: string;
-  hero_intro: string;
-  about_line_one: string;
-  about_line_two: string;
-  about_paragraph_one: string;
-  about_paragraph_two: string;
-  contact_heading: string;
-  contact_paragraph: string;
-};
-const DEFAULT_PAGE_SECTIONS: PageSections = {
-  hero_line_one: "Engineering",
-  hero_line_two: "Student",
-  hero_phrase: "with a",
-  hero_emphasis: "Purpose",
-  hero_intro: "Hi, I’m Serazul Hoque, studying Bachelor of Science in Software Engineering at Istanbul Sabahattin Zaim University.",
-  about_line_one: "Learning the craft.",
-  about_line_two: "Keeping people in mind.",
-  about_paragraph_one: "I’m pursuing software engineering because I want to turn ideas into things people can use. Right now, that means learning the foundations, asking questions, and connecting the small steps to a bigger goal.",
-  about_paragraph_two: "One idea keeps me curious: an AI people can talk to in Rohingya. It brings together my interest in technology and a language that matters to me. This is where I’m beginning.",
-  contact_heading: "Let’s Connect.",
-  contact_paragraph: "Have a question, idea, or something you’d like to discuss with me? I’d love to get back to you..."
-};
-
-
-function useLivePageCopy() {
-  const [copy,setCopy]=useState<PageSections|null>(null);
-  useEffect(()=>{
-    const controller=new AbortController();
-    // Use the last successful version immediately on refresh. Do not show
-    // the old hard-coded text while waiting for the network.
-    const storageKey="serazul:page-copy:v1";
-    try{
-      const stored=JSON.parse(localStorage.getItem(storageKey)||"null") as Record<string,unknown>|null;
-      if(stored&&Object.keys(DEFAULT_PAGE_SECTIONS).every(key=>typeof stored[key]==="string"))
-        setCopy(stored as PageSections);
-    }catch{/* Private browsing or disabled storage: load directly from the database. */}
-    async function load(){
-      try{
-        // Read the published copy directly, without waiting for a backend
-        // function to start up and then making a second request.
-        const response=await fetch("https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/page_sections?select=*&id=eq.1",{
-          signal:controller.signal,credentials:"omit",cache:"no-store",
-          headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"}
-        });
-        if(!response.ok)throw new Error("Saved page text unavailable");
-        const rows=await response.json();
-        if(controller.signal.aborted||!Array.isArray(rows)||!rows[0])return;
-        const data=rows[0] as Record<string,unknown>;
-        const next={...DEFAULT_PAGE_SECTIONS};
-        for(const key of Object.keys(next) as Array<keyof PageSections>){
-          const value=data[key];
-          if(typeof value==="string"&&value.trim()&&value.length<=(key.includes("paragraph")||key==="hero_intro"?2500:160))
-            next[key]=value;
-        }
-        setCopy(next);
-        try{localStorage.setItem(storageKey,JSON.stringify(next));}catch{/* Cache is an optional speed improvement. */}
-      }catch{
-        // A network outage must not replace previously saved copy with old text.
-        if(controller.signal.aborted)return;
-        try{
-          if(!localStorage.getItem(storageKey))setCopy(DEFAULT_PAGE_SECTIONS);
-        }catch{setCopy(DEFAULT_PAGE_SECTIONS);}
-      }
-    }
-    void load();
-    return ()=>controller.abort();
-  },[]);
-  return copy;
-}
 
 function Home() {
   const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
@@ -505,3 +431,4 @@ export default function App() {
       ? <AboutPage /> : <Home />}
   </>;
 }
+

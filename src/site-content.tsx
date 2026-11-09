@@ -1,75 +1,148 @@
-import {useEffect,useState} from "react";
+import { useEffect, useState } from "react";
+import {
+  DATA_URL,
+  PUBLIC_HEADERS,
+  requestJSON,
+  readCache,
+  writeCache,
+} from "./public-api";
 
-export type SiteEntry={
-  id:string;section:"home"|"about"|"contact"|"publications"|"exploring";
-  kind:"story"|"timeline"|"experience";title:string;subtitle:string;body:string;date_label:string;sort_order:number
+export type SiteEntry = {
+  id: string;
+  section: "home" | "about" | "contact" | "publications" | "exploring";
+  kind: "story" | "timeline" | "experience";
+  title: string;
+  subtitle: string;
+  body: string;
+  date_label: string;
+  sort_order: number;
 };
-type SiteData={items:SiteEntry[];entriesLoaded:boolean;labels:Record<string,string>;labelsLoaded:boolean};
-const DATA="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1";
-const HEADERS={apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"};
-export function useSiteContent():SiteData{
-  const [items,setItems]=useState<SiteEntry[]>([]);
-  const [entriesLoaded,setEntriesLoaded]=useState(false);
-  const [labels,setLabels]=useState<Record<string,string>>({});
-  const [labelsLoaded,setLabelsLoaded]=useState(false);
-  useEffect(()=>{
-    const controller=new AbortController();
-    // Restore the last published content immediately after hydration.
-    try{
-      const stored=JSON.parse(localStorage.getItem("serazul:site-content:v1")||"null");
-      if(stored&&Array.isArray(stored.items)){
-        setItems(stored.items);
-        setEntriesLoaded(true);
-      }
-      if(stored&&stored.labels&&typeof stored.labels==="object"){
-        setLabels(stored.labels);
-        setLabelsLoaded(true);
-      }
-    }catch{/* Cached content is optional. */}
-
-    // Refresh cached content without blocking the visible page.
-    const write=(name:"items"|"labels",value:unknown)=>{
-      try{
-        const key="serazul:site-content:v1";
-        const cached=JSON.parse(localStorage.getItem(key)||"{}")||{};
-        localStorage.setItem(key,JSON.stringify({...cached,[name]:value}));
-      }catch{/* Storage may be unavailable. */}
+type SiteData = {
+  items: SiteEntry[];
+  entriesLoaded: boolean;
+  labels: Record<string, string>;
+  labelsLoaded: boolean;
+};
+const CACHE_KEY = "serazul:site-content:v1";
+function isEntry(value: unknown): value is SiteEntry {
+  if (!value || typeof value !== "object") return false;
+  const item = value as Record<string, unknown>;
+  return (
+    ["id", "section", "kind", "title", "subtitle", "body", "date_label"].every(
+      (key) => typeof item[key] === "string",
+    ) &&
+    typeof item.sort_order === "number" &&
+    Number.isFinite(item.sort_order)
+  );
+}
+function isLabels(value: unknown): value is Record<string, string> {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    Object.values(value).every((text) => typeof text === "string")
+  );
+}
+export function useSiteContent(): SiteData {
+  const [items, setItems] = useState<SiteEntry[]>([]);
+  const [entriesLoaded, setEntriesLoaded] = useState(false);
+  const [labels, setLabels] = useState<Record<string, string>>({});
+  const [labelsLoaded, setLabelsLoaded] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    // Validate the optional cache before letting it reach React's renderer.
+    const stored = readCache(CACHE_KEY) as {
+      items?: unknown;
+      labels?: unknown;
+    } | null;
+    if (stored && Array.isArray(stored.items) && stored.items.every(isEntry)) {
+      setItems(stored.items);
+      setEntriesLoaded(true);
+    }
+    if (stored && isLabels(stored.labels)) {
+      setLabels(stored.labels);
+      setLabelsLoaded(true);
+    }
+    const write = (name: "items" | "labels", value: unknown) => {
+      const cached = readCache(CACHE_KEY);
+      const previous =
+        cached && typeof cached === "object" && !Array.isArray(cached)
+          ? cached
+          : {};
+      writeCache(CACHE_KEY, { ...previous, [name]: value });
     };
-    fetch(DATA+"/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300",{signal:controller.signal,cache:"no-store",headers:HEADERS})
-      .then(r=>r.ok?r.json():Promise.reject())
-      .then(data=>{
-        if(controller.signal.aborted||!Array.isArray(data))return;
-        const valid=data.filter((item:SiteEntry)=>item&&typeof item.title==="string");
+    requestJSON<unknown>(
+      DATA_URL +
+        "/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300",
+      { signal: controller.signal, cache: "no-store", headers: PUBLIC_HEADERS },
+    )
+      .then((data) => {
+        if (controller.signal.aborted || !Array.isArray(data)) return;
+        const valid = data.filter(isEntry);
         setItems(valid);
-        write("items",valid);
-      }).catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setEntriesLoaded(true);});
-    fetch(DATA+"/site_editable_text?select=key,value&limit=100",{signal:controller.signal,cache:"no-store",headers:HEADERS})
-      .then(r=>r.ok?r.json():Promise.reject())
-      .then(data=>{
-        if(controller.signal.aborted||!Array.isArray(data))return;
-        const values:Record<string,string>={};
-        for(const item of data)if(typeof item.key==="string"&&typeof item.value==="string")values[item.key]=item.value;
+        write("items", valid);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!controller.signal.aborted) setEntriesLoaded(true);
+      });
+    requestJSON<unknown>(
+      DATA_URL + "/site_editable_text?select=key,value&limit=100",
+      { signal: controller.signal, cache: "no-store", headers: PUBLIC_HEADERS },
+    )
+      .then((data) => {
+        if (controller.signal.aborted || !Array.isArray(data)) return;
+        const values: Record<string, string> = {};
+        for (const item of data)
+          if (
+            item &&
+            typeof item.key === "string" &&
+            typeof item.value === "string"
+          )
+            values[item.key] = item.value;
         setLabels(values);
-        write("labels",values);
-      }).catch(()=>{}).finally(()=>{if(!controller.signal.aborted)setLabelsLoaded(true);});
-    return ()=>controller.abort();
-  },[]);
-  return {items,entriesLoaded,labels,labelsLoaded};
+        write("labels", values);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!controller.signal.aborted) setLabelsLoaded(true);
+      });
+    return () => controller.abort();
+  }, []);
+  return { items, entriesLoaded, labels, labelsLoaded };
 }
-export function textValue(values:Record<string,string>,key:string,fallback:string):string{
-  return typeof values[key]==="string"?values[key]:fallback;
+export function textValue(
+  values: Record<string, string>,
+  key: string,
+  fallback: string,
+): string {
+  return typeof values[key] === "string" ? values[key] : fallback;
 }
-export function ContentStories({items,section}:{
-  items:SiteEntry[];section:SiteEntry["section"]
-}){
-  const stories=items.filter(i=>i.section===section&&i.kind==="story");
-  if(!stories.length)return null;
-  return <div className="extra-stories wrap" aria-label={"More about "+section}>
-    {stories.map(item=><article key={item.id} className="extra-story">
-      {item.date_label&&<span className="extra-story-kicker">{item.date_label}</span>}
-      <h3>{item.title}</h3>
-      {item.subtitle&&<p className="extra-story-subtitle">{item.subtitle}</p>}
-      {item.body&&<p className="extra-story-body">{item.body}</p>}
-    </article>)}
-  </div>;
+export function ContentStories({
+  items,
+  section,
+}: {
+  items: SiteEntry[];
+  section: SiteEntry["section"];
+}) {
+  const stories = items.filter(
+    (i) => i.section === section && i.kind === "story",
+  );
+  if (!stories.length) return null;
+  return (
+    <div className="extra-stories wrap" aria-label={"More about " + section}>
+      {stories.map((item) => (
+        <article key={item.id} className="extra-story">
+          {item.date_label && (
+            <span className="extra-story-kicker">{item.date_label}</span>
+          )}
+          <h3>{item.title}</h3>
+          {item.subtitle && (
+            <p className="extra-story-subtitle">{item.subtitle}</p>
+          )}
+          {item.body && <p className="extra-story-body">{item.body}</p>}
+        </article>
+      ))}
+    </div>
+  );
 }
