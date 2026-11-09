@@ -289,8 +289,8 @@ function useLivePageCopy() {
 }
 
 function Home() {
-  const {items,entriesLoaded,labels}=useSiteContent();
-  const t=(key:string,fallback:string)=>textValue(labels,key,fallback);
+  const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
+  const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
   const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
@@ -434,6 +434,7 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
     number:String(index+1).padStart(2,"0"),phase:item.date_label||"MILESTONE",title:item.title,
     short:item.subtitle,detail:item.body,symbol:index===0?"𝒮":index===1?"{ }":index===2?"</>":"↗"
   })):experience?[]:journeyMilestones;
+  if(!entriesLoaded)return null;
   const id=experience?"experience":"education";
   return <section className={"journey-section journey-inline wrap section-space"+(experience?" experience-section":"")} id={id} aria-labelledby={id+"-title"}>
     <div className="section-label"><span>{experience?"03 / EXPERIENCE":textValue(labels,"journey_label","02 / THE PATH SO FAR")}</span><span className="small-line" /></div>
@@ -465,8 +466,8 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
 }
 
 function AboutPage() {
-  const {items,entriesLoaded,labels}=useSiteContent();
-  const t=(key:string,fallback:string)=>textValue(labels,key,fallback);
+  const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
+  const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
   const copy=useLivePageCopy();
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
