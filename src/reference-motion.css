@@ -340,3 +340,10 @@
   .journey-section .section-label{margin-bottom:25px}
 }
 @media(prefers-reduced-motion:reduce){.journey-detail-body{animation:none}.journey-step:before,.journey-step-arrow,.journey-progress span{transition:none}}
+
+/* Keep the same three-line navigation available on the About Me page. */
+.site-header.about-page-header .desktop-nav{display:none}
+.site-header.about-page-header .menu-orb{display:flex}
+@media(min-width:1001px){
+  .site-header.about-page-header{padding-right:86px}
+}
