@@ -115,7 +115,6 @@ export default function PortfolioAssistant() {
       {messages.length===1&&topics.length>0&&<div className="assistant-topics" aria-label="Suggested questions">
         {topics.map(topic=><button key={topic.id} type="button" onClick={()=>send(topic.question)}>{topic.question}</button>)}
       </div>}
-      <p className="assistant-history-notice">Messages are saved to improve answers. Please avoid personal information.</p>
       <form className="assistant-form" onSubmit={event=>{event.preventDefault();send(input);}}>
         <label className="assistant-sr" htmlFor="assistant-question">Ask a question</label>
         <input id="assistant-question" ref={field} value={input} onChange={event=>setInput(event.target.value)}
