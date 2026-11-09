@@ -464,7 +464,7 @@ function AboutPage() {
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <VisitAnalytics />
-    <main id="main">
+    <main id="main" className="about-page-main">
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
         <div className="section-label"><span>01 / A LITTLE CONTEXT</span><span className="small-line" /></div>
         <div className="about-main">
