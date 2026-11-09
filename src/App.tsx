@@ -404,51 +404,40 @@ const journeyMilestones = [
   }
 ];
 
-function JourneyTimeline({entries,entriesLoaded,labels}:{entries:SiteEntry[],entriesLoaded:boolean,labels:Record<string,string>}) {
-  const [selected,setSelected]=useState(0);
-  const timeline=entriesLoaded?entries.filter(item=>item.section==="about"&&item.kind==="timeline").map((item,index)=>({
+function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[],entriesLoaded:boolean,labels:Record<string,string>,kind:"timeline"|"experience"}) {
+  const [selected,setSelected]=useState<number|null>(null);
+  const experience=kind==="experience";
+  const timeline=entriesLoaded?entries.filter(item=>item.section==="about"&&item.kind===kind).map((item,index)=>({
     number:String(index+1).padStart(2,"0"),phase:item.date_label||"MILESTONE",title:item.title,
     short:item.subtitle,detail:item.body,symbol:index===0?"𝒮":index===1?"{ }":index===2?"</>":"↗"
-  })):journeyMilestones;
-  const current=timeline[selected]||timeline[0];
-  if(!current)return null;
-  return <section className="journey-section wrap section-space" id="my-journey" aria-labelledby="journey-title">
-    <div className="section-label"><span>{textValue(labels,"journey_label","02 / THE PATH SO FAR")}</span><span className="small-line" /></div>
+  })):experience?[]:journeyMilestones;
+  const id=experience?"experience":"education";
+  return <section className={"journey-section journey-inline wrap section-space"+(experience?" experience-section":"")} id={id} aria-labelledby={id+"-title"}>
+    <div className="section-label"><span>{experience?"03 / EXPERIENCE":textValue(labels,"journey_label","02 / THE PATH SO FAR")}</span><span className="small-line" /></div>
     <div className="journey-intro">
-      <div><p className="journey-eyebrow">{textValue(labels,"journey_eyebrow","A JOURNEY STILL UNFOLDING")}</p><h2 id="journey-title">{textValue(labels,"journey_heading_one","Every step")}<br/><em>{textValue(labels,"journey_heading_two","has a story.")}</em></h2></div>
-      <p>{textValue(labels,"journey_intro","No perfect straight line. Just curiosity, choices, lessons, and a direction worth following.")}</p>
+      <div><p className="journey-eyebrow">{experience?"WHAT I'VE WORKED ON":textValue(labels,"journey_eyebrow","A JOURNEY STILL UNFOLDING")}</p>
+        <h2 id={id+"-title"}>{experience?"Experience":"Education"}</h2></div>
+      {!experience&&<p>{textValue(labels,"journey_intro","No perfect straight line. Just curiosity, choices, lessons, and a direction worth following.")}</p>}
     </div>
-    <div className="journey-layout">
-      <div className="journey-steps" aria-label="Explore journey milestones">
-        {timeline.map((step,index)=><button type="button" key={step.number}
-          className={"journey-step"+(selected===index?" is-active":"")}
-          onClick={()=>setSelected(index)}
-          aria-pressed={selected===index}
-          aria-controls="journey-detail">
+    {timeline.length>0?<div className="journey-layout"><div className="journey-steps" aria-label={experience?"Experience milestones":"Education milestones"}>
+      {timeline.map((step,index)=><div className="journey-entry" key={step.number}>
+        <button type="button" className={"journey-step"+(selected===index?" is-active":"")}
+          onClick={()=>setSelected(selected===index?null:index)} aria-expanded={selected===index}
+          aria-controls={id+"-detail-"+index}>
           <span className="journey-step-number">{step.number}</span>
           <span className="journey-step-copy"><small>{step.phase}</small><strong>{step.title}</strong></span>
-          <span className="journey-step-arrow" aria-hidden="true">{selected===index?"↗":"→"}</span>
-        </button>)}
-      </div>
-      <article className="journey-detail" id="journey-detail" aria-live="polite" aria-atomic="true">
-        <div className="journey-detail-top"><span>CHAPTER {current.number} / {String(timeline.length).padStart(2,"0")}</span><span className="journey-detail-symbol" aria-hidden="true">{current.symbol}</span></div>
-        <div className="journey-detail-body" key={current.number}>
-          <p className="journey-detail-phase">{current.phase}</p>
-          <h3>{current.title}</h3>
-          <p className="journey-detail-short">{current.short}</p>
-          <p className="journey-detail-description">{current.detail}</p>
-        </div>
-        <div className="journey-detail-bottom">
-          <div className="journey-progress" aria-label={`Step ${selected+1} of ${timeline.length}`}>
-            {timeline.map((step,index)=><span key={step.number} className={index<=selected?"filled":""} />)}
+          <span className="journey-step-arrow" aria-hidden="true">{selected===index?"↘":"→"}</span>
+        </button>
+        {selected===index&&<article className="journey-detail" id={id+"-detail-"+index}>
+          <div className="journey-detail-top"><span>{experience?"EXPERIENCE":"CHAPTER"} {step.number} / {String(timeline.length).padStart(2,"0")}</span><span className="journey-detail-symbol" aria-hidden="true">{step.symbol}</span></div>
+          <div className="journey-detail-body">
+            <p className="journey-detail-phase">{step.phase}</p><h3>{step.title}</h3>
+            {step.short&&<p className="journey-detail-short">{step.short}</p>}
+            {step.detail&&<p className="journey-detail-description">{step.detail}</p>}
           </div>
-          <div className="journey-controls">
-            <button type="button" aria-label="Previous chapter" disabled={selected===0} onClick={()=>setSelected(v=>v-1)}>←</button>
-            <button type="button" aria-label="Next chapter" disabled={selected===timeline.length-1} onClick={()=>setSelected(v=>v+1)}>→</button>
-          </div>
-        </div>
-      </article>
-    </div>
+        </article>}
+      </div>)}
+    </div></div>:<p className="journey-empty">Experience entries will appear here once added.</p>}
   </section>;
 }
 
@@ -495,7 +484,8 @@ function AboutPage() {
         </div>
       </section>
       <ContentStories items={items} section="about" />
-      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="timeline" />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" />
       <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span>{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="/">Back to home ↑</a></footer>
