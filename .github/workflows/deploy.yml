@@ -1,5 +1,6 @@
 
 name: Deploy Portfolio
+# Refresh GitHub Pages build after the About Me journey update.
 
 on:
   push:
