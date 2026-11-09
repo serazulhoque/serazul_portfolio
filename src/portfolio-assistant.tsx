@@ -36,7 +36,6 @@ function findAnswer(question: string, entries: PreparedAnswer[]) {
 
 export default function PortfolioAssistant() {
   const [open, setOpen] = useState(false);
-  const [saveHistory,setSaveHistory] = useState(false);
   const conversationId=useRef<string>("");
   if(!conversationId.current)conversationId.current=crypto.randomUUID();
   const [profilePhoto,setProfilePhoto] = useState("");
@@ -81,15 +80,13 @@ export default function PortfolioAssistant() {
     const answer=findAnswer(question,entries);
     setMessages(previous => [...previous, { role: "visitor", text: question }, { role: "guide", text: answer }]);
     setInput("");
-    // Messages are saved only when the visitor explicitly opts in.
-    if(saveHistory){
+    // Record only the question and prepared response, not a visitor identity.
       void fetch("https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/ask_me_chat_history",{
         method:"POST",credentials:"omit",
         headers:{"apikey":"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N","Content-Type":"application/json","Prefer":"return=minimal"},
         body:JSON.stringify({conversation_id:conversationId.current,question,answer:answer===fallback?fallback+"EMAIL":answer,
           unanswered:answer===fallback})
-      }).catch(()=>{/* Chat stays usable even if optional history saving fails. */});
-    }
+      }).catch(()=>{/* Chat stays usable even when history storage is unavailable. */});
   }
   const topics=entries.filter(entry=>entry.is_suggested).slice(0,5);
   const avatar=(size:"small"|"large"="small")=><span className={"assistant-avatar assistant-avatar-"+size}>
@@ -118,10 +115,7 @@ export default function PortfolioAssistant() {
       {messages.length===1&&topics.length>0&&<div className="assistant-topics" aria-label="Suggested questions">
         {topics.map(topic=><button key={topic.id} type="button" onClick={()=>send(topic.question)}>{topic.question}</button>)}
       </div>}
-      <label className="assistant-history-choice">
-        <input type="checkbox" checked={saveHistory} onChange={event=>setSaveHistory(event.target.checked)}/>
-        <span>Save my questions and replies for the site owner to review. Don't include private information.</span>
-      </label>
+      <p className="assistant-history-notice">Messages are saved to improve answers. Please avoid personal information.</p>
       <form className="assistant-form" onSubmit={event=>{event.preventDefault();send(input);}}>
         <label className="assistant-sr" htmlFor="assistant-question">Ask a question</label>
         <input id="assistant-question" ref={field} value={input} onChange={event=>setInput(event.target.value)}
