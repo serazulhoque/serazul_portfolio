@@ -367,3 +367,12 @@
 @media(max-width:780px){
   .about-page-main .journey-layout{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Additional stories managed in the admin dashboard. */
+.extra-stories{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:20px;padding:0 0 65px}
+.extra-story{min-width:0;padding:clamp(22px,3vw,35px);border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+.extra-story-kicker{display:block;font-family:var(--font-label);font-size:10px;letter-spacing:1.5px;color:#789653;margin-bottom:18px}
+.extra-story h3{font-family:var(--font-display);font-size:clamp(23px,3vw,34px);font-weight:400;line-height:1.18;overflow-wrap:anywhere}
+.extra-story-subtitle{font-family:var(--font-display);font-style:italic;font-size:17px;margin-top:13px;color:var(--muted)}
+.extra-story-body{font-size:15px;line-height:1.8;margin-top:17px;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:600px){.extra-stories{grid-template-columns:minmax(0,1fr);gap:12px;padding-bottom:45px}}

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import SiteHeader from "./site-header";
 import PortfolioAssistant from "./portfolio-assistant";
 import VisitAnalytics from "./visit-analytics";
+import {useSiteContent,textValue,ContentStories,type SiteEntry} from "./site-content";
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -87,7 +88,7 @@ function ArticleDocument({ content }: { content: unknown }) {
   return <div ref={container} className="published-article-body" />;
 }
 
-function PublishedArticles() {
+function PublishedArticles({labels}: {labels:Record<string,string>}) {
   const [articles, setArticles] = useState<PublishedArticle[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -171,9 +172,9 @@ function PublishedArticles() {
       .published-reader-navigation button:disabled{opacity:.4;cursor:default}
       .published-reader-hint{font-size:12px;color:var(--muted)}
     `}</style>
-    <div className="section-label"><span>03 / NOTES ALONG THE WAY</span><span className="small-line" /></div>
-    <h2 id="articles-title">Latest writing.</h2>
-    <p className="published-articles-intro">Thoughts, discoveries, and things I’m learning.</p>
+    <div className="section-label"><span>{textValue(labels,"publications_label","03 / NOTES ALONG THE WAY")}</span><span className="small-line" /></div>
+    <h2 id="articles-title">{textValue(labels,"publications_heading","Latest writing.")}</h2>
+    <p className="published-articles-intro">{textValue(labels,"publications_intro","Thoughts, discoveries, and things I’m learning.")}</p>
     <div aria-busy={loading}>
       {loading && <p className="published-articles-status" role="status">Loading articles…</p>}
       {error && <div className="published-articles-status" role="status"><p>{error}</p><button type="button" className="button button-dark" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
@@ -244,6 +245,8 @@ const DEFAULT_PAGE_SECTIONS: PageSections = {
 };
 
 function Home() {
+  const {items,entriesLoaded,labels}=useSiteContent();
+  const t=(key:string,fallback:string)=>textValue(labels,key,fallback);
   const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
@@ -309,25 +312,33 @@ function Home() {
     <main id="main">
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
-          <p className="eyebrow"><span className="status-dot" /> LEARNING. EXPLORING. BUILDING A DIRECTION.</p>
+          <p className="eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
           <h1>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
           <p className="hero-intro">{pageCopy.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
       </section>
-      <div className="intro-strip wrap"><span>A PERSONAL CORNER OF THE INTERNET</span><p>Curiosity in the details. <em>Purpose in the bigger picture.</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
+      <div className="intro-strip wrap"><span>{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p>{t("intro_first","Curiosity in the details.")} <em>{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
       <section className="focus-section wrap section-space" id="explorations" tabIndex={-1}>
-        <div className="section-label"><span>02 / BUILDING THE FOUNDATIONS</span><span className="small-line" /></div>
-        <div className="focus-main"><div className="focus-heading" data-reveal><h2>Small steps.<br /><em>A bigger direction.</em></h2><p>The things I’m learning and the questions I want to keep exploring.</p></div><div className="focus-list">
-          <article data-reveal><span className="focus-index">01</span><div><h3>Software foundations</h3><p>C, pseudocode, flowcharts, and the logic that helps turn a problem into a program.</p><span className="focus-tag">CURRENT LEARNING</span></div><span className="focus-symbol" aria-hidden="true">{`{ }`}</span></article>
+        <div className="section-label"><span>{t("exploring_label","02 / BUILDING THE FOUNDATIONS")}</span><span className="small-line" /></div>
+        <div className="focus-main"><div className="focus-heading" data-reveal><h2>{t("exploring_heading_one","Small steps.")}<br /><em>{t("exploring_heading_two","A bigger direction.")}</em></h2><p>{t("exploring_intro","The things I’m learning and the questions I want to keep exploring.")}</p></div><div className="focus-list">
+          {entriesLoaded ? items.filter(i=>i.section==="exploring"&&i.kind==="story").map((item,index)=><article key={item.id}>
+            <span className="focus-index">{String(index+1).padStart(2,"0")}</span>
+            <div><h3>{item.title}</h3>{item.body&&<p>{item.body}</p>}{item.subtitle&&<p>{item.subtitle}</p>}<span className="focus-tag">{item.date_label}</span></div>
+            <span className="focus-symbol" aria-hidden="true">{index===0?"{ }":index===1?"𝒮":"↗"}</span>
+          </article>) : <>          <article data-reveal><span className="focus-index">01</span><div><h3>Software foundations</h3><p>C, pseudocode, flowcharts, and the logic that helps turn a problem into a program.</p><span className="focus-tag">CURRENT LEARNING</span></div><span className="focus-symbol" aria-hidden="true">{`{ }`}</span></article>
           <article data-reveal><span className="focus-index">02</span><div><h3>AI with a practical purpose</h3><p>How could existing AI models become part of a useful, language-centered experience?</p><span className="focus-tag">AN OPEN QUESTION</span></div><span className="focus-symbol" aria-hidden="true">✳</span></article>
           <article data-reveal><span className="focus-index">03</span><div><h3>Clearer ways to learn</h3><p>Interactive examples, visual explanations, and making complicated ideas easier to approach.</p><span className="focus-tag">A PERSONAL INTEREST</span></div><span className="focus-symbol" aria-hidden="true"><Arrow diagonal /></span></article>
+
+          </>}
         </div></div>
       </section>
-      <PublishedArticles />
+      <ContentStories items={items} section="home" />
+      <PublishedArticles labels={labels} />
+      <ContentStories items={items} section="publications" />
       <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
-        <div className="section-label"><span>04 / GET IN TOUCH</span><span className="small-line" /></div>
+        <div className="section-label"><span>{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
         <h2 id="contact-title">{pageCopy.contact_heading}</h2>
         <p>{pageCopy.contact_paragraph}</p>
         <div className="contact-actions">
@@ -338,15 +349,16 @@ function Home() {
           </button>
         </div>
         <nav id="contact-social-links" className="contact-social-links" aria-label="My social media profiles" hidden={!followOpen}>
-          <a href="https://www.facebook.com/iamserazulhoque" target="_blank" rel="noopener noreferrer">Facebook <Arrow diagonal /></a>
-          <a href="https://www.linkedin.com/in/iamserazulhoque" target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal /></a>
-          <a href="https://www.x.com/Serazul_Hoque" target="_blank" rel="noopener noreferrer">X (Twitter) <Arrow diagonal /></a>
-          <a href="https://www.instagram.com/iamserazulhoque" target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal /></a>
+          <a href={t("social_facebook","https://www.facebook.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Facebook <Arrow diagonal /></a>
+          <a href={t("social_linkedin","https://www.linkedin.com/in/iamserazulhoque")} target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal /></a>
+          <a href={t("social_x","https://www.x.com/Serazul_Hoque")} target="_blank" rel="noopener noreferrer">X (Twitter) <Arrow diagonal /></a>
+          <a href={t("social_instagram","https://www.instagram.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal /></a>
         </nav>
       </section>
-      <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">STILL EARLY. ALREADY CURIOUS.</p><h2>Good software begins<br />with a <em>human question.</em></h2><p>Mine is how to help more people be understood.<br />This portfolio is a starting point for that journey.</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
+      <ContentStories items={items} section="contact" />
+      <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2>{t("closing_heading_one","Good software begins")}<br /><em>{t("closing_heading_two","with a human question.")}</em></h2><p>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br />{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
     </main>
-    <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="#home">Back to top ↑</a></footer>
+    <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span>{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="#home">Back to top ↑</a></footer>
     <DesignerSignature />
     <div className={notice ? "toast visible" : "toast"} role="status" aria-live="polite">{notice}</div>
     <PortfolioAssistant />
@@ -390,18 +402,23 @@ const journeyMilestones = [
   }
 ];
 
-function JourneyTimeline() {
+function JourneyTimeline({entries,entriesLoaded,labels}:{entries:SiteEntry[],entriesLoaded:boolean,labels:Record<string,string>}) {
   const [selected,setSelected]=useState(0);
-  const current=journeyMilestones[selected];
+  const timeline=entriesLoaded?entries.filter(item=>item.section==="about"&&item.kind==="timeline").map((item,index)=>({
+    number:String(index+1).padStart(2,"0"),phase:item.date_label||"MILESTONE",title:item.title,
+    short:item.subtitle,detail:item.body,symbol:index===0?"𝒮":index===1?"{ }":index===2?"</>":"↗"
+  })):journeyMilestones;
+  const current=timeline[selected]||timeline[0];
+  if(!current)return null;
   return <section className="journey-section wrap section-space" id="my-journey" aria-labelledby="journey-title">
-    <div className="section-label"><span>02 / THE PATH SO FAR</span><span className="small-line" /></div>
+    <div className="section-label"><span>{textValue(labels,"journey_label","02 / THE PATH SO FAR")}</span><span className="small-line" /></div>
     <div className="journey-intro">
-      <div><p className="journey-eyebrow">A JOURNEY STILL UNFOLDING</p><h2 id="journey-title">Every step<br/><em>has a story.</em></h2></div>
-      <p>No perfect straight line. Just curiosity, choices, lessons, and a direction worth following.</p>
+      <div><p className="journey-eyebrow">{textValue(labels,"journey_eyebrow","A JOURNEY STILL UNFOLDING")}</p><h2 id="journey-title">{textValue(labels,"journey_heading_one","Every step")}<br/><em>{textValue(labels,"journey_heading_two","has a story.")}</em></h2></div>
+      <p>{textValue(labels,"journey_intro","No perfect straight line. Just curiosity, choices, lessons, and a direction worth following.")}</p>
     </div>
     <div className="journey-layout">
       <div className="journey-steps" aria-label="Explore journey milestones">
-        {journeyMilestones.map((step,index)=><button type="button" key={step.number}
+        {timeline.map((step,index)=><button type="button" key={step.number}
           className={"journey-step"+(selected===index?" is-active":"")}
           onClick={()=>setSelected(index)}
           aria-pressed={selected===index}
@@ -412,7 +429,7 @@ function JourneyTimeline() {
         </button>)}
       </div>
       <article className="journey-detail" id="journey-detail" aria-live="polite" aria-atomic="true">
-        <div className="journey-detail-top"><span>CHAPTER {current.number} / 04</span><span className="journey-detail-symbol" aria-hidden="true">{current.symbol}</span></div>
+        <div className="journey-detail-top"><span>CHAPTER {current.number} / {String(timeline.length).padStart(2,"0")}</span><span className="journey-detail-symbol" aria-hidden="true">{current.symbol}</span></div>
         <div className="journey-detail-body" key={current.number}>
           <p className="journey-detail-phase">{current.phase}</p>
           <h3>{current.title}</h3>
@@ -420,12 +437,12 @@ function JourneyTimeline() {
           <p className="journey-detail-description">{current.detail}</p>
         </div>
         <div className="journey-detail-bottom">
-          <div className="journey-progress" aria-label={`Step ${selected+1} of ${journeyMilestones.length}`}>
-            {journeyMilestones.map((step,index)=><span key={step.number} className={index<=selected?"filled":""} />)}
+          <div className="journey-progress" aria-label={`Step ${selected+1} of ${timeline.length}`}>
+            {timeline.map((step,index)=><span key={step.number} className={index<=selected?"filled":""} />)}
           </div>
           <div className="journey-controls">
             <button type="button" aria-label="Previous chapter" disabled={selected===0} onClick={()=>setSelected(v=>v-1)}>←</button>
-            <button type="button" aria-label="Next chapter" disabled={selected===journeyMilestones.length-1} onClick={()=>setSelected(v=>v+1)}>→</button>
+            <button type="button" aria-label="Next chapter" disabled={selected===timeline.length-1} onClick={()=>setSelected(v=>v+1)}>→</button>
           </div>
         </div>
       </article>
@@ -434,6 +451,8 @@ function JourneyTimeline() {
 }
 
 function AboutPage() {
+  const {items,entriesLoaded,labels}=useSiteContent();
+  const t=(key:string,fallback:string)=>textValue(labels,key,fallback);
   const [copy,setCopy] = useState({
     about_line_one: DEFAULT_PAGE_SECTIONS.about_line_one,
     about_line_two: DEFAULT_PAGE_SECTIONS.about_line_two,
@@ -466,17 +485,18 @@ function AboutPage() {
     <VisitAnalytics />
     <main id="main" className="about-page-main">
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
-        <div className="section-label"><span>01 / A LITTLE CONTEXT</span><span className="small-line" /></div>
+        <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
         <div className="about-main">
           <h2>{copy.about_line_one}<br /><em>{copy.about_line_two}</em></h2>
           <div className="about-columns"><p>{copy.about_paragraph_one}</p><p>{copy.about_paragraph_two}</p></div>
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
-      <JourneyTimeline />
+      <ContentStories items={items} section="about" />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} />
       <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
     </main>
-    <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>Engineering Student with a purpose.</span></a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
+    <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span>{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="/">Back to home ↑</a></footer>
     <DesignerSignature />
     <PortfolioAssistant />
   </>;
