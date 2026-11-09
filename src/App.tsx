@@ -171,6 +171,11 @@ function PublishedArticles() {
 
 
 type PageSections = {
+  hero_line_one: string;
+  hero_line_two: string;
+  hero_phrase: string;
+  hero_emphasis: string;
+  hero_intro: string;
   about_line_one: string;
   about_line_two: string;
   about_paragraph_one: string;
@@ -179,6 +184,11 @@ type PageSections = {
   contact_paragraph: string;
 };
 const DEFAULT_PAGE_SECTIONS: PageSections = {
+  hero_line_one: "Engineering",
+  hero_line_two: "Student",
+  hero_phrase: "with a",
+  hero_emphasis: "purpose",
+  hero_intro: "Hi, I’m Serazul. A software engineering student drawn to useful AI, accessible technology, and the possibilities of a voice being understood.",
   about_line_one: "Learning the craft.",
   about_line_two: "Keeping people in mind.",
   about_paragraph_one: "I’m pursuing software engineering because I want to turn ideas into things people can use. Right now, that means learning the foundations, asking questions, and connecting the small steps to a bigger goal.",
@@ -217,7 +227,7 @@ export default function Home() {
       for(const key of keys) {
         const value=data[key];
         if(typeof value === "string" && value.trim().length > 0 &&
-           value.length <= (key.includes("paragraph") ? 2500 : 160)) next[key]=value;
+           value.length <= (key.includes("paragraph") || key === "hero_intro" ? 2500 : 160)) next[key]=value;
       }
       setPageCopy(next);
     }).catch(() => { /* Preserve existing text if the page-content API is unavailable. */ });
@@ -253,8 +263,8 @@ export default function Home() {
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
           <p className="eyebrow"><span className="status-dot" /> LEARNING. EXPLORING. BUILDING A DIRECTION.</p>
-          <h1>Engineering{" "}<br />Student{" "}<span className="hero-purpose">with a <em>purpose</em><span className="green-period">.</span></span></h1>
-          <p className="hero-intro">Hi, I’m Serazul. A software engineering student drawn to useful AI, accessible technology, and the possibilities of a voice being understood.</p>
+          <h1>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
+          <p className="hero-intro">{pageCopy.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="#about">A little about me <span aria-hidden="true">↓</span></a>
         </div><HeroPhoto />
