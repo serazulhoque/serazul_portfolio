@@ -148,7 +148,7 @@ export default function SiteHeader() {
   }
 
   return <>
-    <header className="site-header wrap">
+    <header className={`site-header wrap${isAboutPage ? " about-page-header" : ""}`}>
       <a className="wordmark" href={homeHref} aria-label="Serazul Hoque home">{brand}</a>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
         <a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href={sectionHref("#articles")}>Publication</a><a href={sectionHref("#explorations")}>What I’m exploring</a>
@@ -157,7 +157,7 @@ export default function SiteHeader() {
     </header>
     <dialog ref={dialog} id="portfolio-menu" className={`menu-dialog${closing ? " is-closing" : ""}`} aria-labelledby="menu-title" onCancel={e => { e.preventDefault(); closeMenu(); }}>
       <div className="menu-panel">
-        <a className="wordmark menu-wordmark" href="#home" onClick={follow} aria-label="Serazul Hoque home">{brand}</a>
+        <a className="wordmark menu-wordmark" href={homeHref} onClick={follow} aria-label="Serazul Hoque home">{brand}</a>
         <button className="menu-orb menu-close" onClick={() => closeMenu()} aria-label="Close menu" autoFocus><MenuIcon close /></button>
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
