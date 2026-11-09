@@ -8,7 +8,7 @@ type PreparedAnswer = {
   is_suggested: boolean; sort_order: number;
 };
 const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
-const fallback = "Hey I am sorry I can answer to you right now. Instead, send here ";
+const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
 const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
 function findAnswer(question: string, entries: PreparedAnswer[]) {
