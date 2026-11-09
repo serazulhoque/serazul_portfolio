@@ -2,7 +2,7 @@ import {useEffect,useState} from "react";
 
 export type SiteEntry={
   id:string;section:"home"|"about"|"contact"|"publications"|"exploring";
-  kind:"story"|"timeline";title:string;subtitle:string;body:string;date_label:string;sort_order:number
+  kind:"story"|"timeline"|"experience";title:string;subtitle:string;body:string;date_label:string;sort_order:number
 };
 type SiteData={items:SiteEntry[];entriesLoaded:boolean;labels:Record<string,string>};
 const BASE="https://serazul-backend.vercel.app/api/public";
