@@ -36,11 +36,21 @@ function findAnswer(question: string, entries: PreparedAnswer[]) {
 
 export default function PortfolioAssistant() {
   const [open, setOpen] = useState(false);
+  const [profilePhoto,setProfilePhoto] = useState("");
+  const [showInfo,setShowInfo] = useState(false);
   const [input, setInput] = useState("");
   const [entries,setEntries] = useState<PreparedAnswer[]>([]);
   const [messages, setMessages] = useState<Message[]>([{ role: "guide", text: welcome }]);
   const lastMessage = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const controller=new AbortController();
+    fetch("https://serazul-backend.vercel.app/api/public/profile",{signal:controller.signal,credentials:"omit",cache:"default"})
+      .then(response=>response.ok?response.json():Promise.reject())
+      .then(data=>{if(!controller.signal.aborted && typeof data.url==="string" && /^https:\/\//.test(data.url))setProfilePhoto(data.url);})
+      .catch(()=>{});
+    return ()=>controller.abort();
+  },[]);
   useEffect(() => {
     const controller=new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/ask-me",{signal:controller.signal,credentials:"omit",cache:"no-store"})
@@ -62,7 +72,7 @@ export default function PortfolioAssistant() {
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [open]);
   function send(value: string) {
     const question = value.trim().slice(0, 300);
     if (!question) return;
@@ -70,27 +80,50 @@ export default function PortfolioAssistant() {
     setInput("");
   }
   const topics=entries.filter(entry=>entry.is_suggested).slice(0,5);
+  const avatar=(size:"small"|"large"="small")=><span className={"assistant-avatar assistant-avatar-"+size}>
+    {profilePhoto?<img src={profilePhoto} alt="" decoding="async" referrerPolicy="no-referrer" onError={()=>setProfilePhoto("")}/>:
+      <span className="assistant-avatar-placeholder" aria-hidden="true">S</span>}
+    {size==="large"&&<span className="assistant-status-dot" aria-hidden="true"/>}
+  </span>;
   return <div className="portfolio-assistant">
     {open && <section className="assistant-panel" role="dialog" aria-modal="false" aria-label="Ask about Serazul">
+      <div className="assistant-drag-indicator" aria-hidden="true"><span/><span/><span/></div>
       <header className="assistant-header">
-        <div><strong>Ask about Serazul</strong><small>Free interactive portfolio guide</small></div>
-        <button type="button" className="assistant-close" aria-label="Close assistant" onClick={() => setOpen(false)}>×</button>
+        <button type="button" className="assistant-icon-button assistant-back" aria-label="Close conversation" onClick={()=>setOpen(false)}>
+          <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+        </button>
+        {avatar("large")}
+        <div className="assistant-heading"><strong>Serazul Hoque</strong><small>Portfolio guide</small></div>
+        <button type="button" className="assistant-icon-button assistant-info-button" aria-label="About this chatbot" aria-expanded={showInfo} onClick={()=>setShowInfo(v=>!v)}>
+          <svg viewBox="0 0 24 24" width="25" height="25" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 10.5v6m0-10v.6" stroke="white" strokeWidth="2.2" strokeLinecap="round"/></svg>
+        </button>
+        <button type="button" className="assistant-icon-button assistant-close" aria-label="Close assistant" onClick={()=>setOpen(false)}>×</button>
       </header>
+      {showInfo&&<div className="assistant-info" role="note">
+        This portfolio guide answers questions using prepared public information about Serazul. It is not a live generative AI or a private messaging account.
+      </div>}
       <div className="assistant-messages" role="log" aria-live="polite" aria-label="Conversation">
-        {messages.map((message, index) => <p key={index} className={"assistant-message assistant-" + message.role}>{message.text}</p>)}
-        <div ref={lastMessage} />
+        {messages.map((message,index)=><div className={"assistant-message-row assistant-row-"+message.role} key={index}>
+          {message.role==="guide"&&avatar()}
+          <p className={"assistant-message assistant-"+message.role}>{message.text}</p>
+        </div>)}
+        <div ref={lastMessage}/>
       </div>
-      {messages.length === 1 && topics.length>0 && <div className="assistant-topics">{topics.map(topic => <button type="button" key={topic.id} onClick={() => send(topic.question)}>{topic.question}</button>)}</div>}
-      <form className="assistant-form" onSubmit={event => { event.preventDefault(); send(input); }}>
+      {messages.length===1&&topics.length>0&&<div className="assistant-topics" aria-label="Suggested questions">
+        {topics.map(topic=><button key={topic.id} type="button" onClick={()=>send(topic.question)}>{topic.question}</button>)}
+      </div>}
+      <form className="assistant-form" onSubmit={event=>{event.preventDefault();send(input);}}>
         <label className="assistant-sr" htmlFor="assistant-question">Ask a question</label>
-        <input id="assistant-question" ref={field} value={input} onChange={event => setInput(event.target.value)} maxLength={300} placeholder="Ask me anything about Serazul…" autoComplete="off" />
-        <button type="submit" disabled={!input.trim()} aria-label="Send question">↑</button>
+        <input id="assistant-question" ref={field} value={input} onChange={event=>setInput(event.target.value)}
+          maxLength={300} placeholder="Message" autoComplete="off"/>
+        <button type="submit" disabled={!input.trim()} aria-label="Send question">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 3 4.7 10.3l1.4 1.4L11 6.8V21h2V6.8l4.9 4.9 1.4-1.4L12 3Z"/></svg>
+        </button>
       </form>
-      <p className="assistant-disclaimer">Answers are based on prepared public information, not a live AI model. Don't enter private information.</p>
+      <p className="assistant-disclaimer">Prepared website answers, not a live AI chat. Please don't share private information.</p>
     </section>}
-    <button type="button" className="assistant-launch" aria-expanded={open} aria-label={open ? "Close portfolio guide" : "Open portfolio guide"} onClick={() => setOpen(v => !v)}>
-      <span aria-hidden="true">{open ? "×" : "✳"}</span>
-      <span>{open ? "Close" : "Ask me"}</span>
+    <button type="button" className="assistant-launch" aria-expanded={open} aria-label={open?"Close portfolio guide":"Open portfolio guide"} onClick={()=>setOpen(v=>!v)}>
+      <span aria-hidden="true">{open?"×":"✳"}</span><span>{open?"Close":"Ask me"}</span>
     </button>
   </div>;
 }
