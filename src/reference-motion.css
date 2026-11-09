@@ -187,46 +187,45 @@
   .hero-photo{height:112vw;min-height:320px}
 }
 
-/* Distinct, right-aligned navigation symbols with gentle hover motion. */
+/* Each icon is centered vertically beside its own text, at a fixed right edge. */
 .menu-links{
   width:340px;
   max-width:calc(100vw - 40px);
+  box-sizing:border-box;
 }
 .menu-links>a{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 22px;
-  align-items:center;
-  column-gap:14px;
+  display:block;
+  box-sizing:border-box;
+  position:relative;
   width:100%;
   max-width:100%;
-  min-height:30px;
   margin-left:0;
-}
-.menu-links>a .menu-item-label{
-  display:block;
-  min-width:0;
+  padding:6px 38px 6px 0;
   text-align:right;
-  line-height:1.35;
-}
-.menu-links>a .menu-symbol{
-  align-self:center;
-  justify-self:center;
-  vertical-align:middle;
 }
 .menu-links>a::before{content:none}
+.menu-links>a .menu-item-label{
+  display:block;
+  line-height:1.4;
+  text-align:right;
+}
 .menu-links>a .menu-symbol{
   display:block;
-  flex:0 0 22px;
+  position:absolute;
+  right:0;
+  top:50%;
+  width:22px;
+  height:22px;
   color:var(--lime);
   opacity:.75;
-  transform:translateY(0);
+  transform:translateY(-50%);
   transition:opacity .22s ease,transform .22s ease;
 }
 .menu-links>a:hover .menu-symbol,.menu-links>a:focus-visible .menu-symbol{
   opacity:1;
-  transform:translateY(-3px) scale(1.08);
+  transform:translateY(-50%) scale(1.08);
 }
 @media(prefers-reduced-motion:reduce){
-  .menu-links>a .menu-symbol{transition:none;transform:none}
-  .menu-links>a:hover .menu-symbol,.menu-links>a:focus-visible .menu-symbol{transform:none}
+  .menu-links>a .menu-symbol{transition:none}
+  .menu-links>a:hover .menu-symbol,.menu-links>a:focus-visible .menu-symbol{transform:translateY(-50%)}
 }
