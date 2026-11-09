@@ -43,6 +43,20 @@ function HeroPhoto() {
 // Public content needs no password, Supabase key or admin token.
 const ARTICLES_API = API_URL + "/articles";
 type PublishedArticle = { id: string; title: string; document: unknown; published_at: string | null };
+function postSlug(title:string){
+  return title.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,110)||"post";
+}
+function postUrl(article:PublishedArticle){
+  return "/blog/"+postSlug(article.title);
+}
+function selectedPostIndex(articles:PublishedArticle[]){
+  const match=window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
+  if(!match)return null;
+  const index=articles.findIndex(article=>postSlug(article.title)===decodeURIComponent(match[1]));
+  return index<0?null:index;
+}
+
 
 function ArticleDocument({ content }: { content: unknown }) {
   const container = useRef<HTMLDivElement>(null);
@@ -98,6 +112,7 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+  const [shareNotice, setShareNotice] = useState("");
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -120,10 +135,10 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
         }
         if (!controller.signal.aborted) {
           setArticles(all);
-          setSelected(null);
+          setSelected(selectedPostIndex(all));
         }
       } catch {
-        if (!controller.signal.aborted) setError("Articles couldn’t load right now. Please try again.");
+        if (!controller.signal.aborted) setError("Posts couldn’t load right now. Please try again.");
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -132,10 +147,34 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
     return () => controller.abort();
   }, [retry]);
 
+  useEffect(()=>{
+    const sync=()=>setSelected(selectedPostIndex(articles));
+    window.addEventListener("popstate",sync);
+    return ()=>window.removeEventListener("popstate",sync);
+  },[articles]);
+  function openPost(index:number){
+    setSelected(index);
+    window.history.pushState(null,"",postUrl(articles[index]));
+    document.getElementById("articles")?.scrollIntoView({block:"start"});
+  }
+  function backToPosts(){
+    setSelected(null);
+    window.history.pushState(null,"","/#articles");
+  }
+  async function sharePost(article:PublishedArticle){
+    const url=window.location.origin+postUrl(article);
+    if(navigator.share){
+      try{await navigator.share({title:article.title,text:article.title,url});return;}
+      catch(error){if((error as Error)?.name==="AbortError")return;}
+    }
+    try{await navigator.clipboard.writeText(url);setShareNotice("Link copied!");}
+    catch{setShareNotice(url);}
+  }
   const current = selected === null ? null : articles[selected];
-  const move = (direction: number) => setSelected(index =>
-    index === null ? null : Math.max(0, Math.min(articles.length - 1, index + direction))
-  );
+  const move=(direction:number)=>{
+    if(selected===null)return;
+    openPost(Math.max(0,Math.min(articles.length-1,selected+direction)));
+  };
   const displayDate = (value: string | null) => {
     const date = typeof value === "string" ? new Date(value) : null;
     return date && !Number.isNaN(date.getTime())
@@ -173,24 +212,28 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
       .published-reader-navigation{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:18px}
       .published-reader-navigation button:disabled{opacity:.4;cursor:default}
       .published-reader-hint{font-size:12px;color:var(--muted)}
+      .post-share{border:1px solid var(--line);border-radius:999px;background:transparent;color:inherit;font:600 12px var(--font-body);padding:7px 14px;cursor:pointer}
+      .post-share:hover{background:var(--lime);color:#202b26}
+      .post-share-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 0}
+      .post-share-status{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
     `}</style>
     <div className="section-label"><span>{textValue(labels,"publications_label","03 / NOTES ALONG THE WAY")}</span><span className="small-line" /></div>
-    <h2 id="articles-title">{textValue(labels,"publications_heading","Latest writing.")}</h2>
+    <h2 id="articles-title">Posts</h2>
     <p className="published-articles-intro">{textValue(labels,"publications_intro","Thoughts, discoveries, and things I’m learning.")}</p>
     <div aria-busy={loading}>
-      {loading && <p className="published-articles-status" role="status">Loading articles…</p>}
+      {loading && <p className="published-articles-status" role="status">Loading posts…</p>}
       {error && <div className="published-articles-status" role="status"><p>{error}</p><button type="button" className="button button-dark" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
-      {!loading && !error && articles.length === 0 && <p className="published-articles-status">No published articles yet.</p>}
+      {!loading && !error && articles.length === 0 && <p className="published-articles-status">No published posts yet.</p>}
       {!loading && !error && selected === null && <div className="published-articles-list">
-        {articles.map((article, index) => <button key={article.id} type="button" className="published-article-title" onClick={() => setSelected(index)}>
+        {articles.map((article, index) => <a key={article.id} href={postUrl(article)} className="published-article-title" onClick={event=>{event.preventDefault();openPost(index);}}>
           <span><strong>{article.title}</strong>{displayDate(article.published_at) && <small>{displayDate(article.published_at)}</small>}</span>
           <span aria-hidden="true">↗</span>
-        </button>)}
+        </a>)}
       </div>}
       {!loading && !error && current && <div>
         <div className="published-reader-controls">
-          <button type="button" className="button button-dark" onClick={() => setSelected(null)}>← All article titles</button>
-          <span className="published-reader-hint">Article {selected! + 1} of {articles.length}</span>
+          <button type="button" className="button button-dark" onClick={backToPosts}>← All posts</button>
+          <span className="published-reader-hint">Post {selected! + 1} of {articles.length}</span>
         </div>
         <article className="published-article"
           onTouchStart={event => {const t=event.touches[0];touchStart.current=t?{x:t.clientX,y:t.clientY}:null;}}
@@ -207,6 +250,10 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
             {displayDate(current.published_at) && <time>{displayDate(current.published_at)}</time>}
           </header>
           <ArticleDocument content={current.document} />
+          <div className="post-share-row" style={{padding:"0 clamp(18px,4vw,32px) 20px"}}>
+            <button type="button" className="post-share" onClick={()=>void sharePost(current)} aria-label={"Share post: "+current.title}>↗ Share</button>
+            {shareNotice&&<span className="post-share-status" role="status">{shareNotice}</span>}
+          </div>
         </article>
         <nav className="published-reader-navigation" aria-label="Article navigation">
           <button type="button" className="button button-dark" disabled={selected === 0} onClick={() => move(-1)}>← Previous</button>
