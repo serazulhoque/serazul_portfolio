@@ -252,7 +252,6 @@ function Home() {
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
   const [pageCopy, setPageCopy] = useState<PageSections>(DEFAULT_PAGE_SECTIONS);
-  const [sectionsReady,setSectionsReady] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/settings", { signal: controller.signal, credentials: "omit" })
@@ -281,8 +280,7 @@ function Home() {
            value.length <= (key.includes("paragraph") || key === "hero_intro" ? 2500 : 160)) next[key]=value;
       }
       setPageCopy(next);
-    }).catch(() => { /* Use the latest saved fallback if the API is temporarily unavailable. */ })
-      .finally(() => { if(!controller.signal.aborted)setSectionsReady(true); });
+    }).catch(() => { /* Use the latest saved fallback if the API is temporarily unavailable. */ });
     return () => controller.abort();
   }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
@@ -316,8 +314,8 @@ function Home() {
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
           <p className="eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
-          <h1 style={sectionsReady?undefined:{visibility:"hidden"}}>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
-          <p className="hero-intro" style={sectionsReady?undefined:{visibility:"hidden"}}>{pageCopy.hero_intro}</p>
+          <h1>{pageCopy.hero_line_one}{" "}<br />{pageCopy.hero_line_two}{" "}<span className="hero-purpose">{pageCopy.hero_phrase} <em>{pageCopy.hero_emphasis}</em><span className="green-period">.</span></span></h1>
+          <p className="hero-intro">{pageCopy.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
