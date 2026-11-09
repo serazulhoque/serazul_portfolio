@@ -162,11 +162,11 @@ export default function SiteHeader() {
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
         <nav className="menu-links" aria-label="Portfolio navigation">
-          <a href="/about.html">About me <MenuSymbol name="about" /></a>
-          <a href={sectionHref("#contact")} onClick={follow}>Get in touch <MenuSymbol name="contact" /></a>
-          <a href={sectionHref("#articles")} onClick={follow}>Publication <MenuSymbol name="publication" /></a>
-          <a href={sectionHref("#explorations")} onClick={follow}>What I am exploring <MenuSymbol name="explore" /></a>
-          <a href={homeHref} onClick={follow}>HOME <MenuSymbol name="home" /></a>
+          <a href="/about.html"><span className="menu-item-label">About me</span><MenuSymbol name="about" /></a>
+          <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
+          <a href={sectionHref("#articles")} onClick={follow}><span className="menu-item-label">Publication</span><MenuSymbol name="publication" /></a>
+          <a href={sectionHref("#explorations")} onClick={follow}><span className="menu-item-label">What I am exploring</span><MenuSymbol name="explore" /></a>
+          <a href={homeHref} onClick={follow}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>

@@ -188,11 +188,30 @@
 }
 
 /* Distinct, right-aligned navigation symbols with gentle hover motion. */
+.menu-links{
+  width:340px;
+  max-width:calc(100vw - 40px);
+}
 .menu-links>a{
-  display:flex;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 22px;
   align-items:center;
-  justify-content:flex-end;
-  gap:14px;
+  column-gap:14px;
+  width:100%;
+  max-width:100%;
+  min-height:30px;
+  margin-left:0;
+}
+.menu-links>a .menu-item-label{
+  display:block;
+  min-width:0;
+  text-align:right;
+  line-height:1.35;
+}
+.menu-links>a .menu-symbol{
+  align-self:center;
+  justify-self:center;
+  vertical-align:middle;
 }
 .menu-links>a::before{content:none}
 .menu-links>a .menu-symbol{
