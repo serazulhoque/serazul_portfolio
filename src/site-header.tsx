@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import "./profile-photo-viewer.css";
 
 function MenuIcon({ close = false }: { close?: boolean }) {
   return <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d={close ? "M8 8 20 20M20 8 8 20" : "M5 8h18M5 14h18M5 20h18"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>;
@@ -28,6 +29,11 @@ function MenuSymbol({ name }: { name: "about" | "contact" | "publication" | "exp
 
 export default function SiteHeader() {
   const dialog = useRef<HTMLDialogElement>(null);
+  const photoDialog = useRef<HTMLDialogElement>(null);
+  const photoButton = useRef<HTMLButtonElement>(null);
+  const photoOverflow = useRef("");
+  const [viewedPhoto, setViewedPhoto] = useState("");
+  const [photoError, setPhotoError] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousOverflow = useRef("");
   const [closing, setClosing] = useState(false);
@@ -55,15 +61,46 @@ export default function SiteHeader() {
   const homeHref = isAboutPage ? "/" : "#home";
   const sectionHref = (section: string) => isAboutPage ? `/${section}` : section;
 
-  const brand = <><span className="brand-mark brand-avatar" aria-hidden="true">
+  function openPhoto() {
+    if (!profilePhoto || !photoDialog.current || photoDialog.current.open) return;
+    // Close the mobile menu first so only one modal owns focus and scrolling.
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    if (dialog.current?.open) {
+      dialog.current.close();
+      document.body.style.overflow = previousOverflow.current;
+      setClosing(false);
+    }
+    photoOverflow.current = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    setPhotoError(false);
+    setViewedPhoto(profilePhoto);
+    photoDialog.current.showModal();
+  }
+
+  function finishPhotoClose() {
+    document.body.style.overflow = photoOverflow.current;
+    setViewedPhoto("");
+    photoButton.current?.focus({ preventScroll: true });
+  }
+
+  useEffect(() => {
+    const viewer = photoDialog.current;
+    return () => { if (viewer?.open) document.body.style.overflow = photoOverflow.current; };
+  }, []);
+
+  const brand = (inMenu = false) => <>
+    <button type="button" ref={inMenu ? undefined : photoButton}
+      className="brand-mark brand-avatar profile-photo-button" onClick={openPhoto}
+      disabled={!profilePhoto} aria-label="View Serazul Hoque’s profile picture"
+      aria-haspopup="dialog" aria-controls="profile-photo-viewer">
     {profilePhoto ? <img src={profilePhoto} alt="" decoding="async" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
       <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
-  </span><span className="brand-name">Serazul Hoque
+  </button><a className="brand-name" href={homeHref} onClick={inMenu ? follow : undefined} aria-label="Serazul Hoque home">Serazul Hoque
     <svg className="brand-check" viewBox="0 0 24 24" role="img" aria-label="Blue check decoration">
       <path fill="#1877F2" d="m12 1.2 2.8 1.7 3.3-.1 1.5 3 3 1.6-.1 3.3 1.5 2.9-1.7 2.8.1 3.3-3 1.5-1.6 3-3.3-.1-2.5 1.5-2.9-1.7-3.3.1-1.5-3-3-1.6.1-3.3L1 13.2l1.7-2.8-.1-3.3 3-1.5 1.6-3 3.3.1L12 1.2Z" transform="translate(1.4 1.4) scale(.89)" />
       <path d="m7.2 12.2 3.1 3.1 6.6-6.7" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
-  </span></>;
+  </a></>;
 
   useEffect(() => {
     let frame = 0;
@@ -149,7 +186,7 @@ export default function SiteHeader() {
 
   return <>
     <header className={`site-header wrap${isAboutPage ? " about-page-header" : ""}`}>
-      <a className="wordmark" href={homeHref} aria-label="Serazul Hoque home">{brand}</a>
+      <div className="wordmark">{brand()}</div>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
         <a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href={sectionHref("#articles")}>Publication</a><a href={sectionHref("#explorations")}>What I’m exploring</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
@@ -157,7 +194,7 @@ export default function SiteHeader() {
     </header>
     <dialog ref={dialog} id="portfolio-menu" className={`menu-dialog${closing ? " is-closing" : ""}`} aria-labelledby="menu-title" onCancel={e => { e.preventDefault(); closeMenu(); }}>
       <div className="menu-panel">
-        <a className="wordmark menu-wordmark" href={homeHref} onClick={follow} aria-label="Serazul Hoque home">{brand}</a>
+        <div className="wordmark menu-wordmark">{brand(true)}</div>
         <button className="menu-orb menu-close" onClick={() => closeMenu()} aria-label="Close menu" autoFocus><MenuIcon close /></button>
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
@@ -172,5 +209,21 @@ export default function SiteHeader() {
         <span className="menu-watermark" aria-hidden="true">sh.</span>
       </div>
     </dialog>
+    <dialog ref={photoDialog} id="profile-photo-viewer" className="profile-photo-viewer"
+      aria-labelledby="profile-photo-title" onClose={finishPhotoClose}
+      onClick={event => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
+      <div className="profile-photo-toolbar">
+        <h2 id="profile-photo-title">Serazul Hoque <span>Profile picture</span></h2>
+        <button type="button" className="profile-photo-close" autoFocus
+          aria-label="Close profile picture" onClick={() => photoDialog.current?.close()}>
+          <MenuIcon close />
+        </button>
+      </div>
+      {viewedPhoto && !photoError && <img className="profile-photo-full" src={viewedPhoto}
+        alt="Serazul Hoque’s profile picture" referrerPolicy="no-referrer"
+        onError={() => setPhotoError(true)} />}
+      {photoError && <p className="profile-photo-error" role="status">This photo couldn’t load. Close this viewer and refresh the page to try again.</p>}
+    </dialog>
   </>;
 }
+
