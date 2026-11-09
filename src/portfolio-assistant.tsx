@@ -113,7 +113,7 @@ export default function PortfolioAssistant() {
           <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 3 4.7 10.3l1.4 1.4L11 6.8V21h2V6.8l4.9 4.9 1.4-1.4L12 3Z"/></svg>
         </button>
       </form>
-      <p className="assistant-disclaimer">Prepared website answers, not a live AI chat. Please don't share private information.</p>
+      
     </section>}
     <button type="button" className="assistant-launch" aria-expanded={open} aria-label={open?"Close portfolio guide":"Open portfolio guide"} onClick={()=>setOpen(v=>!v)}>
       <span aria-hidden="true">{open?"×":"✳"}</span><span>{open?"Close":"Ask me"}</span>
