@@ -2,7 +2,7 @@ import {readFile,writeFile,mkdir} from "node:fs/promises";
 import {join} from "node:path";
 
 const base=join(process.cwd(),"dist");
-const template=await readFile(join(base,"index.html"),"utf8");
+const template=await readFile(join(base,"blog","index.html"),"utf8");
 const escape=(text)=>String(text).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const slug=(title)=>title.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
   .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,110)||"post";
