@@ -11,7 +11,7 @@ const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is 
 const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
 const isRohingyaQuestion = (text: string) => /\b(rohingya|arakan|rakhine|rakhaing|myanmar|burma|maungdaw|buthidaung|cox.s bazar|hanifi|genocide|statelessness|1982 citizenship|refugees? in bangladesh)\b/i.test(text);
-const RESEARCH_API = "https://serazul-backend.vercel.app/api/public/rohingya-research";
+const AI_URL = "https://serazul-backend.vercel.app/api/public/ask-ai";
 const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
 function findAnswer(question: string, entries: PreparedAnswer[]) {
   const q = normalize(question);
@@ -42,6 +42,7 @@ export default function PortfolioAssistant() {
   if(!conversationId.current)conversationId.current=crypto.randomUUID();
   const [profilePhoto,setProfilePhoto] = useState("");
   const [input, setInput] = useState("");
+  const [thinking, setThinking] = useState(false);
   const [entries,setEntries] = useState<PreparedAnswer[]>([]);
   const [messages, setMessages] = useState<Message[]>([{ role: "guide", text: welcome }]);
   const lastMessage = useRef<HTMLDivElement>(null);
