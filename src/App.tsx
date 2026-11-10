@@ -236,7 +236,7 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
           <button type="button" className="button button-dark" onClick={backToPosts}>← All posts</button>
           <span className="published-reader-hint">Post {selected! + 1} of {articles.length}</span>
         </div>
-        <article className="published-article"
+        <article className={"published-article"+(current.title.trim().toLowerCase().startsWith("hello")?" published-article--hello":"")}
           onTouchStart={event => {const t=event.touches[0];touchStart.current=t?{x:t.clientX,y:t.clientY}:null;}}
           onTouchEnd={event => {
             const first=touchStart.current;
