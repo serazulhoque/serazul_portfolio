@@ -1,6 +1,7 @@
 import {useEffect,useState} from "react";
 import SiteHeader from "./site-header";
 import PortfolioAssistant from "./portfolio-assistant";
+import "./gallery.css";
 
 const API="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/gallery_items";
 const HEADERS={apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"};
