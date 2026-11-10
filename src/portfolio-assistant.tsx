@@ -73,7 +73,7 @@ export default function PortfolioAssistant({standalone=false}:{standalone?:boole
       const response=await fetch(AI_URL,{
         method:"POST",credentials:"omit",cache:"no-store",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({question}),
+        body:JSON.stringify({question,history:messages.filter(message=>message.role==="visitor" || (message.role==="guide" && message.text!=="Thinking…" && message.text!==welcome)).slice(-8).map(message=>({role:message.role,text:message.text.slice(0,700)}))}),
         signal:AbortSignal.timeout(60000)
       });
       if(!response.ok)throw new Error("Model unavailable");
@@ -84,7 +84,7 @@ export default function PortfolioAssistant({standalone=false}:{standalone?:boole
         if(!source||typeof source!=="object")return false;
         const item=source as Record<string,unknown>;
         return typeof item.title==="string"&&typeof item.url==="string"
-          &&item.url.startsWith("https://rohingyaresearch.org/");
+          &&(/^https:\/\/(?:rohingyaresearch\.org\/|en\.wikipedia\.org\/)/.test(item.url));
       }).slice(0,2);
     }catch{/* Preserve email fallback if inference is unavailable. */}
     setMessages(old=>old.map(message=>message.id===id?{...message,text:answer,sources}:message));
