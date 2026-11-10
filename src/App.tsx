@@ -60,7 +60,7 @@ function selectedPostIndex(articles:PublishedArticle[]){
 }
 
 
-function ArticleDocument({ content, layout }: { content: unknown;layout?:LayoutConfig }) {
+function ArticleDocument({ content, layout, articleId }: { content: unknown;layout?:LayoutConfig;articleId?:string }) {
   const container = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!container.current) return;
@@ -105,7 +105,7 @@ function ArticleDocument({ content, layout }: { content: unknown;layout?:LayoutC
     for (const item of Array.isArray(content) ? content : [content]) { if (nodes >= 3000) break; append(fragment, item, 0); }
     container.current.replaceChildren(fragment);
   }, [content]);
-  return <div ref={container} className="published-article-body" data-edit-key="blog_body" style={layout?styleFor(layout,"blog","body"):undefined} />;
+  return <div ref={container} className="published-article-body" data-edit-key={articleId?"article:"+articleId+":body":"blog_body"} style={layout?styleFor(layout,"article:"+articleId,"body"):undefined} />;
 }
 
 function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record<string,string>;limit?:number;standalone?:boolean;layout?:LayoutConfig}) {
@@ -240,7 +240,7 @@ function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record
       {!loading && !error && articles.length === 0 && <p className="published-articles-status">No published posts yet.</p>}
       {!loading && !error && selected === null && <div className="published-articles-list">
         {articles.map((article, index) => <a key={article.id} href={postUrl(article)} className="published-article-title" onClick={event=>{if(standalone){event.preventDefault();openPost(index);}}}>
-          <span><strong>{article.title}</strong>{displayDate(article.published_at) && <small>{displayDate(article.published_at)}</small>}</span>
+          <span><strong data-edit-key={"article:"+article.id+":title"} style={layout?styleFor(layout,"article:"+article.id,"title"):undefined}>{article.title}</strong>{displayDate(article.published_at) && <small>{displayDate(article.published_at)}</small>}</span>
           <span aria-hidden="true">↗</span>
         </a>)}
       </div>}
@@ -261,10 +261,10 @@ function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record
             if (Math.abs(dx)>65 && Math.abs(dx)>Math.abs(dy)*1.4) move(dx<0?1:-1);
           }}>
           <header className="published-article-heading">
-            <h3>{current.title}</h3>
+            <h3 data-edit-key={"article:"+current.id+":title"} style={layout?styleFor(layout,"article:"+current.id,"title"):undefined}>{current.title}</h3>
             {displayDate(current.published_at) && <time>{displayDate(current.published_at)}</time>}
           </header>
-          <ArticleDocument content={current.document} layout={layout} />
+          <ArticleDocument content={current.document} layout={layout} articleId={current.id} />
           <div className="post-share-row" style={{padding:"0 clamp(18px,4vw,32px) 20px"}}>
             <button type="button" className="post-share" onClick={()=>void sharePost(current)} aria-label={"Share post: "+current.title}>↗ Share</button>
             {shareNotice&&<span className="post-share-status" role="status">{shareNotice}</span>}
