@@ -10,7 +10,7 @@ type PreparedAnswer = {
 const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
 const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
-const isRohingyaQuestion = (text: string) => /\\b(rohingya|arakan|rakhine|rakhaing|maungdaw|buthidaung|rohingya crisis|genocide|statelessness|1982 citizenship|refugees? in bangladesh)\\b/i.test(text);
+const isRohingyaQuestion = (text: string) => /\\b(rohingya|arakan|rakhine|rakhaing|myanmar|burma|maungdaw|buthidaung|cox.s bazar|hanifi|rohingya crisis|genocide|statelessness|1982 citizenship|refugees? in bangladesh)\\b/i.test(text);
 const RESEARCH_API = "https://serazul-backend.vercel.app/api/public/rohingya-research";
 const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
 function findAnswer(question: string, entries: PreparedAnswer[]) {
