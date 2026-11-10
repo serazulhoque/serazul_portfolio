@@ -7,12 +7,14 @@ export type ContentStyle={titleColor?:string;bodyColor?:string;titleSize?:number
 export type LayoutConfig={
   home_blog:boolean;
   blog_page:boolean;
+  publications_home:boolean;
+  publications_page:boolean;
   home_blog_limit:number;
   home_sections:HomeSection[];
   styles:Record<string,ContentStyle>;
 };
 export const DEFAULT_LAYOUT:LayoutConfig={
-  home_blog:true,blog_page:true,home_blog_limit:3,
+  home_blog:true,blog_page:true,publications_home:true,publications_page:true,home_blog_limit:3,
   home_sections:[...HOME_SECTIONS],styles:{}
 };
 function hex(value:unknown):value is string{
@@ -42,6 +44,8 @@ export function parseLayout(value:unknown):LayoutConfig {
   return {
     home_blog:data.home_blog!==false,
     blog_page:data.blog_page!==false,
+    publications_home:data.publications_home!==false,
+    publications_page:data.publications_page!==false,
     home_blog_limit:typeof data.home_blog_limit==="number"&&Number.isInteger(data.home_blog_limit)
       ?Math.max(1,Math.min(30,data.home_blog_limit)):3,
     home_sections:[...new Set([...sections,...HOME_SECTIONS])],
