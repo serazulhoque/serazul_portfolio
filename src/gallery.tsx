@@ -30,7 +30,7 @@ export default function Gallery(){
             return typeof data.url==="string"?{...item,url:data.url,alt:data.alt}:null;
           }catch{return null;}
         }));
-        if(!controller.signal.aborted)setItems(images.filter((item):item is GalleryItem=>!!item));
+        if(!controller.signal.aborted)setItems(images.filter(item=>item!==null));
       }catch{/* Keep the page usable on an unavailable connection. */}
       finally{if(!controller.signal.aborted)setBusy(false);}
     }
