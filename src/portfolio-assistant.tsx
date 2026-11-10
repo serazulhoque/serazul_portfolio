@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./portfolio-assistant.css";
 
-type Message = { role: "visitor" | "guide"; text: string };
+type Message = { role: "visitor" | "guide"; text: string; id?: string; sources?: {title:string;url:string}[] };
 type PreparedAnswer = {
   id: string; question: string; answer: string; keywords: string;
   is_suggested: boolean; sort_order: number;
@@ -10,6 +10,8 @@ type PreparedAnswer = {
 const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
 const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
+const isRohingyaQuestion = (text: string) => /\\b(rohingya|arakan|rakhine|rakhaing|maungdaw|buthidaung|rohingya crisis|genocide|statelessness|1982 citizenship|refugees? in bangladesh)\\b/i.test(text);
+const RESEARCH_API = "https://serazul-backend.vercel.app/api/public/rohingya-research";
 const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
 function findAnswer(question: string, entries: PreparedAnswer[]) {
   const q = normalize(question);
@@ -74,19 +76,53 @@ export default function PortfolioAssistant() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
-  function send(value: string) {
-    const question = value.trim().slice(0, 300);
-    if (!question) return;
-    const answer=findAnswer(question,entries);
-    setMessages(previous => [...previous, { role: "visitor", text: question }, { role: "guide", text: answer }]);
+  function recordQuestion(question:string,answer:string,unanswered:boolean){
+    // Preserve the existing admin chat history, including research responses.
+    void fetch("https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/ask_me_chat_history",{
+      method:"POST",credentials:"omit",
+      headers:{"apikey":"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N","Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({conversation_id:conversationId.current,question,answer:answer.slice(0,2500),unanswered})
+    }).catch(()=>{/* Chat stays usable when history storage is unavailable. */});
+  }
+  async function send(value: string) {
+    const question=value.trim().slice(0,300);
+    if(!question)return;
     setInput("");
-    // Record only the question and prepared response, not a visitor identity.
-      void fetch("https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/ask_me_chat_history",{
-        method:"POST",credentials:"omit",
-        headers:{"apikey":"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N","Content-Type":"application/json","Prefer":"return=minimal"},
-        body:JSON.stringify({conversation_id:conversationId.current,question,answer:answer===fallback?fallback+"EMAIL":answer,
-          unanswered:answer===fallback})
-      }).catch(()=>{/* Chat stays usable even when history storage is unavailable. */});
+    if(!isRohingyaQuestion(question)){
+      const answer=findAnswer(question,entries);
+      setMessages(previous=>[...previous,{role:"visitor",text:question},{role:"guide",text:answer}]);
+      recordQuestion(question,answer===fallback?fallback+"EMAIL":answer,answer===fallback);
+      return;
+    }
+    const id=crypto.randomUUID();
+    setMessages(previous=>[...previous,{role:"visitor",text:question},{role:"guide",id,text:"Searching Rohingya Research Foundation…"}]);
+    let answer="I couldn't retrieve a verified answer from Rohingya Research Foundation right now. You can search their website for this question.";
+    let sources:{title:string;url:string}[]=[{
+      title:"Search Rohingya Research Foundation",
+      url:"https://rohingyaresearch.org/?s="+encodeURIComponent(question)
+    }];
+    let unanswered=true;
+    try{
+      const response=await fetch(RESEARCH_API+"?q="+encodeURIComponent(question),{credentials:"omit",cache:"no-store",signal:AbortSignal.timeout(9000)});
+      if(!response.ok)throw new Error("Research unavailable");
+      const data=await response.json();
+      if(typeof data.search_url==="string"&&data.search_url.startsWith("https://rohingyaresearch.org/"))
+        sources=[{title:"Search Rohingya Research Foundation",url:data.search_url}];
+      const result=Array.isArray(data.results)?data.results.find((item:unknown)=>{
+        if(!item||typeof item!=="object")return false;
+        const r=item as Record<string,unknown>;
+        return typeof r.title==="string"&&typeof r.excerpt==="string"&&typeof r.url==="string"&&r.url.startsWith("https://rohingyaresearch.org/");
+      }):null;
+      if(result){
+        answer=result.excerpt
+          ? "According to Rohingya Research Foundation, an article titled “"+result.title+"” says:\n"+result.excerpt
+          : "I found a related article on Rohingya Research Foundation: “"+result.title+"”. Open the source below to read it.";
+        sources=[{title:result.title,url:result.url}];
+        unanswered=!result.excerpt;
+      }
+    }catch{/* Show a link rather than making up an answer. */}
+    setMessages(previous=>previous.map(message=>message.id===id?{...message,text:answer,sources}:message));
+    recordQuestion(question,answer+" Source: "+sources[0].url,unanswered);
   }
   const topics=entries.filter(entry=>entry.is_suggested).slice(0,5);
   const avatar=(size:"small"|"large"="small")=><span className={"assistant-avatar assistant-avatar-"+size}>
@@ -108,7 +144,8 @@ export default function PortfolioAssistant() {
       <div className="assistant-messages" role="log" aria-live="polite" aria-label="Conversation">
         {messages.map((message,index)=><div className={"assistant-message-row assistant-row-"+message.role} key={index}>
           {message.role==="guide"&&avatar()}
-          <p className={"assistant-message assistant-"+message.role}>{message.text}{message.role==="guide"&&message.text===fallback&&<a href="mailto:info.serazulh@gmail.com" aria-label="Email Serazul Hoque" style={{color:"inherit",fontWeight:700,textDecoration:"underline",textUnderlineOffset:"2px"}}>EMAIL</a>}</p>
+          <p className={"assistant-message assistant-"+message.role}>{message.text}{message.role==="guide"&&message.text===fallback&&<a href="mailto:info.serazulh@gmail.com" aria-label="Email Serazul Hoque" style={{color:"inherit",fontWeight:700,textDecoration:"underline",textUnderlineOffset:"2px"}}>EMAIL</a>}
+          {message.sources?.map(source=><a key={source.url} className="assistant-research-link" href={source.url} target="_blank" rel="noopener noreferrer">Source: {source.title} ↗</a>)}</p>
         </div>)}
         <div ref={lastMessage}/>
       </div>
