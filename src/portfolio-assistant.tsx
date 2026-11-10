@@ -87,43 +87,27 @@ export default function PortfolioAssistant() {
   }
   async function send(value: string) {
     const question=value.trim().slice(0,300);
-    if(!question)return;
+    if(!question||thinking)return;
     setInput("");
-    if(!isRohingyaQuestion(question)){
-      const answer=findAnswer(question,entries);
-      setMessages(previous=>[...previous,{role:"visitor",text:question},{role:"guide",text:answer}]);
-      recordQuestion(question,answer===fallback?fallback+"EMAIL":answer,answer===fallback);
-      return;
-    }
+    setThinking(true);
     const id=crypto.randomUUID();
-    setMessages(previous=>[...previous,{role:"visitor",text:question},{role:"guide",id,text:"Searching Rohingya Research Foundation…"}]);
-    let answer="I couldn't retrieve a verified answer from Rohingya Research Foundation right now. You can search their website for this question.";
-    let sources:{title:string;url:string}[]=[{
-      title:"Search Rohingya Research Foundation",
-      url:"https://rohingyaresearch.org/?s="+encodeURIComponent(question)
-    }];
-    let unanswered=true;
-    try{
-      const response=await fetch(RESEARCH_API+"?q="+encodeURIComponent(question),{credentials:"omit",cache:"no-store",signal:AbortSignal.timeout(9000)});
-      if(!response.ok)throw new Error("Research unavailable");
+    setMessages(old=>[...old,{role:"visitor",text:question},{role:"guide",id,text:"Thinking…"}]);
+    let answer=fallback;
+    try {
+      const response=await fetch(AI_URL,{
+        method:"POST",credentials:"omit",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({question}),
+        signal:AbortSignal.timeout(60000)
+      });
+      if(!response.ok)throw new Error("Model unavailable");
       const data=await response.json();
-      if(typeof data.search_url==="string"&&data.search_url.startsWith("https://rohingyaresearch.org/"))
-        sources=[{title:"Search Rohingya Research Foundation",url:data.search_url}];
-      const result=Array.isArray(data.results)?data.results.find((item:unknown)=>{
-        if(!item||typeof item!=="object")return false;
-        const r=item as Record<string,unknown>;
-        return typeof r.title==="string"&&typeof r.excerpt==="string"&&typeof r.url==="string"&&r.url.startsWith("https://rohingyaresearch.org/");
-      }):null;
-      if(result){
-        answer=result.excerpt
-          ? "According to Rohingya Research Foundation, an article titled “"+result.title+"” says:\n"+result.excerpt
-          : "I found a related article on Rohingya Research Foundation: “"+result.title+"”. Open the source below to read it.";
-        sources=[{title:result.title,url:result.url}];
-        unanswered=!result.excerpt;
-      }
-    }catch{/* Show a link rather than making up an answer. */}
-    setMessages(previous=>previous.map(message=>message.id===id?{...message,text:answer,sources}:message));
-    recordQuestion(question,answer+" Source: "+sources[0].url,unanswered);
+      if(typeof data.answer!=="string"||!data.answer.trim())throw new Error("Empty answer");
+      answer=data.answer.trim().slice(0,1200);
+    }catch{/* Preserve email fallback if inference is unavailable. */}
+    setMessages(old=>old.map(message=>message.id===id?{...message,text:answer}:message));
+    recordQuestion(question,answer===fallback?fallback+"EMAIL":answer,answer===fallback);
+    setThinking(false);
   }
   const topics=entries.filter(entry=>entry.is_suggested).slice(0,5);
   const avatar=(size:"small"|"large"="small")=><span className={"assistant-avatar assistant-avatar-"+size}>
@@ -151,13 +135,13 @@ export default function PortfolioAssistant() {
         <div ref={lastMessage}/>
       </div>
       {messages.length===1&&topics.length>0&&<div className="assistant-topics" aria-label="Suggested questions">
-        {topics.map(topic=><button key={topic.id} type="button" onClick={()=>send(topic.question)}>{topic.question}</button>)}
+        {topics.map(topic=><button key={topic.id} type="button" onClick={()=>void send(topic.question)}>{topic.question}</button>)}
       </div>}
-      <form className="assistant-form" onSubmit={event=>{event.preventDefault();send(input);}}>
+      <form className="assistant-form" onSubmit={event=>{event.preventDefault();void send(input);}}>
         <label className="assistant-sr" htmlFor="assistant-question">Ask a question</label>
         <input id="assistant-question" ref={field} value={input} onChange={event=>setInput(event.target.value)}
           maxLength={300} placeholder="Message" autoComplete="off"/>
-        <button type="submit" disabled={!input.trim()} aria-label="Send question">
+        <button type="submit" disabled={!input.trim()||thinking} aria-label="Send question">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 3 4.7 10.3l1.4 1.4L11 6.8V21h2V6.8l4.9 4.9 1.4-1.4L12 3Z"/></svg>
         </button>
       </form>
