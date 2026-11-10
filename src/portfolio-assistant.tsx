@@ -23,14 +23,16 @@ export default function PortfolioAssistant({standalone=false}:{standalone?:boole
   const lastMessage = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLInputElement>(null);
   useEffect(() => {
+    if(!open)return;
     const controller=new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/profile",{signal:controller.signal,credentials:"omit",cache:"default"})
       .then(response=>response.ok?response.json():Promise.reject())
       .then(data=>{if(!controller.signal.aborted && typeof data.url==="string" && /^https:\/\//.test(data.url))setProfilePhoto(data.url);})
       .catch(()=>{});
     return ()=>controller.abort();
-  },[]);
+  },[open]);
   useEffect(() => {
+    if(!open)return;
     const controller=new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/ask-me",{signal:controller.signal,credentials:"omit",cache:"no-store"})
       .then(response=>response.ok?response.json():Promise.reject())
@@ -44,7 +46,7 @@ export default function PortfolioAssistant({standalone=false}:{standalone?:boole
         }
       }).catch(()=>{/* Show a useful fallback if answers are temporarily unavailable. */});
     return ()=>controller.abort();
-  },[]);
+  },[open]);
   useEffect(() => { if (open) { field.current?.focus(); lastMessage.current?.scrollIntoView({ block: "end" }); } }, [open, messages]);
   useEffect(() => {
     if (!open) return;
