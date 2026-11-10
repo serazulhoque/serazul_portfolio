@@ -64,8 +64,49 @@ export default function SiteDesign(){
       event.stopPropagation();
       window.parent.postMessage({type:"serazul:select-content",key:item.getAttribute("data-edit-key")},parentOrigin);
     };
+    const containers=Array.from(document.querySelectorAll<HTMLElement>("[data-custom-section]"));
+    for(const section of containers)section.draggable=true;
+    const onDragStart=(event:DragEvent)=>{
+      const target=event.target;
+      if(!(target instanceof Element)||!event.dataTransfer)return;
+      const section=target.closest<HTMLElement>("[data-custom-section]");
+      if(!section)return;
+      event.dataTransfer.setData("text/plain",section.dataset.customSection||"");
+      event.dataTransfer.effectAllowed="move";
+    };
+    const onDragOver=(event:DragEvent)=>{
+      if(event.target instanceof Element&&event.target.closest("[data-custom-section]"))
+        event.preventDefault();
+    };
+    const onDrop=(event:DragEvent)=>{
+      const target=event.target;
+      if(!(target instanceof Element)||!event.dataTransfer)return;
+      const destination=target.closest<HTMLElement>("[data-custom-section]");
+      if(!destination)return;
+      event.preventDefault();
+      const from=event.dataTransfer.getData("text/plain");
+      const to=destination.dataset.customSection;
+      const ordered=[...containers].sort((a,b)=>Number(a.style.order)-Number(b.style.order));
+      const start=ordered.findIndex(section=>section.dataset.customSection===from);
+      const end=ordered.findIndex(section=>section.dataset.customSection===to);
+      if(start<0||end<0||start===end)return;
+      ordered.splice(end,0,ordered.splice(start,1)[0]);
+      ordered.forEach((section,index)=>{section.style.order=String(index);});
+      window.parent.postMessage({type:"serazul:section-order",
+        order:ordered.map(section=>section.dataset.customSection)},parentOrigin);
+    };
     document.addEventListener("click",select,true);
-    return()=>{root.classList.remove("customize-preview");document.removeEventListener("click",select,true);};
+    document.addEventListener("dragstart",onDragStart);
+    document.addEventListener("dragover",onDragOver);
+    document.addEventListener("drop",onDrop);
+    return()=>{
+      root.classList.remove("customize-preview");
+      document.removeEventListener("click",select,true);
+      document.removeEventListener("dragstart",onDragStart);
+      document.removeEventListener("dragover",onDragOver);
+      document.removeEventListener("drop",onDrop);
+      for(const section of containers)section.draggable=false;
+    };
   },[]);
   return null;
 }
