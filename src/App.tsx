@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import {useLivePageCopy} from "./page-copy";
 import {API_URL,requestJSON} from "./public-api";
 import SiteHeader from "./site-header";
+import Gallery from "./gallery";
 import SiteDesign from "./site-design";
 import PortfolioAssistant from "./portfolio-assistant";
 import VisitorWall from "./visitor-wall";
@@ -460,7 +461,8 @@ function AboutPage() {
 export default function App() {
   return <>
     <SiteDesign />
-    {typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
+    {typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html")
+      ? <Gallery /> : typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
       ? <AboutPage /> : <Home />}
   </>;
 }
