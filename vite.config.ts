@@ -7,6 +7,7 @@ export default defineConfig({
   base: "/",
   build: { rollupOptions: { input: {
     main: fileURLToPath(new URL("./index.html", import.meta.url)),
-    about: fileURLToPath(new URL("./about.html", import.meta.url))
+    about: fileURLToPath(new URL("./about.html", import.meta.url)),
+    gallery: fileURLToPath(new URL("./gallery.html", import.meta.url))
   } } }
 });
