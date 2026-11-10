@@ -12,10 +12,11 @@ export type LayoutConfig={
   home_blog_limit:number;
   home_sections:HomeSection[];
   styles:Record<string,ContentStyle>;
+  content_pages:Record<string,{home:boolean;blog:boolean}>;
 };
 export const DEFAULT_LAYOUT:LayoutConfig={
   home_blog:true,blog_page:true,publications_home:true,publications_page:true,home_blog_limit:3,
-  home_sections:[...HOME_SECTIONS],styles:{}
+  home_sections:[...HOME_SECTIONS],styles:{},content_pages:{}
 };
 function hex(value:unknown):value is string{
   return typeof value==="string"&&/^#[\da-f]{6}$/i.test(value);
@@ -41,7 +42,16 @@ export function parseLayout(value:unknown):LayoutConfig {
     if(Number.isFinite(style.bodySize)&&Number(style.bodySize)>=10&&Number(style.bodySize)<=40)clean.bodySize=Number(style.bodySize);
     styles[key]=clean;
   }
+  const rawPages=data.content_pages&&typeof data.content_pages==="object"&&!Array.isArray(data.content_pages)
+    ?data.content_pages as Record<string,unknown>:{};
+  const content_pages:Record<string,{home:boolean;blog:boolean}>={};
+  for(const [id,visibility] of Object.entries(rawPages).slice(0,300)){
+    if(!/^[0-9a-f-]{36}$/i.test(id)||!visibility||typeof visibility!=="object"||Array.isArray(visibility))continue;
+    const pages=visibility as Record<string,unknown>;
+    content_pages[id]={home:pages.home!==false,blog:pages.blog!==false};
+  }
   return {
+    content_pages,
     home_blog:data.home_blog!==false,
     blog_page:data.blog_page!==false,
     publications_home:data.publications_home!==false,
