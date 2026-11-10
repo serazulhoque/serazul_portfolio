@@ -123,13 +123,16 @@ export function ContentStories({
   items,
   section,
   layout,
+  page,
 }: {
   items: SiteEntry[];
   section: SiteEntry["section"];
   layout?:LayoutConfig;
+  page?:"home"|"blog";
 }) {
   const stories = items.filter(
-    (i) => i.section === section && i.kind === "story",
+    (i) => i.section === section && i.kind === "story"
+      && (!page||layout?.content_pages?.[i.id]?.[page]!==false),
   );
   if (!stories.length) return null;
   return (
