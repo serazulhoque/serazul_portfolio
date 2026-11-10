@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import {styleFor,type LayoutConfig} from "./site-layout";
 import {
   DATA_URL,
   PUBLIC_HEADERS,
@@ -121,9 +122,11 @@ export function textValue(
 export function ContentStories({
   items,
   section,
+  layout,
 }: {
   items: SiteEntry[];
   section: SiteEntry["section"];
+  layout?:LayoutConfig;
 }) {
   const stories = items.filter(
     (i) => i.section === section && i.kind === "story",
@@ -136,11 +139,11 @@ export function ContentStories({
           {item.date_label && (
             <span className="extra-story-kicker">{item.date_label}</span>
           )}
-          <h3>{item.title}</h3>
+          <h3 data-edit-key={"content:"+item.id+":title"} style={layout?styleFor(layout,"content:"+item.id,"title"):undefined}>{item.title}</h3>
           {item.subtitle && (
             <p className="extra-story-subtitle">{item.subtitle}</p>
           )}
-          {item.body && <p className="extra-story-body">{item.body}</p>}
+          {item.body && <p className="extra-story-body" data-edit-key={"content:"+item.id+":body"} style={layout?styleFor(layout,"content:"+item.id,"body"):undefined}>{item.body}</p>}
         </article>
       ))}
     </div>
