@@ -11,8 +11,8 @@ const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is 
 const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
 const AI_URL = "https://serazul-backend.vercel.app/api/public/ask-ai";
 
-export default function PortfolioAssistant() {
-  const [open, setOpen] = useState(false);
+export default function PortfolioAssistant({standalone=false}:{standalone?:boolean}) {
+  const [open, setOpen] = useState(standalone);
   const conversationId=useRef<string>("");
   if(!conversationId.current)conversationId.current=crypto.randomUUID();
   const [profilePhoto,setProfilePhoto] = useState("");
@@ -97,16 +97,16 @@ export default function PortfolioAssistant() {
       <span className="assistant-avatar-placeholder" aria-hidden="true">S</span>}
     {size==="large"&&<span className="assistant-status-dot" aria-hidden="true"/>}
   </span>;
-  return <div className="portfolio-assistant">
+  return <div className={"portfolio-assistant"+(standalone?" portfolio-assistant--standalone":"")}>
     {open && <section className="assistant-panel" role="dialog" aria-modal="false" aria-label="Ask about Serazul">
       <div className="assistant-drag-indicator" aria-hidden="true"><span/><span/><span/></div>
       <header className="assistant-header">
-        <button type="button" className="assistant-icon-button assistant-back" aria-label="Close conversation" onClick={()=>setOpen(false)}>
+        <button type="button" className="assistant-icon-button assistant-back" aria-label={standalone?"Return to homepage":"Close conversation"} onClick={()=>standalone?window.location.assign("/"):setOpen(false)}>
           <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         </button>
         {avatar("large")}
         <div className="assistant-heading"><a className="assistant-name-link" href="/" aria-label="Go to Serazul Hoque homepage"><strong>Serazul Hoque</strong></a><small>Active</small></div>
-        <button type="button" className="assistant-icon-button assistant-close" aria-label="Close assistant" onClick={()=>setOpen(false)}>×</button>
+        <button type="button" className="assistant-icon-button assistant-close" aria-label={standalone?"Return to homepage":"Close assistant"} onClick={()=>standalone?window.location.assign("/"):setOpen(false)}>×</button>
       </header>
       <div className="assistant-messages" role="log" aria-live="polite" aria-label="Conversation">
         {messages.map((message,index)=><div className={"assistant-message-row assistant-row-"+message.role} key={index}>
@@ -129,8 +129,8 @@ export default function PortfolioAssistant() {
       </form>
       
     </section>}
-    <button type="button" className="assistant-launch" aria-expanded={open} aria-label={open?"Close portfolio guide":"Open portfolio guide"} onClick={()=>setOpen(v=>!v)}>
+    {!standalone&&<button type="button" className="assistant-launch" aria-expanded={open} aria-label={open?"Close portfolio guide":"Open portfolio guide"} onClick={()=>setOpen(v=>!v)}>
       <span aria-hidden="true">{open?"×":"✳"}</span><span>{open?"Close":"Ask me"}</span>
-    </button>
+    </button>}
   </div>;
 }
