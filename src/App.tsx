@@ -458,10 +458,17 @@ function AboutPage() {
   </>;
 }
 
+export function AskMePage() {
+  return <main className="askme-page" id="main" aria-label="Ask Me chatbot">
+    <PortfolioAssistant standalone />
+  </main>;
+}
+
 export default function App() {
   return <>
     <SiteDesign />
-    {typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html")
+    {typeof window !== "undefined" && /^\/askme\/?$/.test(window.location.pathname)
+      ? <AskMePage /> : typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html")
       ? <Gallery /> : typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
       ? <AboutPage /> : <Home />}
   </>;
