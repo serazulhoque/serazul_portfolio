@@ -1,4 +1,5 @@
 import {useEffect} from "react";
+import {parseLayout} from "./site-layout";
 
 // Public read-only design settings. Editing requires signed-in administrator access.
 const API="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/site_design_settings";
@@ -31,6 +32,10 @@ export default function SiteDesign(){
         if(controller.signal.aborted||!Array.isArray(data)||!data[0])return;
         const root=document.documentElement;
         const design=data[0] as Record<string,unknown>;
+        const layout=parseLayout(design.layout_config);
+        const heroBodyColor=layout.styles.hero?.bodyColor;
+        root.style.setProperty("--custom-hero-body-color",heroBodyColor||"#000000");
+        root.dataset.blogOnHome=layout.home_blog?"true":"false";
         for(const [key,property] of Object.entries(scaleKeys)){
           const n=Number(design[key]);
           if(Number.isFinite(n)&&n>=.6&&n<=1.5)root.style.setProperty(property,String(n));
@@ -43,6 +48,24 @@ export default function SiteDesign(){
         }
       }).catch(()=>{/* Website continues using the original design if settings are unavailable. */});
     return ()=>controller.abort();
+  },[]);
+  useEffect(()=>{
+    if(typeof window==="undefined"||window.parent===window||
+      !new URLSearchParams(window.location.search).has("customize-preview"))return;
+    const parentOrigin="https://serazul-admin-serazulhoque.vercel.app";
+    const root=document.documentElement;
+    root.classList.add("customize-preview");
+    const select=(event:MouseEvent)=>{
+      const target=event.target;
+      if(!(target instanceof Element))return;
+      const item=target.closest("[data-edit-key]");
+      if(!item)return;
+      event.preventDefault();
+      event.stopPropagation();
+      window.parent.postMessage({type:"serazul:select-content",key:item.getAttribute("data-edit-key")},parentOrigin);
+    };
+    document.addEventListener("click",select,true);
+    return()=>{root.classList.remove("customize-preview");document.removeEventListener("click",select,true);};
   },[]);
   return null;
 }
