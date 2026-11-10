@@ -339,7 +339,7 @@ function Home() {
       </section>
       <div className="intro-strip wrap"><span>{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p>{t("intro_first","Curiosity in the details.")} <em>{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
       <div className="customizable-home-layout">
-      <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" /></div>
+      <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} /></div>
       <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
       {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} layout={layout} /></div>}
       {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} /></div>}
@@ -410,13 +410,13 @@ const journeyMilestones = [
   }
 ];
 
-function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[],entriesLoaded:boolean,labels:Record<string,string>,kind:"timeline"|"experience"}) {
+function JourneyTimeline({entries,entriesLoaded,labels,kind,layout}:{entries:SiteEntry[],entriesLoaded:boolean,labels:Record<string,string>,kind:"timeline"|"experience",layout?:LayoutConfig}) {
   const [selected,setSelected]=useState<number|null>(null);
   const experience=kind==="experience";
   const timeline=entriesLoaded?entries.filter(item=>item.section==="about"&&item.kind===kind).map((item,index)=>({
-    number:String(index+1).padStart(2,"0"),phase:item.date_label||"MILESTONE",title:item.title,
+    id:item.id,number:String(index+1).padStart(2,"0"),phase:item.date_label||"MILESTONE",title:item.title,
     short:item.subtitle,detail:item.body,symbol:index===0?"𝒮":index===1?"{ }":index===2?"</>":"↗"
-  })):experience?[]:journeyMilestones;
+  })):experience?[]:journeyMilestones.map(item=>({...item,id:null}));
   if(!entriesLoaded)return null;
   const id=experience?"experience":"education";
   return <section className={"journey-section journey-inline wrap section-space"+(experience?" experience-section":"")} id={id} aria-labelledby={id+"-title"}>
@@ -431,15 +431,15 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
         <button type="button" className={"journey-step"+(selected===index?" is-active":"")}
           onClick={()=>setSelected(selected===index?null:index)} aria-expanded={selected===index}
           aria-controls={id+"-detail-"+index}>
-          <span className="journey-step-copy"><small>{step.phase}</small><strong>{step.title}</strong></span>
+          <span className="journey-step-copy"><small>{step.phase}</small><strong data-edit-key={step.id?"content:"+step.id+":title":undefined} style={step.id&&layout?styleFor(layout,"content:"+step.id,"title"):undefined}>{step.title}</strong></span>
           <span className="journey-step-arrow" aria-hidden="true">{selected===index?"↘":"→"}</span>
         </button>
         {selected===index&&<article className="journey-detail" id={id+"-detail-"+index}>
           <div className="journey-detail-top"><span>{experience?"EXPERIENCE":"EDUCATION"}</span><span className="journey-detail-symbol" aria-hidden="true">{step.symbol}</span></div>
           <div className="journey-detail-body">
-            <p className="journey-detail-phase">{step.phase}</p><h3>{step.title}</h3>
+            <p className="journey-detail-phase">{step.phase}</p><h3 data-edit-key={step.id?"content:"+step.id+":title":undefined} style={step.id&&layout?styleFor(layout,"content:"+step.id,"title"):undefined}>{step.title}</h3>
             {step.short&&<p className="journey-detail-short">{step.short}</p>}
-            {step.detail&&<p className="journey-detail-description">{step.detail}</p>}
+            {step.detail&&<p className="journey-detail-description" data-edit-key={step.id?"content:"+step.id+":body":undefined} style={step.id&&layout?styleFor(layout,"content:"+step.id,"body"):undefined}>{step.detail}</p>}
           </div>
         </article>}
       </div>)}
@@ -449,6 +449,7 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind}:{entries:SiteEntry[
 
 function AboutPage() {
   const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
+  const layout=useSiteLayout();
   const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
   const copy=useLivePageCopy();
   return <>
@@ -459,14 +460,14 @@ function AboutPage() {
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
         <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
         <div className="about-main">
-          <h2>{copy?.about_line_one}<br /><em>{copy?.about_line_two}</em></h2>
-          <div className="about-columns"><p>{copy?.about_paragraph_one}</p><p>{copy?.about_paragraph_two}</p></div>
+          <h2 data-edit-key="about_line_one" style={styleFor(layout,"about","title")}>{copy?.about_line_one}<br /><em>{copy?.about_line_two}</em></h2>
+          <div className="about-columns"><p data-edit-key="about_paragraph_one" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_one}</p><p data-edit-key="about_paragraph_two" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_two}</p></div>
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
-      <ContentStories items={items} section="about" />
-      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="timeline" />
-      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" />
+      <ContentStories items={items} section="about" layout={layout} />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="timeline" layout={layout} />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} />
       <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span>{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span>{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="/">Back to home ↑</a></footer>
