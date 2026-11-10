@@ -342,7 +342,7 @@ function Home() {
       <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} /></div>
       <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
       {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} layout={layout} /></div>}
-      {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} /></div>}
+      {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} page="home" /></div>}
       <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span>{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
         <h2 id="contact-title" data-edit-key="contact_heading" style={styleFor(layout,"contact","title")}>{pageCopy?.contact_heading}</h2>
@@ -483,7 +483,7 @@ export function BlogPage() {
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main" className="blog-page-main" tabIndex={-1}>
-      {layout.blog_page?<><PublishedArticles labels={labels} standalone layout={layout} />{layout.publications_page&&<ContentStories items={items} section="publications" layout={layout} />}</>:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
+      {layout.blog_page?<><PublishedArticles labels={labels} standalone layout={layout} />{layout.publications_page&&<ContentStories items={items} section="publications" layout={layout} page="blog" />}</>:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque</a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
     <PortfolioAssistant />
