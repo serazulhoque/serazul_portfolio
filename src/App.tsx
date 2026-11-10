@@ -232,7 +232,7 @@ function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record
       .post-share-status{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
     `}</style>
     <div className="section-label"><span>{textValue(labels,"publications_label","03 / NOTES ALONG THE WAY")}</span><span className="small-line" /></div>
-    <h2 id="articles-title" data-edit-key="blog_title" style={layout?styleFor(layout,"blog","title"):undefined}>Posts</h2>
+    <h2 id="articles-title" data-edit-key="blog_title" style={layout?styleFor(layout,"blog","title"):undefined}>{textValue(labels,"blog_title","Posts")}</h2>
     <p className="published-articles-intro">{textValue(labels,"publications_intro","Thoughts, discoveries, and things I’m learning.")}</p>
     <div aria-busy={loading}>
       {loading && <p className="published-articles-status" role="status">Loading posts…</p>}
