@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {useLivePageCopy} from "./page-copy";
+import {useSiteLayout,sectionOrder,styleFor} from "./site-layout";
 import {API_URL,requestJSON} from "./public-api";
 import SiteHeader from "./site-header";
 import Gallery from "./gallery";
@@ -107,7 +108,7 @@ function ArticleDocument({ content }: { content: unknown }) {
   return <div ref={container} className="published-article-body" />;
 }
 
-function PublishedArticles({labels}: {labels:Record<string,string>}) {
+function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string,string>;limit?:number;standalone?:boolean}) {
   const [articles, setArticles] = useState<PublishedArticle[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,7 +123,7 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
     async function load() {
       try {
         const all: PublishedArticle[] = [];
-        for (let page = 1; page <= 200; page++) {
+        for (let page = 1; page <= (limit?1:20); page++) {
           const data = await requestJSON<{items: Array<PublishedArticle & {status:string}>;total:number}>(`${ARTICLES_API}?page=${page}&limit=50`, {
             signal: controller.signal
           });
@@ -132,10 +133,10 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
             if (item && typeof item.id === "string" && typeof item.title === "string" && item.status === "published")
               all.push(item as PublishedArticle);
           }
-          if (all.length >= data.total || data.items.length === 0) break;
+          if (all.length >= data.total || (limit && all.length >= limit) || data.items.length === 0) break;
         }
         if (!controller.signal.aborted) {
-          setArticles(all);
+          setArticles(limit?all.slice(0,limit):all);
           setSelected(selectedPostIndex(all));
         }
       } catch {
@@ -146,7 +147,7 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
     }
     void load();
     return () => controller.abort();
-  }, [retry]);
+  }, [retry,limit]);
 
   useEffect(()=>{
     const sync=()=>setSelected(selectedPostIndex(articles));
@@ -160,7 +161,7 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
   }
   function backToPosts(){
     setSelected(null);
-    window.history.pushState(null,"","/#articles");
+    window.history.pushState(null,"",standalone?"/blog":"/#articles");
   }
   async function sharePost(article:PublishedArticle){
     const url=window.location.origin+postUrl(article);
@@ -226,11 +227,12 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
       {error && <div className="published-articles-status" role="status"><p>{error}</p><button type="button" className="button button-dark" onClick={() => setRetry(value => value + 1)}>Try again</button></div>}
       {!loading && !error && articles.length === 0 && <p className="published-articles-status">No published posts yet.</p>}
       {!loading && !error && selected === null && <div className="published-articles-list">
-        {articles.map((article, index) => <a key={article.id} href={postUrl(article)} className="published-article-title" onClick={event=>{event.preventDefault();openPost(index);}}>
+        {articles.map((article, index) => <a key={article.id} href={postUrl(article)} className="published-article-title" onClick={event=>{if(standalone){event.preventDefault();openPost(index);}}}>
           <span><strong>{article.title}</strong>{displayDate(article.published_at) && <small>{displayDate(article.published_at)}</small>}</span>
           <span aria-hidden="true">↗</span>
         </a>)}
       </div>}
+      {!standalone&&!loading&&<p className="published-all-link"><a href="/blog">See all blog posts →</a></p>}
       {!loading && !error && current && <div>
         <div className="published-reader-controls">
           <button type="button" className="button button-dark" onClick={backToPosts}>← All posts</button>
@@ -268,6 +270,7 @@ function PublishedArticles({labels}: {labels:Record<string,string>}) {
 
 
 function Home() {
+  const layout=useSiteLayout();
   const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
   const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
   const [notice, setNotice] = useState("");
@@ -325,7 +328,7 @@ function Home() {
       <div className="intro-strip wrap"><span>{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p>{t("intro_first","Curiosity in the details.")} <em>{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
       <div id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" /></div>
       <ContentStories items={items} section="home" />
-      <PublishedArticles labels={labels} />
+      {layout.home_blog&&<PublishedArticles labels={labels} limit={layout.home_blog_limit} />}
       <ContentStories items={items} section="publications" />
       <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span>{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
@@ -458,6 +461,20 @@ function AboutPage() {
   </>;
 }
 
+export function BlogPage() {
+  const {labels}=useSiteContent();
+  const layout=useSiteLayout();
+  return <>
+    <a className="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main" className="blog-page-main" tabIndex={-1}>
+      {layout.blog_page?<PublishedArticles labels={labels} standalone />:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
+    </main>
+    <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque</a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
+    <PortfolioAssistant />
+  </>;
+}
+
 export function AskMePage() {
   return <main className="askme-page" id="main" aria-label="Ask Me chatbot">
     <PortfolioAssistant standalone />
@@ -467,7 +484,8 @@ export function AskMePage() {
 export default function App() {
   return <>
     <SiteDesign />
-    {typeof window !== "undefined" && /^\/askme\/?$/.test(window.location.pathname)
+    {typeof window !== "undefined" && /^\/blog(?:\/.*)?$/.test(window.location.pathname)
+      ? <BlogPage /> : typeof window !== "undefined" && /^\/askme\/?$/.test(window.location.pathname)
       ? <AskMePage /> : typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html")
       ? <Gallery /> : typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
       ? <AboutPage /> : <Home />}
