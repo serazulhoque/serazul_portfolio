@@ -53,3 +53,6 @@ html[data-theme="dark"]{--paper:#151e1a;--ink:#f0f1e7;--muted:#b6c1b0;--line:#35
   color:var(--ink);
 }
 [data-theme="dark"] .post-share{color:var(--ink);border-color:var(--line)}
+/* Rich-text editor colors can be hard-coded; keep every post legible in dark mode. */
+[data-theme="dark"] .published-article-body [style*="color"]{color:var(--ink)!important}
+
