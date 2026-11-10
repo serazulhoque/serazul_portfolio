@@ -68,6 +68,7 @@ export default function PortfolioAssistant() {
     const id=crypto.randomUUID();
     setMessages(old=>[...old,{role:"visitor",text:question},{role:"guide",id,text:"Thinking…"}]);
     let answer=fallback;
+    let sources:{title:string;url:string}[]=[];
     try {
       const response=await fetch(AI_URL,{
         method:"POST",credentials:"omit",cache:"no-store",
@@ -79,9 +80,15 @@ export default function PortfolioAssistant() {
       const data=await response.json();
       if(typeof data.answer!=="string"||!data.answer.trim())throw new Error("Empty answer");
       answer=data.answer.trim().slice(0,1200);
+      if(Array.isArray(data.sources))sources=data.sources.filter((source:unknown)=>{
+        if(!source||typeof source!=="object")return false;
+        const item=source as Record<string,unknown>;
+        return typeof item.title==="string"&&typeof item.url==="string"
+          &&item.url.startsWith("https://rohingyaresearch.org/");
+      }).slice(0,2);
     }catch{/* Preserve email fallback if inference is unavailable. */}
-    setMessages(old=>old.map(message=>message.id===id?{...message,text:answer}:message));
-    recordQuestion(question,answer===fallback?fallback+"EMAIL":answer,answer===fallback);
+    setMessages(old=>old.map(message=>message.id===id?{...message,text:answer,sources}:message));
+    recordQuestion(question,answer===fallback?fallback+"EMAIL":answer+(sources.length?" Source: "+sources[0].url:""),answer===fallback);
     setThinking(false);
   }
   const topics=entries.filter(entry=>entry.is_suggested).slice(0,5);
