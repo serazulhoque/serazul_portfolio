@@ -144,7 +144,7 @@ export default function PortfolioAssistant() {
       <div className="assistant-messages" role="log" aria-live="polite" aria-label="Conversation">
         {messages.map((message,index)=><div className={"assistant-message-row assistant-row-"+message.role} key={index}>
           {message.role==="guide"&&avatar()}
-          <p className={"assistant-message assistant-"+message.role}>{message.text}{message.role==="guide"&&message.text===fallback&&<a href="mailto:info.serazulh@gmail.com" aria-label="Email Serazul Hoque" style={{color:"inherit",fontWeight:700,textDecoration:"underline",textUnderlineOffset:"2px"}}>EMAIL</a>}
+          <p className={"assistant-message assistant-"+message.role}>{message.text}{message.role==="guide"&&message.text===fallback&&<a href="mailto:serazulhoque@proton.me" aria-label="Email Serazul Hoque" style={{color:"inherit",fontWeight:700,textDecoration:"underline",textUnderlineOffset:"2px"}}>EMAIL</a>}
           {message.sources?.map(source=><a key={source.url} className="assistant-research-link" href={source.url} target="_blank" rel="noopener noreferrer">Source: {source.title} ↗</a>)}</p>
         </div>)}
         <div ref={lastMessage}/>
