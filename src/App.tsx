@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {useLivePageCopy} from "./page-copy";
-import {useSiteLayout,sectionOrder,styleFor} from "./site-layout";
+import {useSiteLayout,sectionOrder,styleFor,type LayoutConfig} from "./site-layout";
 import {API_URL,requestJSON} from "./public-api";
 import SiteHeader from "./site-header";
 import Gallery from "./gallery";
@@ -60,7 +60,7 @@ function selectedPostIndex(articles:PublishedArticle[]){
 }
 
 
-function ArticleDocument({ content }: { content: unknown }) {
+function ArticleDocument({ content, layout }: { content: unknown;layout?:LayoutConfig }) {
   const container = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!container.current) return;
@@ -105,10 +105,10 @@ function ArticleDocument({ content }: { content: unknown }) {
     for (const item of Array.isArray(content) ? content : [content]) { if (nodes >= 3000) break; append(fragment, item, 0); }
     container.current.replaceChildren(fragment);
   }, [content]);
-  return <div ref={container} className="published-article-body" />;
+  return <div ref={container} className="published-article-body" data-edit-key="blog_body" style={layout?styleFor(layout,"blog","body"):undefined} />;
 }
 
-function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string,string>;limit?:number;standalone?:boolean}) {
+function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record<string,string>;limit?:number;standalone?:boolean;layout?:LayoutConfig}) {
   const [articles, setArticles] = useState<PublishedArticle[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -116,15 +116,27 @@ function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string
   const [retry, setRetry] = useState(0);
   const [shareNotice, setShareNotice] = useState("");
   const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [visible,setVisible] = useState(standalone);
 
   useEffect(() => {
+    if(visible)return;
+    const el=sectionRef.current;
+    if(!el||typeof IntersectionObserver==="undefined"){setVisible(true);return;}
+    const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){setVisible(true);observer.disconnect();}},{rootMargin:"650px"});
+    observer.observe(el);
+    return()=>observer.disconnect();
+  },[visible]);
+
+  useEffect(() => {
+    if(!visible)return;
     const controller = new AbortController();
     setLoading(true); setError("");
     async function load() {
       try {
         const all: PublishedArticle[] = [];
         for (let page = 1; page <= (limit?1:20); page++) {
-          const data = await requestJSON<{items: Array<PublishedArticle & {status:string}>;total:number}>(`${ARTICLES_API}?page=${page}&limit=50`, {
+          const data = await requestJSON<{items: Array<PublishedArticle & {status:string}>;total:number}>(`${ARTICLES_API}?page=${page}&limit=${limit?Math.max(1,Math.min(50,limit)):50}`, {
             signal: controller.signal
           });
           if (!Array.isArray(data.items) || !Number.isInteger(data.total) || data.total < 0)
@@ -147,7 +159,7 @@ function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string
     }
     void load();
     return () => controller.abort();
-  }, [retry,limit]);
+  }, [retry,limit,visible]);
 
   useEffect(()=>{
     const sync=()=>setSelected(selectedPostIndex(articles));
@@ -184,7 +196,7 @@ function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string
       : null;
   };
 
-  return <section id="articles" className="published-articles wrap section-space" aria-labelledby="articles-title" tabIndex={-1}>
+  return <section ref={sectionRef} id="articles" className="published-articles wrap section-space" aria-labelledby="articles-title" tabIndex={-1}>
     <style>{`
       .published-articles{border-top:1px solid var(--line)}
       .published-articles>h2{font-family:var(--font-display);font-size:clamp(36px,5vw,58px);font-weight:400;line-height:1.15;margin:24px 0 12px}
@@ -220,7 +232,7 @@ function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string
       .post-share-status{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
     `}</style>
     <div className="section-label"><span>{textValue(labels,"publications_label","03 / NOTES ALONG THE WAY")}</span><span className="small-line" /></div>
-    <h2 id="articles-title">Posts</h2>
+    <h2 id="articles-title" data-edit-key="blog_title" style={layout?styleFor(layout,"blog","title"):undefined}>Posts</h2>
     <p className="published-articles-intro">{textValue(labels,"publications_intro","Thoughts, discoveries, and things I’m learning.")}</p>
     <div aria-busy={loading}>
       {loading && <p className="published-articles-status" role="status">Loading posts…</p>}
@@ -252,7 +264,7 @@ function PublishedArticles({labels,limit,standalone=false}:{labels:Record<string
             <h3>{current.title}</h3>
             {displayDate(current.published_at) && <time>{displayDate(current.published_at)}</time>}
           </header>
-          <ArticleDocument content={current.document} />
+          <ArticleDocument content={current.document} layout={layout} />
           <div className="post-share-row" style={{padding:"0 clamp(18px,4vw,32px) 20px"}}>
             <button type="button" className="post-share" onClick={()=>void sharePost(current)} aria-label={"Share post: "+current.title}>↗ Share</button>
             {shareNotice&&<span className="post-share-status" role="status">{shareNotice}</span>}
@@ -329,7 +341,7 @@ function Home() {
       <div className="customizable-home-layout">
       <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" /></div>
       <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
-      {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} /></div>}
+      {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} layout={layout} /></div>}
       {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} /></div>}
       <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span>{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
@@ -470,7 +482,7 @@ export function BlogPage() {
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main" className="blog-page-main" tabIndex={-1}>
-      {layout.blog_page?<><PublishedArticles labels={labels} standalone />{layout.publications_page&&<ContentStories items={items} section="publications" layout={layout} />}</>:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
+      {layout.blog_page?<><PublishedArticles labels={labels} standalone layout={layout} />{layout.publications_page&&<ContentStories items={items} section="publications" layout={layout} />}</>:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque</a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
     <PortfolioAssistant />
