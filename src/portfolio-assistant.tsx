@@ -7,7 +7,7 @@ type PreparedAnswer = {
   id: string; question: string; answer: string; keywords: string;
   is_suggested: boolean; sort_order: number;
 };
-const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
+const welcome = "Hi! I’m AI Version of Serazul Hoque, the virtual version of Serazul on this portfolio. Ask me anything!";
 const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
 const AI_URL = "https://serazul-backend.vercel.app/api/public/ask-ai";
 
@@ -105,7 +105,7 @@ export default function PortfolioAssistant({standalone=false}:{standalone?:boole
           <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         </button>
         {avatar("large")}
-        <div className="assistant-heading"><a className="assistant-name-link" href="/" aria-label="Go to Serazul Hoque homepage"><strong>Serazul Hoque</strong></a><small>Active</small></div>
+        <div className="assistant-heading"><a className="assistant-name-link" href="/" aria-label="Go to Serazul Hoque homepage"><strong>AI Version of Serazul Hoque</strong></a><small>Active</small></div>
         <button type="button" className="assistant-icon-button assistant-close" aria-label={standalone?"Return to homepage":"Close assistant"} onClick={()=>standalone?window.location.assign("/"):setOpen(false)}>×</button>
       </header>
       <div className="assistant-messages" role="log" aria-live="polite" aria-label="Conversation">
