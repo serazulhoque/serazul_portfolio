@@ -25,7 +25,7 @@ function startSound() {
         const gain = context.createGain();
         oscillator.type = "sine";
         oscillator.frequency.value = frequency;
-        gain.gain.value = 0.12;
+        gain.gain.value = 0.17;
         oscillator.connect(gain);
         gain.connect(master);
         oscillator.start();
@@ -35,7 +35,7 @@ function startSound() {
     void context.resume().then(() => {
       if (!context || !master || muted) return;
       master.gain.cancelScheduledValues(context.currentTime);
-      master.gain.setTargetAtTime(0.038, context.currentTime, 2);
+      master.gain.setTargetAtTime(0.32, context.currentTime, 0.35);
       if (pulse) return;
       // Slow changing notes keep the ambient texture musical without distraction.
       const notes = [220, 246.94, 261.63, 329.63, 293.66, 261.63, 246.94, 196];
@@ -47,14 +47,14 @@ function startSound() {
         oscillator.type = "sine";
         oscillator.frequency.value = notes[step++ % notes.length];
         envelope.gain.setValueAtTime(0, now);
-        envelope.gain.linearRampToValueAtTime(0.16, now + 0.8);
-        envelope.gain.exponentialRampToValueAtTime(0.001, now + 4);
+        envelope.gain.linearRampToValueAtTime(0.28, now + 0.55);
+        envelope.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
         oscillator.connect(envelope);
         envelope.connect(master);
         oscillator.start(now);
-        oscillator.stop(now + 4.1);
+        oscillator.stop(now + 3.6);
         oscillator.onended = () => {oscillator.disconnect();envelope.disconnect();};
-      }, 2800);
+      }, 2100);
     }).catch(() => {});
   } catch { /* Audio unavailable: the website remains fully functional. */ }
 }
@@ -62,7 +62,7 @@ function stopSound() {
   if (pulse) {clearInterval(pulse);pulse = null;}
   if (context && master) {
     master.gain.cancelScheduledValues(context.currentTime);
-    master.gain.setTargetAtTime(0, context.currentTime, 0.15);
+    master.gain.setTargetAtTime(0, context.currentTime, 0.08);
   }
 }
 
