@@ -9,32 +9,7 @@ type PreparedAnswer = {
 };
 const welcome = "Hi! I’m Serazul. I am studying Software Engineering. This is my portfolio website. Here you can find everything thing about me.";
 const fallback = "Hey I am sorry I can’t answer to you right now. Instead, send here ";
-const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim();
-const isRohingyaQuestion = (text: string) => /\b(rohingya|arakan|rakhine|rakhaing|myanmar|burma|maungdaw|buthidaung|cox.s bazar|hanifi|genocide|statelessness|1982 citizenship|refugees? in bangladesh)\b/i.test(text);
 const AI_URL = "https://serazul-backend.vercel.app/api/public/ask-ai";
-const ignore = new Set(["a","an","the","is","are","was","does","do","what","who","where","how","can","i","he","his","him","me","you","your","of","for","to","in","on","about","and","tell","please"]);
-function findAnswer(question: string, entries: PreparedAnswer[]) {
-  const q = normalize(question);
-  if(!q) return fallback;
-  const qWords = q.split(" ").filter(word => word.length > 1 && !ignore.has(word));
-  let best: PreparedAnswer | null = null;
-  let highest = 0;
-  for(const entry of entries){
-    const exact = normalize(entry.question);
-    const keywords = entry.keywords.split(",").map(normalize).filter(Boolean);
-    let score = q===exact ? 100 : 0;
-    if(exact.includes(q) && qWords.length>=2)score=Math.max(score,7);
-    for(const keyword of keywords){
-      if(q===keyword)score=Math.max(score,90);
-      else if((" "+q+" ").includes(" "+keyword+" "))score=Math.max(score,5+keyword.split(" ").length);
-    }
-    const entryWords = new Set(exact.split(" ").filter(w=>w.length>1&&!ignore.has(w)));
-    const shared = qWords.filter(w=>entryWords.has(w)).length;
-    if(qWords.length>=2 && shared>=2 && shared/qWords.length>=.6) score=Math.max(score,4+shared);
-    if(score>highest){highest=score;best=entry;}
-  }
-  return best && highest>=5 ? best.answer : fallback;
-}
 
 export default function PortfolioAssistant() {
   const [open, setOpen] = useState(false);
