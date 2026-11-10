@@ -35,3 +35,21 @@ html[data-theme="dark"]{--paper:#151e1a;--ink:#f0f1e7;--muted:#b6c1b0;--line:#35
 [data-theme="dark"] ::selection{background:#d5ed9c;color:#202b26}
 @media(max-width:1000px){.header-actions{gap:0}.header-actions>.theme-toggle{position:fixed;z-index:15;top:100px;right:30px}.site-header{padding-right:86px}}
 @media(prefers-reduced-motion:reduce){body,.theme-toggle,.theme-symbol{transition:none!important}}
+
+
+/* The blog reader follows the visitor's theme, not a fixed light card. */
+[data-theme="dark"] .published-article-body{
+  background:var(--surface,#1b271f);
+  color:var(--ink,#f0f1e7);
+}
+[data-theme="dark"] .published-article{
+  background:var(--raised,#28382c);
+  border-color:var(--line);
+}
+[data-theme="dark"] .published-article-heading,
+[data-theme="dark"] .published-article-body,
+[data-theme="dark"] .published-article-body p,
+[data-theme="dark"] .published-article-body div{
+  color:var(--ink);
+}
+[data-theme="dark"] .post-share{color:var(--ink);border-color:var(--line)}
