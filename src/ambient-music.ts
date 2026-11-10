@@ -95,9 +95,12 @@ export function installAmbientMusic() {
       if(muted)stopSound();else startSound();
     } else if(!muted)begin();
   };
+  // Any first touch or click can unlock audio, including the existing menu.
+  document.addEventListener("pointerdown",begin,{passive:true});
   document.addEventListener("pointerup",tap,{passive:true});
   document.addEventListener("keydown",key);
   return () => {
+    document.removeEventListener("pointerdown",begin);
     document.removeEventListener("pointerup",tap);
     document.removeEventListener("keydown",key);
     stopSound();
