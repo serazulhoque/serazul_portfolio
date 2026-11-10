@@ -319,21 +319,22 @@ function Home() {
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
           <p className="eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
-          <h1>{pageCopy?.hero_line_one}{" "}<br />{pageCopy?.hero_line_two}{" "}<span className="hero-purpose">{pageCopy?.hero_phrase} <em>{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
-          <p className="hero-intro">{pageCopy?.hero_intro}</p>
+          <h1 data-edit-key="hero_line_one" style={styleFor(layout,"hero","title")}>{pageCopy?.hero_line_one}{" "}<br />{pageCopy?.hero_line_two}{" "}<span className="hero-purpose">{pageCopy?.hero_phrase} <em>{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
+          <p className="hero-intro" data-edit-key="hero_intro" style={styleFor(layout,"hero","body")}>{pageCopy?.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
       </section>
       <div className="intro-strip wrap"><span>{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p>{t("intro_first","Curiosity in the details.")} <em>{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
-      <div id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" /></div>
-      <ContentStories items={items} section="home" />
-      {layout.home_blog&&<PublishedArticles labels={labels} limit={layout.home_blog_limit} />}
-      <ContentStories items={items} section="publications" />
-      <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
+      <div className="customizable-home-layout">
+      <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" /></div>
+      <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
+      {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} /></div>}
+      {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} /></div>}
+      <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span>{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
-        <h2 id="contact-title">{pageCopy?.contact_heading}</h2>
-        <p>{pageCopy?.contact_paragraph}</p>
+        <h2 id="contact-title" data-edit-key="contact_heading" style={styleFor(layout,"contact","title")}>{pageCopy?.contact_heading}</h2>
+        <p data-edit-key="contact_paragraph" style={styleFor(layout,"contact","body")}>{pageCopy?.contact_paragraph}</p>
         <div className="contact-actions">
           {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
             <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
@@ -348,9 +349,10 @@ function Home() {
           <a href={t("social_instagram","https://www.instagram.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal /></a>
         </nav>
       </section>
-      <ContentStories items={items} section="contact" />
-      <VisitorWall />
-      <section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2>{t("closing_heading_one","Good software begins")}<br /><em>{t("closing_heading_two","with a human question.")}</em></h2><p>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br />{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section>
+      <ContentStories items={items} section="contact" layout={layout} /></div>
+      <div data-custom-section="visitor_wall" style={{order:sectionOrder(layout,"visitor_wall")}}><VisitorWall /></div>
+      <div data-custom-section="closing" style={{order:sectionOrder(layout,"closing")}}><section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2 data-edit-key="closing_heading_one" style={styleFor(layout,"closing","title")}>{t("closing_heading_one","Good software begins")}<br /><em>{t("closing_heading_two","with a human question.")}</em></h2><p data-edit-key="closing_paragraph_one" style={styleFor(layout,"closing","body")}>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br />{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section></div>
+      </div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span>{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span>{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="#home">Back to top ↑</a></footer>
     <DesignerSignature />
@@ -462,13 +464,13 @@ function AboutPage() {
 }
 
 export function BlogPage() {
-  const {labels}=useSiteContent();
+  const {labels,items}=useSiteContent();
   const layout=useSiteLayout();
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main" className="blog-page-main" tabIndex={-1}>
-      {layout.blog_page?<PublishedArticles labels={labels} standalone />:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
+      {layout.blog_page?<><PublishedArticles labels={labels} standalone />{layout.publications_page&&<ContentStories items={items} section="publications" layout={layout} />}</>:<section className="wrap section-space"><h1>Blog</h1><p>Blog posts are currently hidden on this page.</p></section>}
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque</a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
     <PortfolioAssistant />
