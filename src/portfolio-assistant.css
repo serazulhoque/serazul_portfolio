@@ -104,3 +104,7 @@
 
 /* Inform visitors that Ask Me messages are saved. */
 .assistant-history-notice{margin:0;padding:8px 15px 9px;color:#777987;background:#fff;font-size:10px;line-height:1.4;text-align:center}
+
+
+/* Clearly identified research sources; the original chat layout stays intact. */
+.assistant-research-link{display:block;margin-top:9px;padding-top:8px;border-top:1px solid #e0e0e8;color:#315aab!important;font-size:12px;font-weight:700;line-height:1.45;text-decoration:underline;overflow-wrap:anywhere}
