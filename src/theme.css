@@ -58,6 +58,17 @@ html[data-theme="dark"]{--paper:#151e1a;--ink:#f0f1e7;--muted:#b6c1b0;--line:#35
 
 /* Homepage introduction text, set to black as requested. */
 .hero-intro,
-[data-theme="dark"] .hero-intro{color:#000!important}
+[data-theme="dark"] .hero-intro{color:var(--custom-hero-body-color,#000)!important}
 /* Preserve contrast for black text when the visitor uses dark mode. */
 [data-theme="dark"] .hero-intro{background:#fffdf6;padding:8px;border-radius:4px}
+
+
+/* Database-driven page organization; default order matches the original website. */
+.customizable-home-layout{display:flex;flex-direction:column;min-width:0}
+.customizable-home-layout>[data-custom-section]{width:100%;min-width:0;flex:none}
+.published-all-link{margin:22px 0 0}
+.published-all-link a{display:inline-flex;color:var(--ink);text-decoration:underline;text-underline-offset:4px;font-size:14px}
+.blog-page-main{min-height:65svh;padding-top:clamp(22px,4vw,54px)}
+.blog-page-main .published-articles{border-top:0}
+.customize-preview [data-edit-key]{cursor:crosshair!important}
+.customize-preview [data-edit-key]:hover{outline:2px dashed #80ad58!important;outline-offset:5px}
