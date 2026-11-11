@@ -48,7 +48,7 @@ await writeFile(new URL("../dist/askme/index.html", import.meta.url), chatHtml);
 // post page exists. Root-relative assets keep it usable on deep URLs.
 await writeFile(new URL("../dist/404.html", import.meta.url), output);
 await mkdir(new URL("../dist/blog", import.meta.url), {recursive:true});
-const blogHtml=html.replace(placeholder,()=>'<div id="root">'+renderBlog()+'</div>')
+const blogHtml=preparedHtml.replace(placeholder,()=>'<div id="root">'+renderBlog()+'</div>')
   .replace(/<title>[^<]*<\/title>/,'<title>Blog — Serazul Hoque</title>')
   .replace(/<meta name="description" content="[^"]*"\s*\/>/,
     '<meta name="description" content="Read Serazul Hoque’s blog posts, writing, and reflections." />')
