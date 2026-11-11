@@ -55,3 +55,24 @@ export function writeCache(key: string, value: unknown): void {
     /* Cached content is optional when storage is unavailable or full. */
   }
 }
+
+// Keep background content updates from competing with the initial page render.
+// The published snapshot is already visible in HTML, even on slow connections.
+export function refreshAfterFirstPaint(work: () => void, signal: AbortSignal): void {
+  if (typeof window === "undefined") return;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const start = () => {
+    if (signal.aborted) return;
+    timer = setTimeout(() => { if (!signal.aborted) work(); }, 700);
+  };
+  if (document.readyState === "complete") start();
+  else {
+    window.addEventListener("load", start, { once: true, signal });
+    // Do not stall refresh forever because of a slow image or analytics request.
+    timer = setTimeout(() => {
+      window.removeEventListener("load", start);
+      if (!signal.aborted) work();
+    }, 2400);
+  }
+  signal.addEventListener("abort", () => { if (timer) clearTimeout(timer); }, { once: true });
+}
