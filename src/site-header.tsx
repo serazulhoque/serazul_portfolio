@@ -180,11 +180,13 @@ export default function SiteHeader() {
     };
   }, []);
 
-  function follow(event: React.MouseEvent<HTMLAnchorElement>) {
-    const href = event.currentTarget.getAttribute("href") || "#home";
-    if (!href.startsWith("#")) return;
-    event.preventDefault();
-    closeMenu(href);
+  function follow() {
+    // Restore scrolling and let the browser follow the real link.
+    // Intercepting #home and delaying navigation could leave the menu stuck.
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    if (dialog.current?.open) dialog.current.close();
+    document.body.style.overflow = previousOverflow.current;
+    setClosing(false);
   }
 
   return <>
@@ -202,10 +204,10 @@ export default function SiteHeader() {
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
         <nav className="menu-links" aria-label="Portfolio navigation">
-          <a href="/about.html"><span className="menu-item-label">About me</span><MenuSymbol name="about" /></a>
+          <a onClick={follow} href="/about.html"><span className="menu-item-label">About me</span><MenuSymbol name="about" /></a>
           <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
           <a href="/blog" onClick={follow}><span className="menu-item-label">Blog</span><MenuSymbol name="publication" /></a>
-          <a href="/gallery.html"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
+          <a onClick={follow} href="/gallery.html"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
           <a href={homeHref} onClick={follow}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
