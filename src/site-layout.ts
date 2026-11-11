@@ -75,7 +75,7 @@ export function loadDesignSettings(){
 }
 let pending:Promise<LayoutConfig>|null=null;
 export function loadSiteLayout(){
-  if(!pending)pending=loadDesignSettings().then(data=>parseLayout(data.layout_config));
+  if(!pending)pending=loadDesignSettings().then(data=>parseLayout(data.layout_config ?? snapshot.layout));
   return pending;
 }
 export function useSiteLayout(){
