@@ -26,6 +26,25 @@ export default function SiteDesign(){
         if(!active||!Object.keys(design).length)return;
         const root=document.documentElement;
         const layout=parseLayout(design.layout_config);
+        // One small stylesheet applies independent colors and sizes even to
+        // content loaded later from the database. Keys/values are validated.
+        let fieldStyles=document.getElementById("site-custom-field-styles") as HTMLStyleElement|null;
+        if(!fieldStyles){
+          fieldStyles=document.createElement("style");
+          fieldStyles.id="site-custom-field-styles";
+          document.head.appendChild(fieldStyles);
+        }
+        fieldStyles.textContent=Object.entries(layout.styles)
+          .filter(([key])=>/^field:[a-z_]{2,80}$/.test(key))
+          .map(([key,settings])=>{
+            const color=settings.titleColor||settings.bodyColor;
+            const size=settings.titleSize||settings.bodySize;
+            const declarations=[
+              color?"color:"+color+"!important":"",
+              size?"font-size:"+size+"px!important":""
+            ].filter(Boolean).join(";");
+            return declarations?'html [data-edit-key="'+key.slice(6)+'"]{'+declarations+'}':"";
+          }).join("\n");
         const heroBodyColor=layout.styles.hero?.bodyColor;
         root.style.setProperty("--custom-hero-body-color",heroBodyColor||"#000000");
         root.dataset.blogOnHome=layout.home_blog?"true":"false";
