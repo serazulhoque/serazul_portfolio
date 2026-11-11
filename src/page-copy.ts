@@ -72,9 +72,8 @@ export function useLivePageCopy() {
         if (controller.signal.aborted) return;
         setCopy(next);
       } catch {
-        // Keep text hidden rather than display outdated defaults on a failed fetch.
-        // A later refresh will fetch the latest saved Supabase content.
-        if (!controller.signal.aborted) setCopy(null);
+        // Preserve the last published build snapshot if a live refresh fails.
+        // Never blank already-visible content because of a transient outage.
       }
     }
     void load();
