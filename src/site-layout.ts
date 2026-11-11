@@ -1,6 +1,6 @@
 import snapshot from "./site-snapshot.json";
 import {useEffect,useState} from "react";
-import {DATA_URL,PUBLIC_HEADERS} from "./public-api";
+import {DATA_URL,PUBLIC_HEADERS,refreshAfterFirstPaint} from "./public-api";
 
 export const HOME_SECTIONS=["explorations","home_stories","blog","publications","contact","visitor_wall","closing"] as const;
 export type HomeSection=typeof HOME_SECTIONS[number];
@@ -80,7 +80,16 @@ export function loadSiteLayout(){
 }
 export function useSiteLayout(){
   const [layout,setLayout]=useState<LayoutConfig>(() => parseLayout(snapshot.layout));
-  useEffect(()=>{let active=true;void loadSiteLayout().then(value=>{if(active)setLayout(value);});return()=>{active=false;};},[]);
+  useEffect(()=>{
+    const controller=new AbortController();
+    refreshAfterFirstPaint(()=>{
+      void loadSiteLayout().then(value=>{
+        if(!controller.signal.aborted)
+          setLayout(previous=>JSON.stringify(previous)===JSON.stringify(value)?previous:value);
+      });
+    },controller.signal);
+    return ()=>controller.abort();
+  },[]);
   return layout;
 }
 export function sectionOrder(config:LayoutConfig,key:HomeSection){
