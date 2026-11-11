@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 import {parseLayout,loadDesignSettings} from "./site-layout";
+import {refreshAfterFirstPaint} from "./public-api";
 
 // Public read-only design settings. Editing requires signed-in administrator access.
 const scaleKeys:Record<string,string>={
@@ -21,9 +22,10 @@ const visibilityKeys:Record<string,string>={
 
 export default function SiteDesign(){
   useEffect(()=>{
-    let active=true;
-    void loadDesignSettings().then(design=>{
-        if(!active||!Object.keys(design).length)return;
+    const controller=new AbortController();
+    refreshAfterFirstPaint(()=>{
+      void loadDesignSettings().then(design=>{
+        if(controller.signal.aborted||!Object.keys(design).length)return;
         const root=document.documentElement;
         const layout=parseLayout(design.layout_config);
         // One small stylesheet applies independent colors and sizes even to
@@ -59,7 +61,8 @@ export default function SiteDesign(){
           root.setAttribute("data-"+attribute,design[key]===false?"false":"true");
         }
       });
-    return ()=>{active=false;};
+    },controller.signal);
+    return ()=>controller.abort();
   },[]);
   useEffect(()=>{
     if(typeof window==="undefined"||window.parent===window||
