@@ -572,4 +572,13 @@ html body .hero h1 [data-edit-key="hero_line_one"],
 html body .hero h1 [data-edit-key="hero_line_two"],
 html body .hero h1 [data-edit-key="hero_phrase"],
 html body .hero h1 [data-edit-key="hero_emphasis"]{font-size:inherit!important}
-.hero h1 .hero-purpose{display:block;white-space:nowrap}
+/* One responsive headline line: scale to its own column rather than overflow on phones. */
+.hero .hero-copy{container-type:inline-size}
+.hero .hero-copy h1{
+  font-size:clamp(15px,5.2cqw,34px)!important;
+  letter-spacing:-.025em;
+  line-height:1.2;
+  white-space:nowrap
+}
+.hero .hero-copy h1 br{display:none}
+.hero .hero-copy h1 .hero-purpose{display:inline;white-space:inherit;margin-top:0}
