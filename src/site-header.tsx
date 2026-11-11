@@ -170,6 +170,21 @@ export default function SiteHeader() {
   }
 
   useEffect(() => {
+    // A mobile browser can restore this page from its back/forward cache
+    // with an old modal dialog and body scroll lock still active.
+    function restore(event: PageTransitionEvent) {
+      if (!event.persisted) return;
+      if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+      if (dialog.current?.open) dialog.current.close();
+      if (photoDialog.current?.open) photoDialog.current.close();
+      document.body.style.overflow = previousOverflow.current;
+      setClosing(false);
+    }
+    window.addEventListener("pageshow", restore);
+    return () => window.removeEventListener("pageshow", restore);
+  }, []);
+
+  useEffect(() => {
     const desktop = window.matchMedia("(min-width: 1001px)");
     const resize = () => { if (desktop.matches && dialog.current?.open) closeMenu(); };
     desktop.addEventListener("change", resize);
