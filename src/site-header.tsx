@@ -226,7 +226,7 @@ export default function SiteHeader() {
     <header className={`site-header wrap${isAboutPage ? " about-page-header" : ""}`}>
       <div className="wordmark">{brand()}</div>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
-        <a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href="/blog">Blog</a><a href="/gallery.html">Gallery</a>
+        <a href="/">Home</a><a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href="/blog">Blog</a><a href="/gallery.html">Gallery</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
       <button className="menu-orb" onClick={openMenu} disabled={!ready} aria-haspopup="dialog" aria-controls="portfolio-menu" aria-label="Open menu"><MenuIcon /></button>
     </header>
