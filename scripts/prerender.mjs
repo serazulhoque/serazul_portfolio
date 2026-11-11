@@ -4,7 +4,12 @@ const file = new URL("../dist/index.html", import.meta.url);
 const html = await readFile(file, "utf8");
 const placeholder = '<div id="root"></div>';
 if (!html.includes(placeholder)) throw new Error("Missing prerender root.");
-const output = html.replace(placeholder, () => '<div id="root">' + render() + '</div>');
+const renderedHome=render();
+const snapshot=JSON.parse(await readFile(new URL("../src/site-snapshot.json",import.meta.url),"utf8"));
+// Fail the build instead of deploying a homepage with an empty hero heading.
+if(!snapshot?.pageCopy?.hero_line_one || !renderedHome.includes(snapshot.pageCopy.hero_line_one))
+  throw new Error("Homepage content was not included in initial HTML");
+const output = html.replace(placeholder, () => '<div id="root">' + renderedHome + '</div>');
 await writeFile(file, output);
 await mkdir(new URL("../dist/askme/", import.meta.url), {recursive:true});
 const chatHtml = html.replace(placeholder, () => '<div id="root">' + renderAskMe() + '</div>')
