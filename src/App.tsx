@@ -497,12 +497,26 @@ export function AskMePage() {
 }
 
 export default function App() {
+  const [path, setPath] = useState(() =>
+    typeof window === "undefined" ? "/" : window.location.pathname
+  );
+  useEffect(() => {
+    // Blog post links update history in place. Back/Forward must also
+    // update the displayed page, not just the browser address bar.
+    const sync = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", sync);
+    window.addEventListener("pageshow", sync);
+    return () => {
+      window.removeEventListener("popstate", sync);
+      window.removeEventListener("pageshow", sync);
+    };
+  }, []);
   return <>
     <SiteDesign />
-    {typeof window !== "undefined" && /^\/blog(?:\/.*)?$/.test(window.location.pathname)
-      ? <BlogPage /> : typeof window !== "undefined" && /^\/askme\/?$/.test(window.location.pathname)
-      ? <AskMePage /> : typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html")
-      ? <Gallery /> : typeof window !== "undefined" && window.location.pathname.endsWith("/about.html")
+    {/^\/blog(?:\/.*)?$/.test(path)
+      ? <BlogPage /> : /^\/askme\/?$/.test(path)
+      ? <AskMePage /> : path.endsWith("/gallery.html")
+      ? <Gallery /> : path.endsWith("/about.html")
       ? <AboutPage /> : <Home />}
   </>;
 }
