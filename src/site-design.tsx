@@ -45,7 +45,10 @@ export default function SiteDesign(){
               color?"color:"+color+"!important":"",
               size?"font-size:"+size+"px!important":""
             ].filter(Boolean).join(";");
-            return declarations?'html [data-edit-key="'+key.slice(6)+'"]{'+declarations+'}':"";
+            if(!declarations)return "";
+            const selector='html [data-edit-key="'+key.slice(6)+'"]';
+            const darkRule=color?'html[data-theme="dark"] [data-edit-key="'+key.slice(6)+'"]{color:var(--ink)!important}':"";
+            return selector+'{'+declarations+'}'+darkRule;
           }).join("\n");
         const heroBodyColor=layout.styles.hero?.bodyColor;
         root.style.setProperty("--custom-hero-body-color",heroBodyColor||"#000000");
