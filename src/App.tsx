@@ -331,7 +331,7 @@ function Home() {
       <section className="hero wrap" id="home" tabIndex={-1}>
         <div className="hero-copy" data-reveal>
           <p className="eyebrow" data-edit-key="hero_eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
-          <h1 data-edit-key="hero_line_one" style={styleFor(layout,"hero","title")}>{pageCopy?.hero_line_one}{" "}<br />{pageCopy?.hero_line_two}{" "}<span className="hero-purpose">{pageCopy?.hero_phrase} <em>{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
+          <h1 style={styleFor(layout,"hero","title")}><span data-edit-key="hero_line_one">{pageCopy?.hero_line_one}</span>{" "}<br /><span data-edit-key="hero_line_two">{pageCopy?.hero_line_two}</span>{" "}<span className="hero-purpose"><span data-edit-key="hero_phrase">{pageCopy?.hero_phrase}</span> <em data-edit-key="hero_emphasis">{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
           <p className="hero-intro" data-edit-key="hero_intro" style={styleFor(layout,"hero","body")}>{pageCopy?.hero_intro}</p>
           <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
           <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
@@ -460,7 +460,7 @@ function AboutPage() {
       <section className="about-section wrap section-space" id="about" tabIndex={-1}>
         <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
         <div className="about-main">
-          <h2 data-edit-key="about_line_one" style={styleFor(layout,"about","title")}>{copy?.about_line_one}<br /><em>{copy?.about_line_two}</em></h2>
+          <h2 style={styleFor(layout,"about","title")}><span data-edit-key="about_line_one">{copy?.about_line_one}</span><br /><em data-edit-key="about_line_two">{copy?.about_line_two}</em></h2>
           <div className="about-columns"><p data-edit-key="about_paragraph_one" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_one}</p><p data-edit-key="about_paragraph_two" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_two}</p></div>
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
