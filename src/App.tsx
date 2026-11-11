@@ -447,7 +447,7 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind,layout}:{entries:Sit
   </section>;
 }
 
-function AboutPage() {
+export function AboutPage() {
   const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
   const layout=useSiteLayout();
   const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
