@@ -302,7 +302,7 @@ function Home() {
   }, []);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    const elements = Array.from(document.querySelectorAll<HTMLElement>(".hero-photo[data-reveal]"));
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reduced.matches || !("IntersectionObserver" in window)) return;
     const observer = new IntersectionObserver(entries => {
@@ -363,7 +363,7 @@ function Home() {
       </section>
       <ContentStories items={items} section="contact" layout={layout} /></div>
       <div data-custom-section="visitor_wall" style={{order:sectionOrder(layout,"visitor_wall")}}><VisitorWall /></div>
-      <div data-custom-section="closing" style={{order:sectionOrder(layout,"closing")}}><section className="closing-section wrap" data-reveal><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow" data-edit-key="closing_label">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2 data-edit-key="closing_heading_one" style={styleFor(layout,"closing","title")}>{t("closing_heading_one","Good software begins")}<br /><em data-edit-key="closing_heading_two">{t("closing_heading_two","with a human question.")}</em></h2><p data-edit-key="closing_paragraph_one" style={styleFor(layout,"closing","body")}>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br /><span data-edit-key="closing_paragraph_two">{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</span></p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section></div>
+      <div data-custom-section="closing" style={{order:sectionOrder(layout,"closing")}}><section className="closing-section wrap"><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow" data-edit-key="closing_label">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2 data-edit-key="closing_heading_one" style={styleFor(layout,"closing","title")}>{t("closing_heading_one","Good software begins")}<br /><em data-edit-key="closing_heading_two">{t("closing_heading_two","with a human question.")}</em></h2><p data-edit-key="closing_paragraph_one" style={styleFor(layout,"closing","body")}>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br /><span data-edit-key="closing_paragraph_two">{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</span></p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section></div>
       </div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="#home">Serazul Hoque<span data-edit-key="footer_tagline">{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span data-edit-key="footer_note">{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="#home">Back to top ↑</a></footer>
