@@ -62,6 +62,21 @@ export default function SiteHeader() {
   const isBlogPage = typeof window !== "undefined" && /^\/blog(?:\/|$)/.test(window.location.pathname);
   const separatePage = isAboutPage || isGalleryPage || isBlogPage;
   const homeHref = separatePage ? "/" : "#home";
+  // Home navigation must not depend on a dialog animation, timer or hash state.
+  function navigateHome(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    if (dialog.current?.open) dialog.current.close();
+    document.body.style.overflow = "";
+    setClosing(false);
+    if (window.location.pathname !== "/") {
+      window.location.assign("/");
+    } else {
+      if (window.location.hash) window.history.replaceState(null, "", "/");
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }
   const sectionHref = (section: string) => separatePage ? `/${section}` : section;
 
   function openPhoto() {
@@ -91,6 +106,20 @@ export default function SiteHeader() {
     return () => { if (viewer?.open) document.body.style.overflow = photoOverflow.current; };
   }, []);
 
+  // On mobile, returning with the browser Back button can restore a page
+  // from memory with an old modal and body scroll lock. Always clean both.
+  useEffect(() => {
+    const restore = () => {
+      if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+      if (dialog.current?.open) dialog.current.close();
+      if (photoDialog.current?.open) photoDialog.current.close();
+      document.body.style.overflow = "";
+      setClosing(false);
+    };
+    window.addEventListener("pageshow", restore);
+    return () => window.removeEventListener("pageshow", restore);
+  }, []);
+
   const brand = (inMenu = false) => <>
     <button type="button" ref={inMenu ? undefined : photoButton}
       className="brand-mark brand-avatar profile-photo-button" onClick={openPhoto}
@@ -98,7 +127,7 @@ export default function SiteHeader() {
       aria-haspopup="dialog" aria-controls="profile-photo-viewer">
     {profilePhoto ? <img src={profilePhoto} alt="" decoding="async" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
       <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
-  </button><a className="brand-name" href={homeHref} onClick={inMenu ? follow : undefined} aria-label="Serazul Hoque home">Serazul Hoque
+  </button><a className="brand-name" href={homeHref} onClick={navigateHome} aria-label="Serazul Hoque home">Serazul Hoque
     <svg className="brand-check" viewBox="0 0 24 24" role="img" aria-label="Blue check decoration">
       <path fill="#1877F2" d="m12 1.2 2.8 1.7 3.3-.1 1.5 3 3 1.6-.1 3.3 1.5 2.9-1.7 2.8.1 3.3-3 1.5-1.6 3-3.3-.1-2.5 1.5-2.9-1.7-3.3.1-1.5-3-3-1.6.1-3.3L1 13.2l1.7-2.8-.1-3.3 3-1.5 1.6-3 3.3.1L12 1.2Z" transform="translate(1.4 1.4) scale(.89)" />
       <path d="m7.2 12.2 3.1 3.1 6.6-6.7" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
@@ -223,7 +252,7 @@ export default function SiteHeader() {
           <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
           <a href="/blog" onClick={follow}><span className="menu-item-label">Blog</span><MenuSymbol name="publication" /></a>
           <a onClick={follow} href="/gallery.html"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
-          <a href={homeHref} onClick={follow}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
+          <a href={homeHref} onClick={navigateHome}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>
