@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
-import { render, renderAskMe, renderBlog } from "../.prerender/entry-server.js";
+import { render, renderAskMe, renderBlog, renderAbout, renderGallery } from "../.prerender/entry-server.js";
 const file = new URL("../dist/index.html", import.meta.url);
 const html = await readFile(file, "utf8");
 const placeholder = '<div id="root"></div>';
@@ -26,6 +26,16 @@ const rules=Object.entries(snapshot.layout?.styles||{})
 const preparedHtml=rules?html.replace("</head>",'<style id="site-custom-field-styles">'+rules+"</style></head>"):html;
 const output = preparedHtml.replace(placeholder, () => '<div id="root">' + renderedHome + '</div>');
 await writeFile(file, output);
+for (const [name, renderPage] of [["about.html",renderAbout],["gallery.html",renderGallery]]) {
+  const path=new URL("../dist/"+name,import.meta.url);
+  const original=await readFile(path,"utf8");
+  if(!original.includes(placeholder))throw new Error("Missing prerender root in "+name);
+  const withStyles=rules?original.replace("</head>",'<style id="site-custom-field-styles">'+rules+"</style></head>"):original;
+  const rendered=renderPage();
+  if(name==="about.html"&&!rendered.includes(snapshot.pageCopy.about_line_one))
+    throw new Error("About text was not included in initial HTML");
+  await writeFile(path,withStyles.replace(placeholder,()=>'<div id="root">'+rendered+'</div>'));
+}
 await mkdir(new URL("../dist/askme/", import.meta.url), {recursive:true});
 const chatHtml = html.replace(placeholder, () => '<div id="root">' + renderAskMe() + '</div>')
   .replace(/<title>[^<]*<\/title>/,'<title>Ask Me — Serazul Hoque</title>')
