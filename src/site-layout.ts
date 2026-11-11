@@ -1,3 +1,4 @@
+import snapshot from "./site-snapshot.json";
 import {useEffect,useState} from "react";
 import {DATA_URL,PUBLIC_HEADERS} from "./public-api";
 
@@ -78,7 +79,7 @@ export function loadSiteLayout(){
   return pending;
 }
 export function useSiteLayout(){
-  const [layout,setLayout]=useState<LayoutConfig>(DEFAULT_LAYOUT);
+  const [layout,setLayout]=useState<LayoutConfig>(() => parseLayout(snapshot.layout));
   useEffect(()=>{let active=true;void loadSiteLayout().then(value=>{if(active)setLayout(value);});return()=>{active=false;};},[]);
   return layout;
 }
