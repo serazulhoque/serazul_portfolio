@@ -61,18 +61,18 @@ export function writeCache(key: string, value: unknown): void {
 export function refreshAfterFirstPaint(work: () => void, signal: AbortSignal): void {
   if (typeof window === "undefined") return;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let scheduled = false;
   const start = () => {
-    if (signal.aborted) return;
+    if (signal.aborted || scheduled) return;
+    scheduled = true;
+    if (timer) clearTimeout(timer);
     timer = setTimeout(() => { if (!signal.aborted) work(); }, 700);
   };
   if (document.readyState === "complete") start();
   else {
     window.addEventListener("load", start, { once: true, signal });
     // Do not stall refresh forever because of a slow image or analytics request.
-    timer = setTimeout(() => {
-      window.removeEventListener("load", start);
-      if (!signal.aborted) work();
-    }, 2400);
+    timer = setTimeout(start, 2400);
   }
   signal.addEventListener("abort", () => { if (timer) clearTimeout(timer); }, { once: true });
 }
