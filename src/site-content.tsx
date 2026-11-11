@@ -3,9 +3,7 @@ import {styleFor,type LayoutConfig} from "./site-layout";
 import {
   DATA_URL,
   PUBLIC_HEADERS,
-  requestJSON,
-  readCache,
-  writeCache,
+  requestJSON
 } from "./public-api";
 
 export type SiteEntry = {
@@ -24,7 +22,6 @@ type SiteData = {
   labels: Record<string, string>;
   labelsLoaded: boolean;
 };
-const CACHE_KEY = "serazul:site-content:v1";
 function isEntry(value: unknown): value is SiteEntry {
   if (!value || typeof value !== "object") return false;
   const item = value as Record<string, unknown>;
@@ -51,27 +48,6 @@ export function useSiteContent(): SiteData {
   const [labelsLoaded, setLabelsLoaded] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
-    // Validate the optional cache before letting it reach React's renderer.
-    const stored = readCache(CACHE_KEY) as {
-      items?: unknown;
-      labels?: unknown;
-    } | null;
-    if (stored && Array.isArray(stored.items) && stored.items.every(isEntry)) {
-      setItems(stored.items);
-      setEntriesLoaded(true);
-    }
-    if (stored && isLabels(stored.labels)) {
-      setLabels(stored.labels);
-      setLabelsLoaded(true);
-    }
-    const write = (name: "items" | "labels", value: unknown) => {
-      const cached = readCache(CACHE_KEY);
-      const previous =
-        cached && typeof cached === "object" && !Array.isArray(cached)
-          ? cached
-          : {};
-      writeCache(CACHE_KEY, { ...previous, [name]: value });
-    };
     requestJSON<unknown>(
       DATA_URL +
         "/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300",
@@ -81,7 +57,6 @@ export function useSiteContent(): SiteData {
         if (controller.signal.aborted || !Array.isArray(data)) return;
         const valid = data.filter(isEntry);
         setItems(valid);
-        write("items", valid);
       })
       .catch(() => {})
       .finally(() => {
@@ -102,7 +77,6 @@ export function useSiteContent(): SiteData {
           )
             values[item.key] = item.value;
         setLabels(values);
-        write("labels", values);
       })
       .catch(() => {})
       .finally(() => {
