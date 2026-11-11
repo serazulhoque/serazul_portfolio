@@ -329,7 +329,7 @@ function Home() {
     <VisitAnalytics />
     <main id="main">
       <section className="hero wrap" id="home" tabIndex={-1}>
-        <div className="hero-copy" data-reveal>
+        <div className="hero-copy">
           <p className="eyebrow" data-edit-key="hero_eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
           <h1 style={styleFor(layout,"hero","title")}><span data-edit-key="hero_line_one">{pageCopy?.hero_line_one}</span>{" "}<br /><span data-edit-key="hero_line_two">{pageCopy?.hero_line_two}</span>{" "}<span className="hero-purpose"><span data-edit-key="hero_phrase">{pageCopy?.hero_phrase}</span> <em data-edit-key="hero_emphasis">{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
           <p className="hero-intro" data-edit-key="hero_intro" style={styleFor(layout,"hero","body")}>{pageCopy?.hero_intro}</p>
