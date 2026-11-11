@@ -11,17 +11,21 @@ type GalleryItem={id:string;title:string;caption:string;media_id:string;url?:str
 export default function Gallery(){
   const [items,setItems]=useState<GalleryItem[]>([]);
   const [busy,setBusy]=useState(true);
+  const [error,setError]=useState(false);
+  const [retry,setRetry]=useState(0);
   const [active,setActive]=useState<GalleryItem|null>(null);
   useEffect(()=>{
     const controller=new AbortController();
     async function load(){
+      setBusy(true);
+      setError(false);
       try{
         const response=await fetch(API+"?select=id,title,caption,media_id&is_published=eq.true&order=sort_order.asc,created_at.desc&limit=100",{
           headers:HEADERS,signal:controller.signal,cache:"no-store"
         });
         if(!response.ok)throw new Error("Gallery unavailable");
         const rows=await response.json() as GalleryItem[];
-        if(!Array.isArray(rows))return;
+        if(!Array.isArray(rows))throw new Error("Invalid gallery response");
         const images=await Promise.all(rows.map(async item=>{
           try{
             const r=await fetch(MEDIA+encodeURIComponent(item.media_id),{signal:controller.signal});
@@ -30,13 +34,14 @@ export default function Gallery(){
             return typeof data.url==="string"?{...item,url:data.url,alt:data.alt}:null;
           }catch{return null;}
         }));
+        if(rows.length>0 && images.every(item=>item===null))throw new Error("Gallery media unavailable");
         if(!controller.signal.aborted)setItems(images.filter(item=>item!==null));
-      }catch{/* Keep the page usable on an unavailable connection. */}
+      }catch{if(!controller.signal.aborted)setError(true);}
       finally{if(!controller.signal.aborted)setBusy(false);}
     }
     void load();
     return ()=>controller.abort();
-  },[]);
+  },[retry]);
   useEffect(()=>{
     if(!active)return;
     const close=(event:KeyboardEvent)=>{if(event.key==="Escape")setActive(null);};
@@ -50,7 +55,7 @@ export default function Gallery(){
       <p className="eyebrow">A PERSONAL COLLECTION</p>
       <h1>Gallery<span className="green-period">.</span></h1>
       <p className="gallery-intro">Moments, memories, and images worth sharing.</p>
-      {busy?<p className="gallery-status" role="status">Loading gallery…</p>:items.length===0?<p className="gallery-status">No photos in the gallery yet.</p>:
+      {busy?<p className="gallery-status" role="status">Loading gallery…</p>:error?<div className="gallery-status" role="status"><p>Gallery couldn’t load right now.</p><button type="button" className="button button-dark" onClick={()=>setRetry(n=>n+1)}>Try again</button></div>:items.length===0?<p className="gallery-status">No photos in the gallery yet.</p>:
         <div className="gallery-grid">{items.map(item=>
           <button type="button" key={item.id} className="gallery-tile" onClick={()=>setActive(item)}
             aria-label={"View "+(item.title||item.alt||"gallery photo")}>
