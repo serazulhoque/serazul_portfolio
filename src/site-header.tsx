@@ -62,21 +62,6 @@ export default function SiteHeader() {
   const isBlogPage = typeof window !== "undefined" && /^\/blog(?:\/|$)/.test(window.location.pathname);
   const separatePage = isAboutPage || isGalleryPage || isBlogPage;
   const homeHref = separatePage ? "/" : "#home";
-  // Home navigation must not depend on a dialog animation, timer or hash state.
-  function navigateHome(event: React.MouseEvent<HTMLAnchorElement>) {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    event.preventDefault();
-    if (timer.current) { clearTimeout(timer.current); timer.current = null; }
-    if (dialog.current?.open) dialog.current.close();
-    document.body.style.overflow = "";
-    setClosing(false);
-    if (window.location.pathname !== "/") {
-      window.location.assign("/");
-    } else {
-      if (window.location.hash) window.history.replaceState(null, "", "/");
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
-  }
   const sectionHref = (section: string) => separatePage ? `/${section}` : section;
 
   function openPhoto() {
@@ -256,7 +241,7 @@ export default function SiteHeader() {
           <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
           <a href="/blog" onClick={follow}><span className="menu-item-label">Blog</span><MenuSymbol name="publication" /></a>
           <a onClick={follow} href="/gallery.html"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
-          <a href={homeHref} onClick={navigateHome}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
+          <a href="/"><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>
