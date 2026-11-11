@@ -1,4 +1,4 @@
-import snapshot from "./site-snapshot.json";
+import snapshot from "./site-snapshot.json" with { type: "json" };
 import { useEffect, useState } from "react";
 import {
   DATA_URL,
