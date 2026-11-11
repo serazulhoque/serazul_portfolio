@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import {
   DATA_URL,
   PUBLIC_HEADERS,
-  requestJSON
+  requestJSON,
+  refreshAfterFirstPaint
 } from "./public-api.ts";
 
 type PageSections = {
@@ -70,13 +71,13 @@ export function useLivePageCopy() {
         const next = parsePageCopy(Array.isArray(rows) ? rows[0] : null);
         if (!next) throw new Error("Saved page text unavailable");
         if (controller.signal.aborted) return;
-        setCopy(next);
+        setCopy(current => current && Object.keys(next).every(key => current[key as keyof typeof next] === next[key as keyof typeof next]) ? current : next);
       } catch {
         // Preserve the last published build snapshot if a live refresh fails.
         // Never blank already-visible content because of a transient outage.
       }
     }
-    void load();
+    refreshAfterFirstPaint(() => void load(), controller.signal);
     return () => controller.abort();
   }, []);
   return copy;
