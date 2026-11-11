@@ -55,7 +55,11 @@ function postUrl(article:PublishedArticle){
 function selectedPostIndex(articles:PublishedArticle[]){
   const match=window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
   if(!match)return null;
-  const index=articles.findIndex(article=>postSlug(article.title)===decodeURIComponent(match[1]));
+  // Malformed URL escapes are possible in external links; never crash the page.
+  let slug: string;
+  try { slug=decodeURIComponent(match[1]); }
+  catch { return null; }
+  const index=articles.findIndex(article=>postSlug(article.title)===slug);
   return index<0?null:index;
 }
 
