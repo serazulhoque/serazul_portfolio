@@ -1,9 +1,7 @@
 import {useEffect} from "react";
-import {parseLayout} from "./site-layout";
+import {parseLayout,loadDesignSettings} from "./site-layout";
 
 // Public read-only design settings. Editing requires signed-in administrator access.
-const API="https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/site_design_settings";
-const PUBLIC_KEY="sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N";
 const scaleKeys:Record<string,string>={
   hero_scale:"--site-hero-scale",
   intro_scale:"--site-intro-scale",
@@ -23,15 +21,10 @@ const visibilityKeys:Record<string,string>={
 
 export default function SiteDesign(){
   useEffect(()=>{
-    const controller=new AbortController();
-    fetch(API+"?select=*&id=eq.1",{
-      headers:{"apikey":PUBLIC_KEY},
-      credentials:"omit",cache:"no-store",signal:controller.signal
-    }).then(response=>response.ok?response.json():Promise.reject())
-      .then(data=>{
-        if(controller.signal.aborted||!Array.isArray(data)||!data[0])return;
+    let active=true;
+    void loadDesignSettings().then(design=>{
+        if(!active||!Object.keys(design).length)return;
         const root=document.documentElement;
-        const design=data[0] as Record<string,unknown>;
         const layout=parseLayout(design.layout_config);
         const heroBodyColor=layout.styles.hero?.bodyColor;
         root.style.setProperty("--custom-hero-body-color",heroBodyColor||"#000000");
@@ -46,8 +39,8 @@ export default function SiteDesign(){
         for(const [key,attribute] of Object.entries(visibilityKeys)){
           root.setAttribute("data-"+attribute,design[key]===false?"false":"true");
         }
-      }).catch(()=>{/* Website continues using the original design if settings are unavailable. */});
-    return ()=>controller.abort();
+      });
+    return ()=>{active=false;};
   },[]);
   useEffect(()=>{
     if(typeof window==="undefined"||window.parent===window||
