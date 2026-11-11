@@ -62,13 +62,19 @@ export function parseLayout(value:unknown):LayoutConfig {
     styles
   };
 }
-let pending:Promise<LayoutConfig>|null=null;
-export function loadSiteLayout(){
-  if(!pending)pending=fetch(DATA_URL+"/site_design_settings?select=layout_config&id=eq.1",{
+// Share one settings request between the page layout and design effects.
+let settingsPromise:Promise<Record<string,unknown>>|null=null;
+export function loadDesignSettings(){
+  if(!settingsPromise)settingsPromise=fetch(DATA_URL+"/site_design_settings?select=*&id=eq.1",{
     credentials:"omit",cache:"no-store",headers:PUBLIC_HEADERS,signal:AbortSignal.timeout(8000)
   }).then(response=>response.ok?response.json():Promise.reject())
-    .then(data=>parseLayout(Array.isArray(data)?data[0]?.layout_config:null))
-    .catch(()=>DEFAULT_LAYOUT);
+    .then(data=>Array.isArray(data)&&data[0]&&typeof data[0]==="object"?data[0]:{})
+    .catch(()=>({}));
+  return settingsPromise;
+}
+let pending:Promise<LayoutConfig>|null=null;
+export function loadSiteLayout(){
+  if(!pending)pending=loadDesignSettings().then(data=>parseLayout(data.layout_config));
   return pending;
 }
 export function useSiteLayout(){
