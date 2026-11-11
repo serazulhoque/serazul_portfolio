@@ -56,11 +56,29 @@ html[data-theme="dark"]{--paper:#151e1a;--ink:#f0f1e7;--muted:#b6c1b0;--line:#35
 /* Rich-text editor colors can be hard-coded; keep every post legible in dark mode. */
 [data-theme="dark"] .published-article-body [style*="color"]{color:var(--ink)!important}
 
-/* Homepage introduction text, set to black as requested. */
-.hero-intro,
-[data-theme="dark"] .hero-intro{color:var(--custom-hero-body-color,#000)!important}
-/* Preserve contrast for black text when the visitor uses dark mode. */
-[data-theme="dark"] .hero-intro{background:#fffdf6;padding:8px;border-radius:4px}
+/* Keep the chosen dark text in light mode, and follow the site palette
+   in dark mode instead of forcing a light-colored box behind the paragraph. */
+.hero-intro{color:var(--custom-hero-body-color,#000)!important}
+html[data-theme="dark"] .hero-intro{
+  color:var(--muted)!important;
+  background:transparent;
+  padding:0;
+  border-radius:0
+}
+/* Saved section colors are intended for the light palette. Inline editor
+   colors must not override legible text when switching to dark mode. */
+html[data-theme="dark"] .hero h1,
+html[data-theme="dark"] .about-main h2,
+html[data-theme="dark"] .contact-section h2,
+html[data-theme="dark"] .closing-section h2,
+html[data-theme="dark"] .extra-story h3,
+html[data-theme="dark"] .extra-story-body{
+  color:var(--ink)!important
+}
+html[data-theme="dark"] .contact-section p,
+html[data-theme="dark"] .closing-section>p:not(.eyebrow){
+  color:var(--muted)!important
+}
 
 
 /* Database-driven page organization; default order matches the original website. */
