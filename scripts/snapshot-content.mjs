@@ -1,4 +1,4 @@
-import {writeFile} from "node:fs/promises";
+import {readFile,writeFile} from "node:fs/promises";
 
 // Generate the initial visible page text at build time. The public browser
 // API remains the authority for edits made after the latest deployment.
@@ -11,14 +11,23 @@ async function load(path){
   if(!Array.isArray(data))throw new Error("Invalid public content response: "+path);
   return data;
 }
-const [pageRows,labelsRows,entryRows]=await Promise.all([
-  load("/page_sections?select=*&id=eq.1"),
-  load("/site_editable_text?select=key,value&limit=100"),
-  load("/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300")
-]);
-if(!pageRows[0] || typeof pageRows[0].hero_line_one!=="string")
-  throw new Error("Page copy missing; refusing to deploy an empty snapshot");
-const labels=Object.fromEntries(labelsRows.filter(x=>typeof x.key==="string"&&typeof x.value==="string").map(x=>[x.key,x.value]));
-const snapshot={pageCopy:pageRows[0],labels,items:entryRows};
-await writeFile(new URL("../src/site-snapshot.json",import.meta.url),JSON.stringify(snapshot));
-console.log("Loaded current public text into initial HTML build");
+const file=new URL("../src/site-snapshot.json",import.meta.url);
+try {
+  const [pageRows,labelsRows,entryRows]=await Promise.all([
+    load("/page_sections?select=*&id=eq.1"),
+    load("/site_editable_text?select=key,value&limit=100"),
+    load("/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300")
+  ]);
+  if(!pageRows[0] || typeof pageRows[0].hero_line_one!=="string")
+    throw new Error("Published page copy is missing");
+  const labels=Object.fromEntries(labelsRows.filter(x=>typeof x.key==="string"&&typeof x.value==="string").map(x=>[x.key,x.value]));
+  const snapshot={pageCopy:pageRows[0],labels,items:entryRows};
+  await writeFile(file,JSON.stringify(snapshot));
+  console.log("Loaded current published website text into initial HTML");
+} catch(error) {
+  // Never replace known published content with an empty snapshot when the database is slow.
+  const backup=JSON.parse(await readFile(file,"utf8"));
+  if(!backup?.pageCopy?.hero_line_one || !Array.isArray(backup.items))
+    throw error;
+  console.warn("Using last committed published snapshot:",error.message);
+}
