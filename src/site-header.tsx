@@ -224,13 +224,17 @@ export default function SiteHeader() {
     };
   }, []);
 
-  function follow() {
-    // Restore scrolling and let the browser follow the real link.
-    // Intercepting #home and delaying navigation could leave the menu stuck.
+  function follow(event: React.MouseEvent<HTMLAnchorElement>) {
+    // Make navigation explicit before closing the modal. Some mobile browsers
+    // cancel the anchor's default action when its containing dialog closes.
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    const destination = event.currentTarget.href;
+    event.preventDefault();
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
     if (dialog.current?.open) dialog.current.close();
     document.body.style.overflow = previousOverflow.current;
     setClosing(false);
+    window.location.assign(destination);
   }
 
   return <>
