@@ -21,7 +21,11 @@ const rules=Object.entries(snapshot.layout?.styles||{})
       typeof color==="string"&&/^#[0-9a-f]{6}$/i.test(color)?"color:"+color+"!important":"",
       Number.isInteger(size)&&size>=10&&size<=96?"font-size:"+size+"px!important":""
     ].filter(Boolean).join(";");
-    return declarations?'html [data-edit-key="'+key.slice(6)+'"]{'+declarations+'}':"";
+    if(!declarations)return "";
+    const selector='html [data-edit-key="'+key.slice(6)+'"]';
+    // A saved light-theme color must not make text unreadable in dark mode.
+    const darkRule=color?'html[data-theme="dark"] [data-edit-key="'+key.slice(6)+'"]{color:var(--ink)!important}':"";
+    return selector+'{'+declarations+'}'+darkRule;
   }).filter(Boolean).join("\n");
 const preparedHtml=rules?html.replace("</head>",'<style id="site-custom-field-styles">'+rules+"</style></head>"):html;
 const output = preparedHtml.replace(placeholder, () => '<div id="root">' + renderedHome + '</div>');
