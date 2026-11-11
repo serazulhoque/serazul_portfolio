@@ -1,3 +1,4 @@
+import snapshot from "./site-snapshot.json";
 import { useEffect, useState } from "react";
 import {
   DATA_URL,
@@ -53,7 +54,7 @@ export function parsePageCopy(value: unknown): PageSections | null {
 }
 
 export function useLivePageCopy() {
-  const [copy, setCopy] = useState<PageSections | null>(null);
+  const [copy, setCopy] = useState<PageSections | null>(() => parsePageCopy(snapshot.pageCopy));
   useEffect(() => {
     const controller = new AbortController();
 
