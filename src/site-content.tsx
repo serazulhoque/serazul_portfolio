@@ -1,3 +1,4 @@
+import snapshot from "./site-snapshot.json";
 import { useEffect, useState } from "react";
 import {styleFor,type LayoutConfig} from "./site-layout";
 import {
@@ -42,10 +43,10 @@ function isLabels(value: unknown): value is Record<string, string> {
   );
 }
 export function useSiteContent(): SiteData {
-  const [items, setItems] = useState<SiteEntry[]>([]);
-  const [entriesLoaded, setEntriesLoaded] = useState(false);
-  const [labels, setLabels] = useState<Record<string, string>>({});
-  const [labelsLoaded, setLabelsLoaded] = useState(false);
+  const [items, setItems] = useState<SiteEntry[]>(() => snapshot.items.filter(isEntry) as SiteEntry[]);
+  const [entriesLoaded, setEntriesLoaded] = useState(snapshot.pageCopy !== null);
+  const [labels, setLabels] = useState<Record<string, string>>(() => isLabels(snapshot.labels) ? snapshot.labels : {});
+  const [labelsLoaded, setLabelsLoaded] = useState(snapshot.pageCopy !== null);
   useEffect(() => {
     const controller = new AbortController();
     requestJSON<unknown>(
