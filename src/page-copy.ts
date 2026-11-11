@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import {
   DATA_URL,
   PUBLIC_HEADERS,
-  requestJSON,
-  readCache,
-  writeCache,
+  requestJSON
 } from "./public-api.ts";
 
 type PageSections = {
@@ -58,9 +56,6 @@ export function useLivePageCopy() {
   const [copy, setCopy] = useState<PageSections | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    const key = "serazul:page-copy:v1";
-    const cached = parsePageCopy(readCache(key));
-    if (cached) setCopy(cached);
 
     async function load() {
       try {
@@ -75,12 +70,9 @@ export function useLivePageCopy() {
         if (!next) throw new Error("Saved page text unavailable");
         if (controller.signal.aborted) return;
         setCopy(next);
-        writeCache(key, next);
       } catch {
-        // Preserve saved text during outages. A corrupt cache must not leave
-        // the page blank forever; use the existing fallback in that case.
-        if (!controller.signal.aborted)
-          setCopy(cached || DEFAULT_PAGE_SECTIONS);
+        // Never resurrect stale browser text when the database is unavailable.
+        if (!controller.signal.aborted) setCopy(DEFAULT_PAGE_SECTIONS);
       }
     }
     void load();
