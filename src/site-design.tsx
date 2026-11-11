@@ -52,7 +52,19 @@ export default function SiteDesign(){
       const target=event.target;
       if(!(target instanceof Element))return;
       const item=target.closest("[data-edit-key]");
-      if(!item)return;
+      if(!item){
+        // Navigation inside the preview must keep editor mode on the next page.
+        const link=target.closest<HTMLAnchorElement>("a[href]");
+        if(!link)return;
+        event.preventDefault();
+        event.stopPropagation();
+        const url=new URL(link.href,location.href);
+        if(url.origin===location.origin){
+          url.searchParams.set("customize-preview","1");
+          location.assign(url.href);
+        }
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
       window.parent.postMessage({type:"serazul:select-content",key:item.getAttribute("data-edit-key")},parentOrigin);
