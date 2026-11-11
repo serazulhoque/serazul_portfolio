@@ -13,15 +13,16 @@ async function load(path){
 }
 const file=new URL("../src/site-snapshot.json",import.meta.url);
 try {
-  const [pageRows,labelsRows,entryRows]=await Promise.all([
+  const [pageRows,labelsRows,entryRows,layoutRows]=await Promise.all([
     load("/page_sections?select=*&id=eq.1"),
     load("/site_editable_text?select=key,value&limit=100"),
-    load("/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300")
+    load("/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300"),
+    load("/site_design_settings?select=layout_config&id=eq.1")
   ]);
   if(!pageRows[0] || typeof pageRows[0].hero_line_one!=="string")
     throw new Error("Published page copy is missing");
   const labels=Object.fromEntries(labelsRows.filter(x=>typeof x.key==="string"&&typeof x.value==="string").map(x=>[x.key,x.value]));
-  const snapshot={pageCopy:pageRows[0],labels,items:entryRows};
+  const snapshot={pageCopy:pageRows[0],labels,items:entryRows,layout:layoutRows[0]?.layout_config||{}};
   await writeFile(file,JSON.stringify(snapshot));
   console.log("Loaded current published website text into initial HTML");
 } catch(error) {
