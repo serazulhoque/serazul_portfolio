@@ -112,7 +112,7 @@ export default function SiteHeader() {
       aria-haspopup="dialog" aria-controls="profile-photo-viewer">
     {profilePhoto ? <img src={profilePhoto} alt="" decoding="async" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
       <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
-  </button><a className="brand-name" href={homeHref} onClick={navigateHome} aria-label="Serazul Hoque home">Serazul Hoque
+  </button><a className="brand-name" href="/" aria-label="Serazul Hoque home">Serazul Hoque
     <svg className="brand-check" viewBox="0 0 24 24" role="img" aria-label="Blue check decoration">
       <path fill="#1877F2" d="m12 1.2 2.8 1.7 3.3-.1 1.5 3 3 1.6-.1 3.3 1.5 2.9-1.7 2.8.1 3.3-3 1.5-1.6 3-3.3-.1-2.5 1.5-2.9-1.7-3.3.1-1.5-3-3-1.6.1-3.3L1 13.2l1.7-2.8-.1-3.3 3-1.5 1.6-3 3.3.1L12 1.2Z" transform="translate(1.4 1.4) scale(.89)" />
       <path d="m7.2 12.2 3.1 3.1 6.6-6.7" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
