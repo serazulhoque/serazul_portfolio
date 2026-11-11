@@ -4,7 +4,8 @@ import {styleFor,type LayoutConfig} from "./site-layout";
 import {
   DATA_URL,
   PUBLIC_HEADERS,
-  requestJSON
+  requestJSON,
+  refreshAfterFirstPaint
 } from "./public-api";
 
 export type SiteEntry = {
@@ -49,6 +50,7 @@ export function useSiteContent(): SiteData {
   const [labelsLoaded, setLabelsLoaded] = useState(snapshot.pageCopy !== null);
   useEffect(() => {
     const controller = new AbortController();
+    refreshAfterFirstPaint(() => {
     requestJSON<unknown>(
       DATA_URL +
         "/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300",
@@ -57,7 +59,7 @@ export function useSiteContent(): SiteData {
       .then((data) => {
         if (controller.signal.aborted || !Array.isArray(data)) return;
         const valid = data.filter(isEntry);
-        setItems(valid);
+        setItems(previous => JSON.stringify(previous) === JSON.stringify(valid) ? previous : valid);
       })
       .catch(() => {})
       .finally(() => {
@@ -77,12 +79,13 @@ export function useSiteContent(): SiteData {
             typeof item.value === "string"
           )
             values[item.key] = item.value;
-        setLabels(values);
+        setLabels(previous => JSON.stringify(previous) === JSON.stringify(values) ? previous : values);
       })
       .catch(() => {})
       .finally(() => {
         if (!controller.signal.aborted) setLabelsLoaded(true);
       });
+    }, controller.signal);
     return () => controller.abort();
   }, []);
   return { items, entriesLoaded, labels, labelsLoaded };
