@@ -9,7 +9,22 @@ const snapshot=JSON.parse(await readFile(new URL("../src/site-snapshot.json",imp
 // Fail the build instead of deploying a homepage with an empty hero heading.
 if(!snapshot?.pageCopy?.hero_line_one || !renderedHome.includes(snapshot.pageCopy.hero_line_one))
   throw new Error("Homepage content was not included in initial HTML");
-const output = html.replace(placeholder, () => '<div id="root">' + renderedHome + '</div>');
+// Embed published custom text sizes/colors in the initial HTML. Otherwise
+// field styles arrive only after a later API call and headings visibly jump.
+const rules=Object.entries(snapshot.layout?.styles||{})
+  .filter(([key])=>/^field:[a-z_]{2,80}$/.test(key))
+  .map(([key,setting])=>{
+    if(!setting||typeof setting!=="object")return "";
+    const color=setting.titleColor||setting.bodyColor;
+    const size=setting.titleSize||setting.bodySize;
+    const declarations=[
+      typeof color==="string"&&/^#[0-9a-f]{6}$/i.test(color)?"color:"+color+"!important":"",
+      Number.isInteger(size)&&size>=10&&size<=96?"font-size:"+size+"px!important":""
+    ].filter(Boolean).join(";");
+    return declarations?"html [data-edit-key=\\""+key.slice(6)+"\\"]{"+declarations+"}":"";
+  }).filter(Boolean).join("\\n");
+const preparedHtml=rules?html.replace("</head>","<style id=\\"site-custom-field-styles\\">"+rules+"</style></head>"):html;
+const output = preparedHtml.replace(placeholder, () => '<div id="root">' + renderedHome + '</div>');
 await writeFile(file, output);
 await mkdir(new URL("../dist/askme/", import.meta.url), {recursive:true});
 const chatHtml = html.replace(placeholder, () => '<div id="root">' + renderAskMe() + '</div>')
