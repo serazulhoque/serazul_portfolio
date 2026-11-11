@@ -48,9 +48,13 @@ const chatHtml = html.replace(placeholder, () => '<div id="root">' + renderAskMe
   .replace("</head>", '<link rel="canonical" href="https://serazulhoque.github.io/askme" /></head>');
 await writeFile(new URL("../dist/askme/index.html", import.meta.url), chatHtml);
 
-// GitHub Pages serves this fallback for /blog/post-title before a static
-// post page exists. Root-relative assets keep it usable on deep URLs.
-await writeFile(new URL("../dist/404.html", import.meta.url), output);
+// An unknown route (including an unpublished /blog/post-title) must render
+// from the actual browser URL. Reusing homepage SSR markup causes React
+// hydration mismatches on Blog routes and can leave stale homepage elements.
+const fallbackHtml=html.replace(/<title>[^<]*<\/title>/,
+  "<title>Serazul Hoque — Portfolio</title>");
+if(!fallbackHtml.includes(placeholder))throw new Error("404 page is missing its empty root");
+await writeFile(new URL("../dist/404.html", import.meta.url), fallbackHtml);
 await mkdir(new URL("../dist/blog", import.meta.url), {recursive:true});
 const blogHtml=preparedHtml.replace(placeholder,()=>'<div id="root">'+renderBlog()+'</div>')
   .replace(/<title>[^<]*<\/title>/,'<title>Blog — Serazul Hoque</title>')
