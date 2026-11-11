@@ -32,7 +32,7 @@ export function parseLayout(value:unknown):LayoutConfig {
     ? data.styles as Record<string,unknown>:{};
   const styles:Record<string,ContentStyle>={};
   for(const [key,value] of Object.entries(rawStyles).slice(0,160)){
-    if(!/^(hero|about|contact|blog|closing|(?:content|article):[0-9a-f-]{36})$/.test(key)||
+    if(!/^(hero|about|contact|blog|closing|field:[a-z_]{2,80}|(?:content|article):[0-9a-f-]{36})$/.test(key)||
       !value||typeof value!=="object"||Array.isArray(value))continue;
     const style=value as Record<string,unknown>;
     const clean:ContentStyle={};
