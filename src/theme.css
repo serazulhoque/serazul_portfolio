@@ -55,6 +55,11 @@ html[data-theme="dark"]{--paper:#151e1a;--ink:#f0f1e7;--muted:#b6c1b0;--line:#35
 [data-theme="dark"] .post-share{color:var(--ink);border-color:var(--line)}
 /* Rich-text editor colors can be hard-coded; keep every post legible in dark mode. */
 [data-theme="dark"] .published-article-body [style*="color"]{color:var(--ink)!important}
+/* Admin-set inline title/body colors must not become unreadable on the
+   dark blog reader or publications list. */
+html[data-theme="dark"] .published-articles [data-edit-key][style*="color"]{
+  color:var(--ink)!important
+}
 
 /* Keep the chosen dark text in light mode, and follow the site palette
    in dark mode instead of forcing a light-colored box behind the paragraph. */
