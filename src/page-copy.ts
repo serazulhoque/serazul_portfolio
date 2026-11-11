@@ -71,8 +71,9 @@ export function useLivePageCopy() {
         if (controller.signal.aborted) return;
         setCopy(next);
       } catch {
-        // Never resurrect stale browser text when the database is unavailable.
-        if (!controller.signal.aborted) setCopy(DEFAULT_PAGE_SECTIONS);
+        // Keep text hidden rather than display outdated defaults on a failed fetch.
+        // A later refresh will fetch the latest saved Supabase content.
+        if (!controller.signal.aborted) setCopy(null);
       }
     }
     void load();
