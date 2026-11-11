@@ -565,3 +565,11 @@
 
 /* Timeline titles use the full row after removing their serial numbers. */
 .journey-inline .journey-step{grid-template-columns:minmax(0,1fr) 20px}
+
+/* Keep every part of the main headline at one consistent size.
+   The published Customize values previously shrank each headline span to 34px. */
+html body .hero h1 [data-edit-key="hero_line_one"],
+html body .hero h1 [data-edit-key="hero_line_two"],
+html body .hero h1 [data-edit-key="hero_phrase"],
+html body .hero h1 [data-edit-key="hero_emphasis"]{font-size:inherit!important}
+.hero h1 .hero-purpose{display:block;white-space:nowrap}
