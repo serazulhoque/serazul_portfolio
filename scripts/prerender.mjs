@@ -21,9 +21,9 @@ const rules=Object.entries(snapshot.layout?.styles||{})
       typeof color==="string"&&/^#[0-9a-f]{6}$/i.test(color)?"color:"+color+"!important":"",
       Number.isInteger(size)&&size>=10&&size<=96?"font-size:"+size+"px!important":""
     ].filter(Boolean).join(";");
-    return declarations?"html [data-edit-key=\\""+key.slice(6)+"\\"]{"+declarations+"}":"";
-  }).filter(Boolean).join("\\n");
-const preparedHtml=rules?html.replace("</head>","<style id=\\"site-custom-field-styles\\">"+rules+"</style></head>"):html;
+    return declarations?'html [data-edit-key="'+key.slice(6)+'"]{'+declarations+'}':"";
+  }).filter(Boolean).join("\n");
+const preparedHtml=rules?html.replace("</head>",'<style id="site-custom-field-styles">'+rules+"</style></head>"):html;
 const output = preparedHtml.replace(placeholder, () => '<div id="root">' + renderedHome + '</div>');
 await writeFile(file, output);
 await mkdir(new URL("../dist/askme/", import.meta.url), {recursive:true});
