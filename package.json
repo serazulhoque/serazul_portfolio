@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
-    "build": "npm run typecheck && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender && node scripts/prerender.mjs && node scripts/blog-pages.mjs",
+    "build": "node scripts/snapshot-content.mjs && npm run typecheck && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender && node scripts/prerender.mjs && node scripts/blog-pages.mjs",
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test test/*.test.js"
   },
