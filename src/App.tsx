@@ -286,10 +286,7 @@ function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record
 
 
 
-function ContactSection() {
-  const {labels,labelsLoaded}=useSiteContent();
-  const layout=useSiteLayout();
-  const pageCopy=useLivePageCopy();
+function ContactSection({labels,labelsLoaded,layout,pageCopy}:{labels:Record<string,string>;labelsLoaded:boolean;layout:LayoutConfig;pageCopy:ReturnType<typeof useLivePageCopy>}) {
   const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
@@ -373,7 +370,7 @@ function Home() {
       <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
       {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} layout={layout} /></div>}
       {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} page="home" /></div>}
-      <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><ContactSection />
+      <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><ContactSection labels={labels} labelsLoaded={labelsLoaded} layout={layout} pageCopy={pageCopy} />
       <ContentStories items={items} section="contact" layout={layout} /></div>
       <div data-custom-section="visitor_wall" style={{order:sectionOrder(layout,"visitor_wall")}}><VisitorWall /></div>
       <div data-custom-section="closing" style={{order:sectionOrder(layout,"closing")}}><section className="closing-section wrap"><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow" data-edit-key="closing_label">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2 data-edit-key="closing_heading_one" style={styleFor(layout,"closing","title")}>{t("closing_heading_one","Good software begins")}<br /><em data-edit-key="closing_heading_two">{t("closing_heading_two","with a human question.")}</em></h2><p data-edit-key="closing_paragraph_one" style={styleFor(layout,"closing","body")}>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br /><span data-edit-key="closing_paragraph_two">{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</span></p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section></div>
@@ -505,11 +502,14 @@ export function BlogPage() {
 
 
 export function ContactPage() {
+  const {labels,labelsLoaded}=useSiteContent();
+  const layout=useSiteLayout();
+  const pageCopy=useLivePageCopy();
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader />
     <main id="main" className="contact-page-main" tabIndex={-1}>
-      <ContactSection />
+      <ContactSection labels={labels} labelsLoaded={labelsLoaded} layout={layout} pageCopy={pageCopy} />
       <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque</a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
