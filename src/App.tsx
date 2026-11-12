@@ -8,6 +8,7 @@ import Gallery from "./gallery";
 import SiteDesign from "./site-design";
 import PortfolioAssistant from "./portfolio-assistant";
 import VisitorWall from "./visitor-wall";
+import ContactOptions from "./contact-options";
 import VisitAnalytics from "./visit-analytics";
 import {useSiteContent,textValue,ContentStories,type SiteEntry} from "./site-content";
 
@@ -288,31 +289,13 @@ function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record
 
 function ContactSection({labels,labelsLoaded,layout,pageCopy}:{labels:Record<string,string>;labelsLoaded:boolean;layout:LayoutConfig;pageCopy:ReturnType<typeof useLivePageCopy>}) {
   const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
-  const [contactEmail, setContactEmail] = useState("");
-  const [followOpen, setFollowOpen] = useState(false);
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch("https://serazul-backend.vercel.app/api/public/settings", { signal: controller.signal, credentials: "omit" })
-      .then(response => response.ok ? response.json() : Promise.reject())
-      .then(settings => {
-        if (!controller.signal.aborted && typeof settings.contact_email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.contact_email)) {
-          setContactEmail(settings.contact_email);
-        }
-      }).catch(() => {/* No public address has been configured. */});
-    return () => controller.abort();
-  }, []);
   return <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
         <div className="section-label"><span data-edit-key="contact_label">{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
         <h2 id="contact-title" data-edit-key="contact_heading" style={styleFor(layout,"contact","title")}>{pageCopy?.contact_heading}</h2>
         <p data-edit-key="contact_paragraph" style={styleFor(layout,"contact","body")}>{pageCopy?.contact_paragraph}</p>
-        <div className="contact-actions">
-          {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
-            <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
-          <button type="button" className="button button-outline" aria-expanded={followOpen} aria-controls="contact-social-links" onClick={() => setFollowOpen(open => !open)}>
-            Follow me <span className="follow-chevron" aria-hidden="true">{followOpen ? "−" : "+"}</span>
-          </button>
-        </div>
-        <nav id="contact-social-links" className="contact-social-links" aria-label="My social media profiles" hidden={!followOpen}>
+        <ContactOptions />
+        <p className="contact-follow-label">FOLLOW ME</p>
+        <nav id="contact-social-links" className="contact-social-links" aria-label="My social media profiles">
           <a href={t("social_facebook","https://www.facebook.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Facebook <Arrow diagonal /></a>
           <a href={t("social_linkedin","https://www.linkedin.com/in/iamserazulhoque")} target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal /></a>
           <a href={t("social_x","https://www.x.com/Serazul_Hoque")} target="_blank" rel="noopener noreferrer">X (Twitter) <Arrow diagonal /></a>

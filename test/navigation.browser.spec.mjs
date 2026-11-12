@@ -129,3 +129,50 @@ for (const [mode, width, height] of [
   });
 }
 
+
+test("contact page has two side-by-side choices and delivers form submission to email service", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto("/get-in-touch/");
+  const first=page.getByRole("button",{name:"SEND TO ME"});
+  const second=page.getByRole("link",{name:"Leave a Thought"});
+  await expect(first).toBeVisible();
+  await expect(second).toBeVisible();
+  const a=await first.boundingBox();
+  const b=await second.boundingBox();
+  expect(a).not.toBeNull();
+  expect(b).not.toBeNull();
+  expect(Math.abs(a.y-b.y)).toBeLessThan(5);
+  await first.click();
+  await expect(page.locator("#contact-mail-panel")).toBeVisible();
+  await page.getByLabel("Your name").fill("Example Visitor");
+  await page.getByLabel("Your email").fill("example@example.com");
+  await page.getByLabel("Subject").fill("Project enquiry");
+  await page.getByLabel("Message").fill("Hello, this is a test message.");
+  let received=false;
+  await page.route("https://formsubmit.co/ajax/hello@serazulh.com",async route=>{
+    const body=route.request().postDataJSON();
+    expect(body).toMatchObject({
+      name:"Example Visitor",email:"example@example.com",
+      subject:"Project enquiry",message:"Hello, this is a test message."
+    });
+    received=true;
+    await route.fulfill({status:200,contentType:"application/json",body:'{"success":true}'});
+  });
+  await page.getByRole("button",{name:"Send message"}).click();
+  await expect(page.getByRole("status")).toContainText("submitted for email delivery");
+  expect(received).toBe(true);
+  await second.click();
+  await expect(page).toHaveURL(/\/#visitor-note$/);
+  await expect(page.locator("#visitor-note")).toBeVisible();
+  await expect(page.getByLabel("Your display name")).toBeVisible();
+});
+
+test("homepage contact choices use the same visitor note and mail form",async ({page})=>{
+  await page.goto("/");
+  const contact=page.locator("#contact");
+  await expect(contact.getByRole("button",{name:"SEND TO ME"})).toBeVisible();
+  await expect(contact.getByRole("link",{name:"Leave a Thought"}))
+    .toHaveAttribute("href","/#visitor-note");
+  await contact.getByRole("button",{name:"SEND TO ME"}).click();
+  await expect(contact.locator("#contact-mail-panel")).toBeVisible();
+});

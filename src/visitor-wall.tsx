@@ -121,7 +121,7 @@ export default function VisitorWall() {
           ))}
         </div>
       )}
-      <div className="visitor-wall-compose">
+      <div className="visitor-wall-compose" id="visitor-note">
         <div>
           <p className="visitor-wall-kicker">YOUR TURN</p>
           <h3>Leave a thought.</h3>
