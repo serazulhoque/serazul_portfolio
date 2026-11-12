@@ -61,7 +61,6 @@ export default function SiteHeader() {
   const isGalleryPage = typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html");
   const isBlogPage = typeof window !== "undefined" && /^\/blog(?:\/|$)/.test(window.location.pathname);
   const separatePage = isAboutPage || isGalleryPage || isBlogPage;
-  const homeHref = separatePage ? "/" : "#home";
   const sectionHref = (section: string) => separatePage ? `/${section}` : section;
 
   function openPhoto() {
@@ -112,7 +111,7 @@ export default function SiteHeader() {
       aria-haspopup="dialog" aria-controls="profile-photo-viewer">
     {profilePhoto ? <img src={profilePhoto} alt="" decoding="async" referrerPolicy="no-referrer" onError={() => setProfilePhoto("")} /> :
       <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="currentColor" opacity=".58" /><path d="M8 43c1-11 7-16 16-16s15 5 16 16" fill="currentColor" opacity=".58" /></svg>}
-  </button><a className="brand-name" href="/" aria-label="Serazul Hoque home">Serazul Hoque
+  </button><a className="brand-name" href="/" onClick={follow} aria-label="Serazul Hoque home">Serazul Hoque
     <svg className="brand-check" viewBox="0 0 24 24" role="img" aria-label="Blue check decoration">
       <path fill="#1877F2" d="m12 1.2 2.8 1.7 3.3-.1 1.5 3 3 1.6-.1 3.3 1.5 2.9-1.7 2.8.1 3.3-3 1.5-1.6 3-3.3-.1-2.5 1.5-2.9-1.7-3.3.1-1.5-3-3-1.6.1-3.3L1 13.2l1.7-2.8-.1-3.3 3-1.5 1.6-3 3.3.1L12 1.2Z" transform="translate(1.4 1.4) scale(.89)" />
       <path d="m7.2 12.2 3.1 3.1 6.6-6.7" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
@@ -163,7 +162,7 @@ export default function SiteHeader() {
     dialog.current.showModal();
   }
 
-  function closeMenu(href?: string) {
+  function closeMenu() {
     if (!dialog.current?.open || timer.current) return;
     setClosing(true);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -172,14 +171,6 @@ export default function SiteHeader() {
       document.body.style.overflow = previousOverflow.current;
       setClosing(false);
       timer.current = null;
-      if (href) {
-        const target = document.querySelector<HTMLElement>(href);
-        target?.scrollIntoView({ behavior: reduced ? "instant" : "smooth", block: "start" });
-        target?.focus({ preventScroll: true });
-        const heading = target?.querySelector<HTMLElement>("[data-reveal]");
-        if (!reduced) heading?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, easing: "ease-in-out" });
-        window.history.pushState(null, "", href);
-      }
     }, reduced ? 0 : 300);
   }
 
@@ -210,23 +201,48 @@ export default function SiteHeader() {
   }, []);
 
   function follow(event: React.MouseEvent<HTMLAnchorElement>) {
-    // Make navigation explicit before closing the modal. Some mobile browsers
-    // cancel the anchor's default action when its containing dialog closes.
-    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-    const destination = event.currentTarget.href;
+    // Preserve normal browser behavior for new tabs and modified clicks.
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey ||
+        event.shiftKey || event.altKey || event.currentTarget.target === "_blank") return;
+    const destination = new URL(event.currentTarget.href);
+    if (destination.origin !== window.location.origin) return;
+
+    const current = new URL(window.location.href);
+    const samePage = destination.pathname === current.pathname && destination.search === current.search;
+    const menuOpen = Boolean(dialog.current?.open);
+    // Desktop cross-page links work as native links; modal links must close
+    // the dialog *before* changing pages or scrolling.
+    if (!menuOpen && !samePage) return;
     event.preventDefault();
+
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
-    if (dialog.current?.open) dialog.current.close();
-    document.body.style.overflow = previousOverflow.current;
+    if (menuOpen) {
+      dialog.current?.close();
+      document.body.style.overflow = previousOverflow.current;
+    }
     setClosing(false);
-    window.location.assign(destination);
+
+    if (samePage) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const behavior = reduced ? "instant" : "smooth";
+      const nextUrl = destination.pathname + destination.search + destination.hash;
+      if (destination.href !== current.href) window.history.pushState(null, "", nextUrl);
+      if (destination.hash) {
+        const target = document.getElementById(decodeURIComponent(destination.hash.slice(1)));
+        target?.scrollIntoView({ behavior, block: "start" });
+      } else {
+        window.scrollTo({ top: 0, behavior });
+      }
+      return;
+    }
+    window.location.assign(destination.href);
   }
 
   return <>
     <header className={`site-header wrap${isAboutPage ? " about-page-header" : ""}`}>
       <div className="wordmark">{brand()}</div>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
-        <a href="/">Home</a><a href="/about.html">About me</a><a href={sectionHref("#contact")}>Get in touch</a><a href="/blog">Blog</a><a href="/gallery.html">Gallery</a>
+        <a href="/" onClick={follow}>Home</a><a href="/about.html">About me</a><a href={sectionHref("#contact")} onClick={follow}>Get in touch</a><a href="/blog">Blog</a><a href="/gallery.html">Gallery</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
       <button className="menu-orb" onClick={openMenu} disabled={!ready} aria-haspopup="dialog" aria-controls="portfolio-menu" aria-label="Open menu"><MenuIcon /></button>
     </header>
@@ -241,7 +257,7 @@ export default function SiteHeader() {
           <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
           <a href="/blog" onClick={follow}><span className="menu-item-label">Blog</span><MenuSymbol name="publication" /></a>
           <a onClick={follow} href="/gallery.html"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
-          <a href="/"><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
+          <a href="/" onClick={follow}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
         <span className="menu-watermark" aria-hidden="true">sh.</span>
