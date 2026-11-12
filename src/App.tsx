@@ -355,18 +355,11 @@ function Home() {
     <SiteHeader />
     <VisitAnalytics />
     <main id="main">
-      <section className="hero wrap" id="home" tabIndex={-1}>
-        <div className="hero-copy">
-          <p className="eyebrow" data-edit-key="hero_eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
-          <h1 style={styleFor(layout,"hero","title")}><span data-edit-key="hero_line_one">{pageCopy?.hero_line_one}</span>{" "}<br /><span data-edit-key="hero_line_two">{pageCopy?.hero_line_two}</span>{" "}<span className="hero-purpose"><span data-edit-key="hero_phrase">{pageCopy?.hero_phrase}</span> <em data-edit-key="hero_emphasis">{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
-          <p className="hero-intro" data-edit-key="hero_intro" style={styleFor(layout,"hero","body")}>{pageCopy?.hero_intro}</p>
-          <a className="button button-dark" href="/get-in-touch">Get in touch <Arrow diagonal /></a>
-          <a className="subtle-link" href="/aboutme">A little about me <span aria-hidden="true">↗</span></a>
-        </div><HeroPhoto />
-      </section>
-      <div className="intro-strip wrap"><span data-edit-key="intro_label">{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p><span data-edit-key="intro_first">{t("intro_first","Curiosity in the details.")}</span> <em data-edit-key="intro_second">{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
+      <div className="about-page-main home-about-content">
+        <AboutContent items={items} entriesLoaded={entriesLoaded} labels={labels} labelsLoaded={labelsLoaded} layout={layout} copy={pageCopy} home />
+      </div>
       <div className="customizable-home-layout">
-      <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} /><ContentStories items={items} section="exploring" layout={layout} /></div>
+      <div data-custom-section="explorations" style={{order:sectionOrder(layout,"explorations")}} id="explorations"><ContentStories items={items} section="exploring" layout={layout} /></div>
       <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
       {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} layout={layout} /></div>}
       {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} page="home" /></div>}
@@ -457,6 +450,33 @@ function JourneyTimeline({entries,entriesLoaded,labels,kind,layout}:{entries:Sit
   </section>;
 }
 
+function AboutContent({items,entriesLoaded,labels,labelsLoaded,layout,copy,home=false}:{
+  items:SiteEntry[];
+  entriesLoaded:boolean;
+  labels:Record<string,string>;
+  labelsLoaded:boolean;
+  layout:LayoutConfig;
+  copy:ReturnType<typeof useLivePageCopy>;
+  home?:boolean;
+}) {
+  const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
+  const Heading=home?"h1":"h2";
+  return <>
+      <section className="about-section wrap section-space" id="about" tabIndex={-1}>
+        <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
+        <div className="about-main">
+          <Heading style={styleFor(layout,"about","title")}><span data-edit-key="about_line_one">{copy?.about_line_one}</span><br /><em data-edit-key="about_line_two">{copy?.about_line_two}</em></Heading>
+          <div className="about-columns"><p data-edit-key="about_paragraph_one" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_one}</p><p data-edit-key="about_paragraph_two" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_two}</p></div>
+          <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
+        </div>
+      </section>
+      <ContentStories items={items} section="about" layout={layout} />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="timeline" layout={layout} />
+      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} />
+      {home&&<div className="home-about-portrait wrap"><HeroPhoto /></div>}
+  </>;
+}
+
 export function AboutPage() {
   const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
   const layout=useSiteLayout();
@@ -467,17 +487,7 @@ export function AboutPage() {
     <SiteHeader />
     <VisitAnalytics />
     <main id="main" className="about-page-main">
-      <section className="about-section wrap section-space" id="about" tabIndex={-1}>
-        <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
-        <div className="about-main">
-          <h2 style={styleFor(layout,"about","title")}><span data-edit-key="about_line_one">{copy?.about_line_one}</span><br /><em data-edit-key="about_line_two">{copy?.about_line_two}</em></h2>
-          <div className="about-columns"><p data-edit-key="about_paragraph_one" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_one}</p><p data-edit-key="about_paragraph_two" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_two}</p></div>
-          <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
-        </div>
-      </section>
-      <ContentStories items={items} section="about" layout={layout} />
-      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="timeline" layout={layout} />
-      <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} />
+      <AboutContent items={items} entriesLoaded={entriesLoaded} labels={labels} labelsLoaded={labelsLoaded} layout={layout} copy={copy} />
       <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
     </main>
     <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque<span data-edit-key="footer_tagline">{t("footer_tagline","Engineering Student with a purpose.")}</span></a><span data-edit-key="footer_note">{t("footer_note","© 2026 · A WORK IN PROGRESS, WITH INTENTION.")}</span><a className="back-top" href="/">Back to home ↑</a></footer>
