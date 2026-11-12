@@ -6,9 +6,12 @@ const placeholder = '<div id="root"></div>';
 if (!html.includes(placeholder)) throw new Error("Missing prerender root.");
 const renderedHome=render();
 const snapshot=JSON.parse(await readFile(new URL("../src/site-snapshot.json",import.meta.url),"utf8"));
-// Fail the build instead of deploying a homepage with an empty hero heading.
-if(!snapshot?.pageCopy?.hero_line_one || !renderedHome.includes(snapshot.pageCopy.hero_line_one))
-  throw new Error("Homepage content was not included in initial HTML");
+// The homepage now begins with the published About Me introduction.
+if(!snapshot?.pageCopy?.about_line_one ||
+   !renderedHome.includes(snapshot.pageCopy.about_line_one) ||
+   !renderedHome.includes(snapshot.pageCopy.about_paragraph_one) ||
+   !renderedHome.includes(snapshot.pageCopy.about_paragraph_two))
+  throw new Error("Homepage About Me content was not included in initial HTML");
 // Embed published custom text sizes/colors in the initial HTML. Otherwise
 // field styles arrive only after a later API call and headings visibly jump.
 const rules=Object.entries(snapshot.layout?.styles||{})

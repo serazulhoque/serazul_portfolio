@@ -1,7 +1,7 @@
 /* Reference typography and timing; the portfolio keeps its own colors and content. */
 .eyebrow,.section-label,.art-top,.art-bottom,.project-meta,.focus-tag,.site-footer>span,.about-signature>span:last-child,.intro-strip>span:first-child,.diagram-label,.voice-node>small,.brief-badge{font-family:var(--font-label)}
-.hero h1,.about-main h2,.focus-heading h2,.project-heading h2,.scenario-copy h3,.focus-list h3,.closing-section h2,.brief-dialog h2,.brief-block h3,.art-title{letter-spacing:normal;font-weight:400;line-height:1.1}
-.hero h1 em,.about-main h2 em,.focus-heading h2 em,.project-heading h2 em,.closing-section h2 em,.brief-dialog h2 em,.art-title em{font-style:normal}
+.hero h1,.about-main :is(h1,h2),.focus-heading h2,.project-heading h2,.scenario-copy h3,.focus-list h3,.closing-section h2,.brief-dialog h2,.brief-block h3,.art-title{letter-spacing:normal;font-weight:400;line-height:1.1}
+.hero h1 em,.about-main :is(h1,h2) em,.focus-heading h2 em,.project-heading h2 em,.closing-section h2 em,.brief-dialog h2 em,.art-title em{font-style:normal}
 .hero h1{font-size:clamp(64px,6.3vw,95px)}
 .hero h1 .hero-purpose{display:block;font-size:1em;line-height:1.1;margin-top:.12em}
 .hero-intro{font-size:18px;line-height:1.5;max-width:415px}
@@ -27,8 +27,8 @@
 @keyframes menu-watermark-in{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
 @keyframes content-fade-in{from{opacity:0}to{opacity:1}}
 @media(max-width:1100px){.desktop-nav{gap:23px;font-size:10px}.hero h1{font-size:clamp(62px,6.7vw,77px)}.project-heading{gap:45px}.project-heading h2{font-size:61px}.scenario-copy h3{font-size:32px}}
-@media(max-width:1000px){.desktop-nav{display:none}.menu-orb{display:flex}.site-header{height:104px;padding-right:86px}.hero h1{font-size:clamp(55px,7.3vw,72px)}.hero-intro{font-size:16px}.about-columns p,.project-heading p{font-size:15px}.about-main h2,.focus-heading h2{font-size:39px}.project-heading h2{font-size:54px}.scenario-copy h3{font-size:30px}.scenario-copy p,.focus-list p{font-size:14px}.art-title{font-size:44px}}
-@media(max-width:600px){.site-header{height:104px;border-bottom:none;z-index:15}.wordmark{font-size:15px}.brand-mark{width:35px;height:35px;font-size:28px}.brand-mark span{right:7px;bottom:6px}.menu-wordmark{top:34px;left:20px}.hero{padding-top:28px}.hero h1{font-size:clamp(42px,10.8vw,61px);line-height:1.1}.hero-intro{font-size:16px;line-height:1.5;max-width:370px}.hero .eyebrow{font-size:6.5px;letter-spacing:.9px;white-space:normal}.about-main h2,.focus-heading h2{font-size:36px}.project-heading h2{font-size:clamp(42px,10.5vw,56px)}.about-columns p,.project-heading p,.scenario-copy p,.focus-list p{font-size:16px;line-height:1.5}.focus-heading p{font-size:16px}.intro-strip p{font-size:19px;line-height:1.35}.intro-strip p em{display:block;margin-top:4px}.scenario-copy h3{font-size:32px;line-height:1.1}.art-title{font-size:46px}.closing-section h2{font-size:38px;line-height:1.1}.closing-section>p:not(.eyebrow){font-size:15px}.brief-dialog h2{font-size:43px}.brief-lead{font-size:16px}.brief-block p{font-size:15px}.handwriting{font-size:31px}.about-signature{gap:17px}.about-signature>span:last-child{font-size:6.5px;letter-spacing:.8px}}
+@media(max-width:1000px){.desktop-nav{display:none}.menu-orb{display:flex}.site-header{height:104px;padding-right:86px}.hero h1{font-size:clamp(55px,7.3vw,72px)}.hero-intro{font-size:16px}.about-columns p,.project-heading p{font-size:15px}.about-main :is(h1,h2),.focus-heading h2{font-size:39px}.project-heading h2{font-size:54px}.scenario-copy h3{font-size:30px}.scenario-copy p,.focus-list p{font-size:14px}.art-title{font-size:44px}}
+@media(max-width:600px){.site-header{height:104px;border-bottom:none;z-index:15}.wordmark{font-size:15px}.brand-mark{width:35px;height:35px;font-size:28px}.brand-mark span{right:7px;bottom:6px}.menu-wordmark{top:34px;left:20px}.hero{padding-top:28px}.hero h1{font-size:clamp(42px,10.8vw,61px);line-height:1.1}.hero-intro{font-size:16px;line-height:1.5;max-width:370px}.hero .eyebrow{font-size:6.5px;letter-spacing:.9px;white-space:normal}.about-main :is(h1,h2),.focus-heading h2{font-size:36px}.project-heading h2{font-size:clamp(42px,10.5vw,56px)}.about-columns p,.project-heading p,.scenario-copy p,.focus-list p{font-size:16px;line-height:1.5}.focus-heading p{font-size:16px}.intro-strip p{font-size:19px;line-height:1.35}.intro-strip p em{display:block;margin-top:4px}.scenario-copy h3{font-size:32px;line-height:1.1}.art-title{font-size:46px}.closing-section h2{font-size:38px;line-height:1.1}.closing-section>p:not(.eyebrow){font-size:15px}.brief-dialog h2{font-size:43px}.brief-lead{font-size:16px}.brief-block p{font-size:15px}.handwriting{font-size:31px}.about-signature{gap:17px}.about-signature>span:last-child{font-size:6.5px;letter-spacing:.8px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal-ready{opacity:1}.menu-panel,.menu-links,.menu-watermark,.menu-close svg,.scenario-panel,.brief-dialog[open],.brief-dialog[open]::backdrop{animation:none!important}.menu-dialog.is-closing .menu-panel{clip-path:inset(0 0 100% 100%)}.menu-links{opacity:1;transform:none}.menu-watermark{opacity:1;transform:none}*,*:before,*:after{transition:none!important}}
 
 /* Profile avatar, decorative blue check, and compact Cardo navigation. */
@@ -60,7 +60,7 @@
 .conversation-diagram,.focus-heading,.focus-list,.focus-list article>div,
 .published-articles,.published-article,.contact-section{min-width:0}
 .hero h1,.project-heading h2,.scenario-copy h3,.focus-list h3,
-.about-main h2,.closing-section h2,.contact-section h2{overflow-wrap:anywhere}
+.about-main :is(h1,h2),.closing-section h2,.contact-section h2{overflow-wrap:anywhere}
 .bridge-svg{max-width:100%}
 .wordmark .brand-name{white-space:nowrap}
 
@@ -582,3 +582,11 @@ html body .hero h1 [data-edit-key="hero_emphasis"]{font-size:inherit!important}
 }
 .hero .hero-copy h1 br{display:none}
 .hero .hero-copy h1 .hero-purpose{display:inline;white-space:inherit;margin-top:0}
+
+// Home leads with the same About Me content and retains the existing portrait.
+.home-about-content .about-section{padding-top:clamp(30px,5vw,70px);padding-bottom:clamp(30px,5vw,65px)}
+.home-about-portrait{display:flex;justify-content:center;padding-bottom:clamp(32px,5vw,70px)}
+.home-about-portrait .hero-photo{width:min(100%,470px);height:440px;min-height:0;flex:0 1 470px}
+@media(max-width:600px){
+  .home-about-portrait .hero-photo{height:min(115vw,490px);min-height:300px}
+}

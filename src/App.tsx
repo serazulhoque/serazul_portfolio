@@ -470,10 +470,10 @@ function AboutContent({items,entriesLoaded,labels,labelsLoaded,layout,copy,home=
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
+      {home&&<div className="home-about-portrait wrap"><HeroPhoto /></div>}
       <ContentStories items={items} section="about" layout={layout} />
       <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="timeline" layout={layout} />
       <JourneyTimeline entries={items} entriesLoaded={entriesLoaded} labels={labels} kind="experience" layout={layout} />
-      {home&&<div className="home-about-portrait wrap"><HeroPhoto /></div>}
   </>;
 }
 
