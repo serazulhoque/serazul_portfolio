@@ -77,6 +77,7 @@ test("direct URLs serve prerendered HTML, old HTML output is removed, and contac
     await expect(page.locator("#main")).toBeVisible();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://serazulh.com" + route.slice(0, -1));
   }
+  await page.getByRole("button",{name:"SEND TO ME"}).click();
   await expect(page.locator('a[href="mailto:hello@serazulh.com"]')).toBeVisible();
 
   for (const oldPath of ["about.html","gallery.html"]) {
@@ -162,8 +163,8 @@ test("contact page has two side-by-side choices and submits the form to the emai
   await expect(page.getByRole("status")).toContainText("submitted for email delivery");
   expect(received).toBe(true);
   await second.click();
-  await expect(page).toHaveURL(/\/#visitor-note$/);
-  await expect(page.locator("#visitor-note")).toBeVisible();
+  await expect(page).toHaveURL(/\/#visitor-compose$/);
+  await expect(page.locator("#visitor-compose")).toBeVisible();
   await expect(page.getByLabel("Your display name")).toBeVisible();
 });
 
@@ -172,7 +173,7 @@ test("homepage contact choices use the same visitor note and mail form",async ({
   const contact=page.locator("#contact");
   await expect(contact.getByRole("button",{name:"SEND TO ME"})).toBeVisible();
   await expect(contact.getByRole("link",{name:"Leave a Thought"}))
-    .toHaveAttribute("href","/#visitor-note");
+    .toHaveAttribute("href","/#visitor-compose");
   await contact.getByRole("button",{name:"SEND TO ME"}).click();
   await expect(contact.locator("#contact-mail-panel")).toBeVisible();
 });

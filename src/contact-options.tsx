@@ -77,7 +77,7 @@ export default function ContactOptions() {
         aria-controls="contact-mail-panel" onClick={() => {setOpen(current => !current);setFeedback("");}}>
         SEND TO ME
       </button>
-      <a className="button button-outline" href="/#visitor-note">Leave a Thought</a>
+      <a className="button button-outline" href="/#visitor-compose">Leave a Thought</a>
     </div>
     {open && <div className="contact-mail-panel" id="contact-mail-panel">
       <h3>Send me a message.</h3>

@@ -75,7 +75,7 @@
 .contact-mail-privacy a{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
 .contact-section .contact-follow-label{margin:21px 0 0;font-family:var(--font-label);font-size:10px;letter-spacing:1.6px}
 .contact-social-links{margin-top:10px}
-#visitor-note{scroll-margin-top:30px}
+#visitor-compose{scroll-margin-top:30px}
 @media(max-width:600px){
   .contact-option-row{gap:8px}
   .contact-option-row .button{padding:12px 6px;font-size:clamp(10px,3vw,12px)}
