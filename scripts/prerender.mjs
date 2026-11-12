@@ -67,7 +67,7 @@ for (const [slug, sourceFile, title] of [
   ["aboutme", "about.html", "About Me — Serazul Hoque"],
   ["gallery", "gallery.html", "Gallery — Serazul Hoque"]
 ]) {
-  // Reuse the already prerendered legacy HTML, including its Vite asset tags.
+  // Reuse intermediate Vite HTML with its asset tags for the clean URL.
   const source=await readFile(new URL("../dist/"+sourceFile,import.meta.url),"utf8");
   const canonical="https://serazulh.com/"+slug;
   const page=source.replace("</head>",'<link rel="canonical" href="'+canonical+'" /></head>');
@@ -83,5 +83,9 @@ const contactHtml=preparedHtml
   .replace("</head>",'<link rel="canonical" href="https://serazulh.com/get-in-touch" /></head>');
 await writeFile(new URL("index.html",contactFolder),contactHtml);
 
+// Keep the HTML entry templates in source for Vite, but never publish the old URLs.
+await Promise.all(["about.html","gallery.html"].map(name =>
+  rm(new URL("../dist/"+name, import.meta.url), { force: true })
+));
 await rm(new URL("../.prerender", import.meta.url), { recursive: true, force: true });
 console.log("Static HTML generated. Ready to deploy dist/.");

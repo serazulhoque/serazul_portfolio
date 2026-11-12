@@ -543,8 +543,8 @@ export default function App() {
     <SiteDesign />
     {/^\/blog(?:\/.*)?$/.test(path)
       ? <BlogPage /> : /^\/askme\/?$/.test(path)
-      ? <AskMePage /> : ["/gallery", "/gallery/", "/gallery.html"].includes(path)
-      ? <Gallery /> : ["/aboutme", "/aboutme/", "/about.html"].includes(path)
+      ? <AskMePage /> : ["/gallery", "/gallery/"].includes(path)
+      ? <Gallery /> : ["/aboutme", "/aboutme/"].includes(path)
       ? <AboutPage /> : ["/get-in-touch", "/get-in-touch/"].includes(path)
       ? <ContactPage /> : <Home />}
   </>;

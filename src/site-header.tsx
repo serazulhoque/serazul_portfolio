@@ -57,8 +57,8 @@ export default function SiteHeader() {
     return () => controller.abort();
   }, []);
 
-  const isAboutPage = typeof window !== "undefined" && ["/aboutme","/aboutme/","/about.html"].includes(window.location.pathname);
-  const isGalleryPage = typeof window !== "undefined" && ["/gallery","/gallery/","/gallery.html"].includes(window.location.pathname);
+  const isAboutPage = typeof window !== "undefined" && ["/aboutme","/aboutme/"].includes(window.location.pathname);
+  const isGalleryPage = typeof window !== "undefined" && ["/gallery","/gallery/"].includes(window.location.pathname);
   const isBlogPage = typeof window !== "undefined" && /^\/blog(?:\/|$)/.test(window.location.pathname);
 
   function openPhoto() {

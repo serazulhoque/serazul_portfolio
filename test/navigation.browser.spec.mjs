@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 
 // Run against the built GitHub Pages site, served using Vite preview.
 test.use({ baseURL: "http://127.0.0.1:4173" });
@@ -77,8 +79,7 @@ test("direct URLs serve prerendered HTML, old URLs still work, and contact email
   }
   await expect(page.locator('a[href="mailto:hello@serazulh.com"]')).toBeVisible();
 
-  for (const legacy of ["/about.html", "/gallery.html"]) {
-    expect((await page.goto(legacy))?.status()).toBe(200);
-    await expect(page.locator("#main")).toBeVisible();
+  for (const oldPath of ["about.html","gallery.html"]) {
+    expect(existsSync(join(process.cwd(),"dist",oldPath))).toBe(false);
   }
 });
