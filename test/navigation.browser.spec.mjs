@@ -61,7 +61,7 @@ for (const [mode, width, height] of [
   });
 }
 
-test("direct URLs serve prerendered HTML, old URLs still work, and contact email is updated", async ({ page }) => {
+test("direct URLs serve prerendered HTML, old HTML output is removed, and contact email is updated", async ({ page }) => {
   await page.route("https://serazul-backend.vercel.app/api/public/settings", route =>
     route.fulfill({
       status: 200,
@@ -116,6 +116,9 @@ for (const [mode, width, height] of [
     await expect(main.locator(".hero, .hero-intro, .intro-strip")).toHaveCount(0);
     await expect(main.locator("#experience")).toHaveCount(1);
     await expect(main.locator(".customizable-home-layout")).toBeVisible();
+    if (width <= 390) {
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    }
     const homeAbout = await start.locator(".about-main").innerText();
     await page.goto("/aboutme/");
     await expect(page.locator(".about-main h2")).toBeVisible();
