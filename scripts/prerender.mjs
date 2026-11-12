@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
-import { render, renderAskMe, renderBlog, renderAbout, renderGallery } from "../.prerender/entry-server.js";
+import { render, renderAskMe, renderBlog, renderAbout, renderGallery, renderContact } from "../.prerender/entry-server.js";
 const file = new URL("../dist/index.html", import.meta.url);
 const html = await readFile(file, "utf8");
 const placeholder = '<div id="root"></div>';
@@ -62,5 +62,26 @@ const blogHtml=preparedHtml.replace(placeholder,()=>'<div id="root">'+renderBlog
     '<meta name="description" content="Read Serazul Hoque’s blog posts, writing, and reflections." />')
   .replace("</head>",'<link rel="canonical" href="https://serazulh.com/blog" /></head>');
 await writeFile(new URL("../dist/blog/index.html", import.meta.url),blogHtml);
+
+for (const [slug, sourceFile, title] of [
+  ["aboutme", "about.html", "About Me — Serazul Hoque"],
+  ["gallery", "gallery.html", "Gallery — Serazul Hoque"]
+]) {
+  // Reuse the already prerendered legacy HTML, including its Vite asset tags.
+  const source=await readFile(new URL("../dist/"+sourceFile,import.meta.url),"utf8");
+  const canonical="https://serazulh.com/"+slug;
+  const page=source.replace("</head>",'<link rel="canonical" href="'+canonical+'" /></head>');
+  const folder=new URL("../dist/"+slug+"/",import.meta.url);
+  await mkdir(folder,{recursive:true});
+  await writeFile(new URL("index.html",folder),page);
+}
+const contactFolder=new URL("../dist/get-in-touch/",import.meta.url);
+await mkdir(contactFolder,{recursive:true});
+const contactHtml=preparedHtml
+  .replace(placeholder,()=>'<div id="root">'+renderContact()+'</div>')
+  .replace("<title>Serazul Hoque — Engineering Student with a purpose</title>","<title>Get in Touch — Serazul Hoque</title>")
+  .replace("</head>",'<link rel="canonical" href="https://serazulh.com/get-in-touch" /></head>');
+await writeFile(new URL("index.html",contactFolder),contactHtml);
+
 await rm(new URL("../.prerender", import.meta.url), { recursive: true, force: true });
 console.log("Static HTML generated. Ready to deploy dist/.");
