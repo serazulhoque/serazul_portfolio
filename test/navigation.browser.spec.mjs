@@ -130,7 +130,7 @@ for (const [mode, width, height] of [
 }
 
 
-test("contact page has two side-by-side choices and delivers form submission to email service", async ({ page }) => {
+test("contact page has two side-by-side choices and submits the form to the email service", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto("/get-in-touch/");
   const first=page.getByRole("button",{name:"SEND TO ME"});
@@ -175,4 +175,19 @@ test("homepage contact choices use the same visitor note and mail form",async ({
     .toHaveAttribute("href","/#visitor-note");
   await contact.getByRole("button",{name:"SEND TO ME"}).click();
   await expect(contact.locator("#contact-mail-panel")).toBeVisible();
+});
+
+test("email form reports delivery-service failure without claiming success",async ({page})=>{
+  await page.goto("/get-in-touch/");
+  await page.route("https://formsubmit.co/ajax/hello@serazulh.com",route =>
+    route.fulfill({status:503,contentType:"application/json",body:'{"success":false}'})
+  );
+  await page.getByRole("button",{name:"SEND TO ME"}).click();
+  await page.getByLabel("Your name").fill("Example Visitor");
+  await page.getByLabel("Your email").fill("example@example.com");
+  await page.getByLabel("Subject").fill("Hello");
+  await page.getByLabel("Message").fill("A note for testing.");
+  await page.getByRole("button",{name:"Send message"}).click();
+  await expect(page.locator(".contact-mail-feedback")).toContainText("could not submit");
+  await expect(page.getByLabel("Message")).toHaveValue("A note for testing.");
 });
