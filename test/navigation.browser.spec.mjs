@@ -92,3 +92,37 @@ test("dashboard entry redirects to the existing authenticated Vercel login", asy
   expect(html).toContain('rel="noreferrer"');
   expect(html).not.toContain("hoque15062002");
 });
+
+
+for (const [mode, width, height] of [
+  ["desktop", 1440, 900],
+  ["mobile", 390, 844],
+  ["small phone", 320, 700]
+]) {
+  test(mode + ": complete About Me replaces the homepage introduction", async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const main = page.locator("#main");
+    await expect(main.locator(":scope > .home-about-content")).toBeVisible();
+    const start = main.locator(":scope > :first-child");
+    await expect(start).toHaveClass(/home-about-content/);
+    await expect(start.locator(".about-section")).toBeVisible();
+    await expect(start.locator(".about-main h1")).toBeVisible();
+    await expect(start.locator('[data-edit-key="about_paragraph_one"]')).not.toBeEmpty();
+    await expect(start.locator('[data-edit-key="about_paragraph_two"]')).not.toBeEmpty();
+    await expect(start.locator(".home-about-portrait .hero-photo")).toBeVisible();
+    await expect(start.locator("#education")).toHaveCount(1);
+    await expect(start.locator("#experience")).toHaveCount(1);
+    await expect(main.locator(".hero, .hero-intro, .intro-strip")).toHaveCount(0);
+    await expect(main.locator("#experience")).toHaveCount(1);
+    await expect(main.locator(".customizable-home-layout")).toBeVisible();
+    const homeAbout = await start.locator(".about-main").innerText();
+    await page.goto("/aboutme/");
+    await expect(page.locator(".about-main h2")).toBeVisible();
+    expect(await page.locator(".about-main").innerText()).toBe(homeAbout);
+    if (width <= 390) {
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    }
+  });
+}
+
