@@ -285,14 +285,14 @@ function PublishedArticles({labels,limit,standalone=false,layout}:{labels:Record
 }
 
 
-function Home() {
+
+function ContactSection() {
+  const {labels,labelsLoaded}=useSiteContent();
   const layout=useSiteLayout();
-  const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
+  const pageCopy=useLivePageCopy();
   const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
-  const [notice, setNotice] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [followOpen, setFollowOpen] = useState(false);
-  const pageCopy=useLivePageCopy();
   useEffect(() => {
     const controller = new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/settings", { signal: controller.signal, credentials: "omit" })
@@ -304,6 +304,32 @@ function Home() {
       }).catch(() => {/* No public address has been configured. */});
     return () => controller.abort();
   }, []);
+  return <section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
+        <div className="section-label"><span data-edit-key="contact_label">{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
+        <h2 id="contact-title" data-edit-key="contact_heading" style={styleFor(layout,"contact","title")}>{pageCopy?.contact_heading}</h2>
+        <p data-edit-key="contact_paragraph" style={styleFor(layout,"contact","body")}>{pageCopy?.contact_paragraph}</p>
+        <div className="contact-actions">
+          {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
+            <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
+          <button type="button" className="button button-outline" aria-expanded={followOpen} aria-controls="contact-social-links" onClick={() => setFollowOpen(open => !open)}>
+            Follow me <span className="follow-chevron" aria-hidden="true">{followOpen ? "−" : "+"}</span>
+          </button>
+        </div>
+        <nav id="contact-social-links" className="contact-social-links" aria-label="My social media profiles" hidden={!followOpen}>
+          <a href={t("social_facebook","https://www.facebook.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Facebook <Arrow diagonal /></a>
+          <a href={t("social_linkedin","https://www.linkedin.com/in/iamserazulhoque")} target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal /></a>
+          <a href={t("social_x","https://www.x.com/Serazul_Hoque")} target="_blank" rel="noopener noreferrer">X (Twitter) <Arrow diagonal /></a>
+          <a href={t("social_instagram","https://www.instagram.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal /></a>
+        </nav>
+      </section>;
+}
+
+function Home() {
+  const layout=useSiteLayout();
+  const {items,entriesLoaded,labels,labelsLoaded}=useSiteContent();
+  const t=(key:string,fallback:string)=>labelsLoaded?textValue(labels,key,fallback):"";
+  const [notice, setNotice] = useState("");
+  const pageCopy=useLivePageCopy();
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(""), 3200); return () => clearTimeout(timer); }, [notice]);
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>(".hero-photo[data-reveal]"));
@@ -337,8 +363,8 @@ function Home() {
           <p className="eyebrow" data-edit-key="hero_eyebrow"><span className="status-dot" /> {t("hero_eyebrow","LEARNING. EXPLORING. BUILDING A DIRECTION.")}</p>
           <h1 style={styleFor(layout,"hero","title")}><span data-edit-key="hero_line_one">{pageCopy?.hero_line_one}</span>{" "}<br /><span data-edit-key="hero_line_two">{pageCopy?.hero_line_two}</span>{" "}<span className="hero-purpose"><span data-edit-key="hero_phrase">{pageCopy?.hero_phrase}</span> <em data-edit-key="hero_emphasis">{pageCopy?.hero_emphasis}</em><span className="green-period">.</span></span></h1>
           <p className="hero-intro" data-edit-key="hero_intro" style={styleFor(layout,"hero","body")}>{pageCopy?.hero_intro}</p>
-          <a className="button button-dark" href="#contact">Get in touch <Arrow diagonal /></a>
-          <a className="subtle-link" href="/about.html">A little about me <span aria-hidden="true">↗</span></a>
+          <a className="button button-dark" href="/get-in-touch">Get in touch <Arrow diagonal /></a>
+          <a className="subtle-link" href="/aboutme">A little about me <span aria-hidden="true">↗</span></a>
         </div><HeroPhoto />
       </section>
       <div className="intro-strip wrap"><span data-edit-key="intro_label">{t("intro_label","A PERSONAL CORNER OF THE INTERNET")}</span><p><span data-edit-key="intro_first">{t("intro_first","Curiosity in the details.")}</span> <em data-edit-key="intro_second">{t("intro_second","Purpose in the bigger picture.")}</em></p><span className="strip-star" aria-hidden="true">✳</span></div>
@@ -347,24 +373,7 @@ function Home() {
       <div data-custom-section="home_stories" style={{order:sectionOrder(layout,"home_stories")}}><ContentStories items={items} section="home" layout={layout} /></div>
       {layout.home_blog&&<div data-custom-section="blog" style={{order:sectionOrder(layout,"blog")}}><PublishedArticles labels={labels} limit={layout.home_blog_limit} layout={layout} /></div>}
       {layout.publications_home&&<div data-custom-section="publications" style={{order:sectionOrder(layout,"publications")}}><ContentStories items={items} section="publications" layout={layout} page="home" /></div>}
-      <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><section id="contact" className="contact-section wrap section-space" tabIndex={-1} aria-labelledby="contact-title">
-        <div className="section-label"><span data-edit-key="contact_label">{t("contact_label","04 / GET IN TOUCH")}</span><span className="small-line" /></div>
-        <h2 id="contact-title" data-edit-key="contact_heading" style={styleFor(layout,"contact","title")}>{pageCopy?.contact_heading}</h2>
-        <p data-edit-key="contact_paragraph" style={styleFor(layout,"contact","body")}>{pageCopy?.contact_paragraph}</p>
-        <div className="contact-actions">
-          {contactEmail ? <a className="button button-dark" href={`mailto:${contactEmail}`}>Send an email <Arrow diagonal /></a> :
-            <p className="contact-placeholder">Contact details will appear here when added in Site Settings.</p>}
-          <button type="button" className="button button-outline" aria-expanded={followOpen} aria-controls="contact-social-links" onClick={() => setFollowOpen(open => !open)}>
-            Follow me <span className="follow-chevron" aria-hidden="true">{followOpen ? "−" : "+"}</span>
-          </button>
-        </div>
-        <nav id="contact-social-links" className="contact-social-links" aria-label="My social media profiles" hidden={!followOpen}>
-          <a href={t("social_facebook","https://www.facebook.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Facebook <Arrow diagonal /></a>
-          <a href={t("social_linkedin","https://www.linkedin.com/in/iamserazulhoque")} target="_blank" rel="noopener noreferrer">LinkedIn <Arrow diagonal /></a>
-          <a href={t("social_x","https://www.x.com/Serazul_Hoque")} target="_blank" rel="noopener noreferrer">X (Twitter) <Arrow diagonal /></a>
-          <a href={t("social_instagram","https://www.instagram.com/iamserazulhoque")} target="_blank" rel="noopener noreferrer">Instagram <Arrow diagonal /></a>
-        </nav>
-      </section>
+      <div data-custom-section="contact" style={{order:sectionOrder(layout,"contact")}}><ContactSection />
       <ContentStories items={items} section="contact" layout={layout} /></div>
       <div data-custom-section="visitor_wall" style={{order:sectionOrder(layout,"visitor_wall")}}><VisitorWall /></div>
       <div data-custom-section="closing" style={{order:sectionOrder(layout,"closing")}}><section className="closing-section wrap"><div className="closing-star" aria-hidden="true">✳</div><p className="eyebrow" data-edit-key="closing_label">{t("closing_label","STILL EARLY. ALREADY CURIOUS.")}</p><h2 data-edit-key="closing_heading_one" style={styleFor(layout,"closing","title")}>{t("closing_heading_one","Good software begins")}<br /><em data-edit-key="closing_heading_two">{t("closing_heading_two","with a human question.")}</em></h2><p data-edit-key="closing_paragraph_one" style={styleFor(layout,"closing","body")}>{t("closing_paragraph_one","Mine is how to help more people be understood.")}<br /><span data-edit-key="closing_paragraph_two">{t("closing_paragraph_two","This portfolio is a starting point for that journey.")}</span></p><button className="button button-dark" onClick={() => copy(new URL("./", window.location.href).href, "Portfolio link copied.")}>Share this portfolio <Arrow diagonal /></button></section></div>
@@ -494,6 +503,21 @@ export function BlogPage() {
   </>;
 }
 
+
+export function ContactPage() {
+  return <>
+    <a className="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main" className="contact-page-main" tabIndex={-1}>
+      <ContactSection />
+      <div className="journey-return wrap"><a className="subtle-link" href="/">← Back to homepage</a></div>
+    </main>
+    <footer className="site-footer wrap"><a className="footer-name" href="/">Serazul Hoque</a><span>© 2026 · A WORK IN PROGRESS, WITH INTENTION.</span><a className="back-top" href="/">Back to home ↑</a></footer>
+    <DesignerSignature />
+    <PortfolioAssistant />
+  </>;
+}
+
 export function AskMePage() {
   return <main className="askme-page" id="main" aria-label="Ask Me chatbot">
     <PortfolioAssistant standalone />
@@ -519,9 +543,10 @@ export default function App() {
     <SiteDesign />
     {/^\/blog(?:\/.*)?$/.test(path)
       ? <BlogPage /> : /^\/askme\/?$/.test(path)
-      ? <AskMePage /> : path.endsWith("/gallery.html")
-      ? <Gallery /> : path.endsWith("/about.html")
-      ? <AboutPage /> : <Home />}
+      ? <AskMePage /> : ["/gallery", "/gallery/", "/gallery.html"].includes(path)
+      ? <Gallery /> : ["/aboutme", "/aboutme/", "/about.html"].includes(path)
+      ? <AboutPage /> : ["/get-in-touch", "/get-in-touch/"].includes(path)
+      ? <ContactPage /> : <Home />}
   </>;
 }
 
