@@ -19,7 +19,7 @@ export default function VisitAnalytics() {
     try {
       if(document.referrer){
         const host=new URL(document.referrer).hostname.toLowerCase();
-        if(host && !host.endsWith("serazulhoque.github.io"))referrer=host.slice(0,100);
+        if(host && host!=="serazulh.com" && host!=="www.serazulh.com" && !host.endsWith("serazulhoque.github.io"))referrer=host.slice(0,100);
       }
     }catch {/* Unknown or private referrer. */}
     fetch("https://serazul-backend.vercel.app/api/public/visit",{

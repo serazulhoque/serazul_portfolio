@@ -23,7 +23,7 @@ try{
       if(seen.has(name))continue;
       seen.add(name);
       const title=escape(item.title);
-      const url="https://serazulhoque.github.io/blog/"+name;
+      const url="https://serazulh.com/blog/"+name;
       const description=escape("Read "+item.title+" by Serazul Hoque.");
       let html=template
         .replace(/<title>[^<]*<\/title>/,'<title>'+title+' — Serazul Hoque | Blog</title>')

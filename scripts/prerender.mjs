@@ -45,7 +45,7 @@ const chatHtml = html.replace(placeholder, () => '<div id="root">' + renderAskMe
   .replace(/<title>[^<]*<\/title>/,'<title>Ask Me — Serazul Hoque</title>')
   .replace(/<meta name="description" content="[^"]*"\s*\/>/,
     '<meta name="description" content="Ask questions and chat with Serazul Hoque’s website assistant." />')
-  .replace("</head>", '<link rel="canonical" href="https://serazulhoque.github.io/askme" /></head>');
+  .replace("</head>", '<link rel="canonical" href="https://serazulh.com/askme" /></head>');
 await writeFile(new URL("../dist/askme/index.html", import.meta.url), chatHtml);
 
 // An unknown route (including an unpublished /blog/post-title) must render
@@ -60,7 +60,7 @@ const blogHtml=preparedHtml.replace(placeholder,()=>'<div id="root">'+renderBlog
   .replace(/<title>[^<]*<\/title>/,'<title>Blog — Serazul Hoque</title>')
   .replace(/<meta name="description" content="[^"]*"\s*\/>/,
     '<meta name="description" content="Read Serazul Hoque’s blog posts, writing, and reflections." />')
-  .replace("</head>",'<link rel="canonical" href="https://serazulhoque.github.io/blog" /></head>');
+  .replace("</head>",'<link rel="canonical" href="https://serazulh.com/blog" /></head>');
 await writeFile(new URL("../dist/blog/index.html", import.meta.url),blogHtml);
 await rm(new URL("../.prerender", import.meta.url), { recursive: true, force: true });
 console.log("Static HTML generated. Ready to deploy dist/.");
