@@ -57,11 +57,9 @@ export default function SiteHeader() {
     return () => controller.abort();
   }, []);
 
-  const isAboutPage = typeof window !== "undefined" && window.location.pathname.endsWith("/about.html");
-  const isGalleryPage = typeof window !== "undefined" && window.location.pathname.endsWith("/gallery.html");
+  const isAboutPage = typeof window !== "undefined" && ["/aboutme","/aboutme/","/about.html"].includes(window.location.pathname);
+  const isGalleryPage = typeof window !== "undefined" && ["/gallery","/gallery/","/gallery.html"].includes(window.location.pathname);
   const isBlogPage = typeof window !== "undefined" && /^\/blog(?:\/|$)/.test(window.location.pathname);
-  const separatePage = isAboutPage || isGalleryPage || isBlogPage;
-  const sectionHref = (section: string) => separatePage ? `/${section}` : section;
 
   function openPhoto() {
     if (!profilePhoto || !photoDialog.current || photoDialog.current.open) return;
@@ -242,7 +240,7 @@ export default function SiteHeader() {
     <header className={`site-header wrap${isAboutPage ? " about-page-header" : ""}`}>
       <div className="wordmark">{brand()}</div>
       <div className="header-actions"><nav className="desktop-nav" aria-label="Main navigation">
-        <a href="/" onClick={follow}>Home</a><a href="/about.html">About me</a><a href={sectionHref("#contact")} onClick={follow}>Get in touch</a><a href="/blog">Blog</a><a href="/gallery.html">Gallery</a>
+        <a href="/" onClick={follow}>Home</a><a href="/aboutme">About me</a><a href="/get-in-touch" onClick={follow}>Get in touch</a><a href="/blog">Blog</a><a href="/gallery">Gallery</a>
       </nav><ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} fade={themeFade} /></div>
       <button className="menu-orb" onClick={openMenu} disabled={!ready} aria-haspopup="dialog" aria-controls="portfolio-menu" aria-label="Open menu"><MenuIcon /></button>
     </header>
@@ -253,10 +251,10 @@ export default function SiteHeader() {
         <ThemeToggle dark={dark} ready={ready} onToggle={toggleTheme} inMenu />
         <h2 id="menu-title" className="sr-only">Explore Serazul’s portfolio</h2>
         <nav className="menu-links" aria-label="Portfolio navigation">
-          <a onClick={follow} href="/about.html"><span className="menu-item-label">About me</span><MenuSymbol name="about" /></a>
-          <a href={sectionHref("#contact")} onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
+          <a onClick={follow} href="/aboutme"><span className="menu-item-label">About me</span><MenuSymbol name="about" /></a>
+          <a href="/get-in-touch" onClick={follow}><span className="menu-item-label">Get in touch</span><MenuSymbol name="contact" /></a>
           <a href="/blog" onClick={follow}><span className="menu-item-label">Blog</span><MenuSymbol name="publication" /></a>
-          <a onClick={follow} href="/gallery.html"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
+          <a onClick={follow} href="/gallery"><span className="menu-item-label">Gallery</span><MenuSymbol name="explore" /></a>
           <a href="/" onClick={follow}><span className="menu-item-label">HOME</span><MenuSymbol name="home" /></a>
           <span className="menu-note">Engineering Student with a purpose.</span>
         </nav>
