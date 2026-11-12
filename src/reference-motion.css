@@ -583,7 +583,7 @@ html body .hero h1 [data-edit-key="hero_emphasis"]{font-size:inherit!important}
 .hero .hero-copy h1 br{display:none}
 .hero .hero-copy h1 .hero-purpose{display:inline;white-space:inherit;margin-top:0}
 
-// Home leads with the same About Me content and retains the existing portrait.
+/* Home leads with the same About Me content and retains the existing portrait. */
 .home-about-content .about-section{padding-top:clamp(30px,5vw,70px);padding-bottom:clamp(30px,5vw,65px)}
 .home-about-portrait{display:flex;justify-content:center;padding-bottom:clamp(32px,5vw,70px)}
 .home-about-portrait .hero-photo{width:min(100%,470px);height:440px;min-height:0;flex:0 1 470px}
