@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 // Run against the built GitHub Pages site, served using Vite preview.
@@ -82,4 +82,13 @@ test("direct URLs serve prerendered HTML, old URLs still work, and contact email
   for (const oldPath of ["about.html","gallery.html"]) {
     expect(existsSync(join(process.cwd(),"dist",oldPath))).toBe(false);
   }
+});
+
+test("dashboard entry redirects to the existing authenticated Vercel login", async () => {
+  const html = readFileSync(join(process.cwd(), "dist", "hoquepapamama", "index.html"), "utf8");
+  const destination = "https://serazul-admin-serazulhoque.vercel.app/admin.html?entry=portfolio";
+  expect(html).toContain('http-equiv="refresh"');
+  expect(html).toContain(destination);
+  expect(html).toContain('rel="noreferrer"');
+  expect(html).not.toContain("hoque15062002");
 });
