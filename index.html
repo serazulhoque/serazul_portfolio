@@ -4,14 +4,16 @@
 <meta charset="UTF-8" />
 <script>document.documentElement.dataset.siteFresh="loading";</script>
 <style>
-#site-content-loading{display:none}
-html[data-site-fresh="loading"] #root,html[data-site-fresh="error"] #root{visibility:hidden}
-html[data-site-fresh="loading"] #site-content-loading,html[data-site-fresh="error"] #site-content-loading{
-display:block;position:fixed;z-index:999;top:36%;left:50%;transform:translateX(-50%);
-box-sizing:border-box;width:min(90vw,480px);padding:24px;
-background:var(--paper,#fffefa);color:var(--ink,#21332c);font:16px/1.6 Georgia,serif;
-text-align:center;border-radius:8px;border:1px solid #d7dfd2}
-#site-content-loading a{display:inline-block;margin-top:12px;color:inherit;text-decoration:underline}
+html[data-site-fresh="loading"] #root,
+html[data-site-fresh="error"] #root{visibility:hidden}
+#site-content-error{display:none}
+html[data-site-fresh="error"] #site-content-error{
+  display:block;position:fixed;z-index:999;top:36%;left:50%;transform:translateX(-50%);
+  width:min(90vw,480px);box-sizing:border-box;padding:24px;
+  background:var(--paper,#fffefa);color:var(--ink,#21332c);
+  font:16px/1.6 Georgia,serif;text-align:center;border-radius:8px;border:1px solid #d7dfd2
+}
+#site-content-error a{display:inline-block;margin-top:12px;color:inherit;text-decoration:underline}
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=yes" />
 <title>Serazul Hoque — Engineering Student with a purpose</title>
@@ -23,6 +25,12 @@ text-align:center;border-radius:8px;border:1px solid #d7dfd2}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://serazul-backend.vercel.app" crossorigin />
 <link rel="preconnect" href="https://krtnmzfucyfgalxvnuwj.supabase.co" crossorigin />
+<script>
+window.__portfolioFreshRequest=fetch(
+  "https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/rpc/get_portfolio_public_content",
+  {headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"},cache:"no-store",credentials:"omit"}
+).then(response=>response.ok?response.json():null).catch(()=>null);
+</script>
 <script>try{var t=localStorage.getItem("serazul-theme");document.documentElement.dataset.theme=t==="dark"||t==="light"?t:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}</script>
 
 <script>
@@ -32,7 +40,7 @@ text-align:center;border-radius:8px;border:1px solid #d7dfd2}
 </script>
 </head>
 <body>
-<div id="site-content-loading" role="status" aria-live="polite">Loading the latest website content…</div>
+<div id="site-content-error" role="alert">Website content is temporarily unavailable. <a href="">Try again</a>.</div>
 <div id="root"></div>
 <script type="module" src="/src/main.tsx"></script>
 </body>
