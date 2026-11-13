@@ -178,7 +178,7 @@ html[data-theme="dark"] .handdraw-signature{color:#FFFFFF}
   from{stroke-dashoffset:100}
   to{stroke-dashoffset:0}
 }
-.handdraw-glow{opacity:0;pointer-events:none}
+.handdraw-glow{pointer-events:none}
 @media(prefers-reduced-motion:reduce){
   .handdraw-signature .handdraw-stroke{animation:none!important;stroke-dashoffset:0}
   .handdraw-signature .handdraw-glow{display:none}
