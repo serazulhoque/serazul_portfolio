@@ -142,18 +142,29 @@ html[data-theme="dark"] .ink-signature{color:#f7f9f3}
 }
 
 
-/* Signature typography uses a polished handwritten script; ink follows page theme. */
+/* Genuine single-line ink: path coordinates are scaled to 12.6% in SVG.
+   A 20-unit SVG stroke therefore appears 2.52px wide at full SVG scale. */
 .handdraw-signature{
   display:block;width:min(430px,88vw);max-width:100%;height:auto;
-  padding:0;margin:0;border:0;background:transparent;appearance:none;
-  color:#111111;text-align:left;cursor:pointer;
+  padding:0;margin:0;border:0;appearance:none;
+  color:#111111;background:transparent;text-align:left;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
 html[data-theme="dark"] .handdraw-signature{color:#FFFFFF}
 .handdraw-signature:focus-visible{outline:2px solid #00b832;outline-offset:5px}
 .handdraw-svg{display:block;width:100%;height:auto;overflow:visible;background:transparent}
-.signature-lettering{
-  font-family:"Mrs Saint Delafield","Qwigley",cursive;
-  font-size:137px;font-weight:400;font-style:normal;fill:currentColor;
-  stroke:none;
+.handdraw-stroke{
+  fill:none;stroke:currentColor;stroke-width:20px;
+  stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:100;stroke-dashoffset:100;
+  animation-name:signature-write-centerline;
+  animation-timing-function:linear;
+  animation-fill-mode:both;
+}
+@keyframes signature-write-centerline{
+  from{stroke-dashoffset:100}
+  to{stroke-dashoffset:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .handdraw-stroke{animation:none!important;stroke-dashoffset:0!important}
 }
