@@ -46,3 +46,15 @@ export function parsePageCopy(value: unknown): PageSections | null {
   return result;
 }
 
+// Render the entire About Me introduction in reading order. The two existing
+// database fields are storage details, not pre-assigned visual columns.
+export function aboutIntroductionParagraphs(
+  copy: Pick<PageSections, "about_paragraph_one" | "about_paragraph_two"> | null,
+): string[] {
+  return [copy?.about_paragraph_one, copy?.about_paragraph_two]
+    .filter((value): value is string => typeof value === "string" && !!value.trim())
+    .join("\n\n")
+    .split(/\n[ \t]*\n+/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
