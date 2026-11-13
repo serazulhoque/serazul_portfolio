@@ -1,0 +1,62 @@
+/* Progressive enhancement: elements stay readable when JS is unavailable. */
+.site-motion-item{
+  opacity:0;
+  transform:translate3d(0,14px,0);
+  transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1);
+}
+.site-motion-item.site-motion-visible{opacity:1;transform:none}
+.journey-entry.site-motion-item{transition-duration:.48s}
+.journey-steps{border-left-color:transparent!important}
+.journey-steps::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:1px;
+  background:var(--line);transform:scaleY(0);transform-origin:top;
+  transition:transform 1.1s cubic-bezier(.22,.75,.3,1);
+}
+.journey-steps:has(.journey-entry.site-motion-visible)::before{transform:scaleY(1)}
+/* Existing menu open/close timing stays unchanged; links enter sequentially. */
+.menu-dialog[open]:not(.is-closing) .menu-links>a{
+  animation:menu-item-arrive .34s cubic-bezier(.2,.75,.25,1) both;
+}
+.menu-dialog[open]:not(.is-closing) .menu-links>a:nth-child(1){animation-delay:.08s}
+.menu-dialog[open]:not(.is-closing) .menu-links>a:nth-child(2){animation-delay:.12s}
+.menu-dialog[open]:not(.is-closing) .menu-links>a:nth-child(3){animation-delay:.16s}
+.menu-dialog[open]:not(.is-closing) .menu-links>a:nth-child(4){animation-delay:.20s}
+.menu-dialog[open]:not(.is-closing) .menu-links>a:nth-child(5){animation-delay:.24s}
+@keyframes menu-item-arrive{from{opacity:0;transform:translate3d(12px,0,0)}to{opacity:1;transform:none}}
+/* Hover only on hover-capable devices; touch gets a short pressed response. */
+@media(hover:hover) and (pointer:fine){
+  .button:not(:disabled),.post-share,.gallery-tile,.published-article-title,
+  .journey-step,.menu-orb,.profile-photo-button{
+    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+  }
+  .button:not(:disabled):hover,.post-share:hover,.menu-orb:hover{transform:translateY(-2px)}
+  .gallery-tile:hover{transform:translateY(-3px);box-shadow:0 8px 23px #12251c14}
+  .published-article-title:hover{transform:translateX(4px)}
+  .profile-photo-button:hover:not(:disabled){transform:scale(1.045)}
+}
+.button:not(:disabled):active,.menu-orb:active,.gallery-tile:active,.journey-step:active,
+.assistant-form button:not(:disabled):active{transform:scale(.985)}
+/* Gallery imagery is GPU-transformed, not resized in layout. */
+.gallery-tile img{transition:transform .3s ease}
+@media(hover:hover) and (pointer:fine){.gallery-tile:hover img{transform:scale(1.035)}}
+/* Photo opens without movement of surrounding content. */
+.profile-photo-viewer[open] .profile-photo-full{animation:photo-focus-in .26s cubic-bezier(.2,.7,.2,1) both}
+@keyframes photo-focus-in{from{opacity:.7;transform:scale(.975)}to{opacity:1;transform:none}}
+/* Chat processing indicator: animation never changes the actual answer text. */
+.assistant-typing{display:inline-flex;align-items:center;gap:4px;min-height:14px;vertical-align:middle}
+.assistant-typing>span{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35;animation:assistant-dot 1.1s ease-in-out infinite}
+.assistant-typing>span:nth-child(2){animation-delay:.16s}
+.assistant-typing>span:nth-child(3){animation-delay:.32s}
+@keyframes assistant-dot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.assistant-message-row{animation:message-arrive .24s ease-out both}
+@keyframes message-arrive{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  .site-motion-item,.site-motion-item.site-motion-visible{opacity:1!important;transform:none!important;transition:none!important}
+  .journey-steps::before{transform:none!important;transition:none!important}
+  .menu-dialog[open]:not(.is-closing) .menu-links>a,
+  .assistant-typing>span,.assistant-message-row,
+  .profile-photo-viewer[open] .profile-photo-full{animation:none!important;transform:none!important;opacity:1!important}
+  .button,.post-share,.gallery-tile,.published-article-title,.journey-step,
+  .menu-orb,.profile-photo-button,.gallery-tile img{transition:none!important}
+  .button:active,.gallery-tile:active,.journey-step:active{transform:none!important}
+}
