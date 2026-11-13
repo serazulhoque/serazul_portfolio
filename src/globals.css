@@ -142,44 +142,18 @@ html[data-theme="dark"] .ink-signature{color:#f7f9f3}
 }
 
 
-/* Inline SVG signature. Button preserves the original footprint and supports replay. */
+/* Signature typography uses a polished handwritten script; ink follows page theme. */
 .handdraw-signature{
-  display:block;
-  width:min(430px,88vw);
-  max-width:100%;
-  height:auto;
-  padding:0;
-  margin:0;
-  border:0;
-  border-radius:2px;
-  background:transparent;
-  color:#111111;
-  appearance:none;
-  text-align:left;
-  cursor:pointer;
+  display:block;width:min(430px,88vw);max-width:100%;height:auto;
+  padding:0;margin:0;border:0;background:transparent;appearance:none;
+  color:#111111;text-align:left;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
 html[data-theme="dark"] .handdraw-signature{color:#FFFFFF}
 .handdraw-signature:focus-visible{outline:2px solid #00b832;outline-offset:5px}
 .handdraw-svg{display:block;width:100%;height:auto;overflow:visible;background:transparent}
-.handdraw-stroke{
-  fill:none;
-  stroke:currentColor;
-  stroke-width:2.5px;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-  stroke-dasharray:100;
-  stroke-dashoffset:100;
-  animation-name:handdraw-write;
-  animation-timing-function:linear;
-  animation-fill-mode:both;
-}
-@keyframes handdraw-write{
-  from{stroke-dashoffset:100}
-  to{stroke-dashoffset:0}
-}
-.handdraw-glow{pointer-events:none}
-@media(prefers-reduced-motion:reduce){
-  .handdraw-signature .handdraw-stroke{animation:none!important;stroke-dashoffset:0}
-  .handdraw-signature .handdraw-glow{display:none}
+.signature-lettering{
+  font-family:"Mrs Saint Delafield","Qwigley",cursive;
+  font-size:137px;font-weight:400;font-style:normal;fill:currentColor;
+  stroke:none;
 }
