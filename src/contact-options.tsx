@@ -65,7 +65,7 @@ export default function ContactOptions() {
       setMessage("");
       setFeedback("Your message was submitted for email delivery. Thank you!");
     } catch {
-      setFeedback("The form could not submit your message. Please try again, or use the email link below.");
+      setFeedback("The form could not submit your message. Please try again.");
     } finally {
       setSending(false);
     }
