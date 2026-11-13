@@ -18,7 +18,12 @@ export function getProfilePhoto(): Promise<string | null> {
           ? data.url as string
           : null
       )
-      .catch(() => null);
+      // Transient network errors should not permanently cache a missing photo
+      // for the rest of this page session.
+      .catch(() => {
+        currentPhoto = undefined;
+        return null;
+      });
   }
   return currentPhoto;
 }
