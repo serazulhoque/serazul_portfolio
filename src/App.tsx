@@ -365,40 +365,42 @@ function Home() {
 
 // Bespoke slanted copperplate-style monoline paths inspired by the user's video.
 // Each path follows the pen's trajectory; timing is sequenced in HandwrittenSignature.
-// The lettering uses a professional open-source signature script rather than guessed pen paths.
-// The SVG remains inline and draws with a replayable emerald writing highlight.
+// Handwriting vectors are genuine single-line pen trajectories, adapted from
+// Mistral SingleLine (isdaT-type), SIL Open Font License 1.1:
+// https://github.com/isdat-type/Mistral-SingleLine
+// No text/font is rendered; every visible ink mark is an SVG centerline.
+const signaturePenStrokes: Array<{d:string;x:number;delay:number;duration:number}> = [{"d":"M195 492C241 521 307 574 307 599C307 605 303 608 295 608C289 608 283 607 274 604C175 572 73 481 73 402C73 349 109 310 151 270C203 221 254 183 254 140C254 70 115 -18 83 -30C76 -33 63 -37 52 -37C42 -37 35 -33 35 -24C35 3 137 48 309 111","x":22,"delay":0,"duration":0.3838},{"d":"M0 111L31 142C148 199 203 272 203 307C203 321 194 330 180 330C131 330 28 220 28 109C28 55 54 11 108 11C150 11 207 37 270 100L281 111","x":60.93,"delay":0.3838,"duration":0.2175},{"d":"M0 111L29 140C50 161 108 227 151 295","x":96.34,"delay":0.6013,"duration":0.0593},{"d":"M151 295L107 294","x":96.34,"delay":0.6606,"duration":0.0501},{"d":"M107 294C189 255 208 225 208 192C208 140 167 27 167 -2C167 -9 170 -12 176 -12C200 -12 263 36 326 99L338 111","x":96.34,"delay":0.7107,"duration":0.1763},{"d":"M0 111L17 128C97 208 191 283 297 352","x":138.93,"delay":0.8869,"duration":0.0593},{"d":"M297 352L299 350","x":138.93,"delay":0.9462,"duration":0.0501},{"d":"M299 350C190 269 41 124 41 55C41 40 48 31 62 31C95 31 166 81 297 222","x":138.93,"delay":0.9963,"duration":0.112},{"d":"M297 222C288 194 282 161 282 138C282 95 303 69 335 69C355 69 379 79 405 105L411 111","x":138.93,"delay":1.1083,"duration":0.1367},{"d":"M0 111L13 124C48 159 92 220 133 284L138 284C193 255 214 217 214 185C214 123 134 74 134 25C134 -28 225 -84 225 -149C225 -224 99 -315 51 -315C33 -315 24 -302 24 -283C24 -189 244 25 265 46L330 111","x":190.71,"delay":1.2451,"duration":0.3179},{"d":"M0 111L21 132C63 174 110 234 152 299","x":232.29,"delay":1.563,"duration":0.0593},{"d":"M152 299C110 208 92 134 92 81C92 32 106 6 131 6C184 6 268 124 321 215","x":232.29,"delay":1.6223,"duration":0.1137},{"d":"M321 215C315 187 313 164 313 148C313 98 332 64 365 64C386 64 414 78 438 102L447 111","x":232.29,"delay":1.736,"duration":0.1367},{"d":"M0 111L12 123C194 305 273 504 273 587C273 606 269 620 258 620C203 620 94 277 94 127C94 81 104 28 151 28C184 28 226 54 266 94L283 111","x":288.62,"delay":1.8727,"duration":0.2175},{"d":"M157 582C126 435 106 169 106 51C106 18 112 -2 122 -2C130 -2 142 8 158 32","x":357.03,"delay":2.0902,"duration":0.1186},{"d":"M65 223C150 253 271 276 443 285","x":357.03,"delay":2.2088,"duration":0.0511},{"d":"M472 582C481 568 485 549 485 527C485 438 415 129 356 -82","x":357.03,"delay":2.2599,"duration":0.0923},{"d":"M162 186C183 236 223 270 262 270C297 270 313 243 312 204C310 106 204 0 131 0C98 0 75 22 75 68C75 130 118 211 185 285C103 215 57 168 19 130L0 111","x":425.07,"delay":2.3521,"duration":0.2372},{"d":"M285 24C316 45 344 68 376 100L387 111","x":425.07,"delay":2.5893,"duration":0.061},{"d":"M0 111L16 127C76 187 161 261 280 309","x":473.84,"delay":2.6503,"duration":0.0593},{"d":"M280 309L281 307","x":473.84,"delay":2.7096,"duration":0.0501},{"d":"M281 307C135 235 18 114 18 38C18 13 31 2 51 2C107 2 203 88 281 185","x":473.84,"delay":2.7597,"duration":0.1087},{"d":"M281 185L283 184","x":473.84,"delay":2.8684,"duration":0.0501},{"d":"M283 184C267 16 233 -140 180 -314","x":473.84,"delay":2.9185,"duration":0.0544},{"d":"M0 111L21 132C63 174 110 234 152 299","x":513.9,"delay":2.9728,"duration":0.0593},{"d":"M152 299C110 208 92 134 92 81C92 32 106 6 131 6C184 6 268 124 321 215","x":513.9,"delay":3.0321,"duration":0.1137},{"d":"M321 215C315 187 313 164 313 148C313 98 332 64 365 64C386 64 414 78 438 102L447 111","x":513.9,"delay":3.1458,"duration":0.1367},{"d":"M0 111L31 142C148 199 203 272 203 307C203 321 194 330 180 330C131 330 28 220 28 109C28 55 54 11 108 11C150 11 207 37 270 100L281 111","x":570.23,"delay":3.2825,"duration":0.2175}];
+
 function HandwrittenSignature(){
   const [replay,setReplay]=useState(0);
-  const clipId="signature-writing-clip";
-  const glowId="signature-pen-glow";
-  return <button
-    type="button"
-    className="handdraw-signature"
-    aria-label="Replay Serazul Hoque handwritten signature"
-    title="Replay signature"
-    onClick={()=>setReplay(n=>n+1)}
-  >
-    <svg key={replay} viewBox="0 0 650 170" className="handdraw-svg"
-      role="img" aria-label="Serazul Hoque handwritten signature"
+  const reducedMotion=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  return <button type="button" className="handdraw-signature"
+    aria-label="Replay the handwritten Serazul Hoque signature" title="Replay handwriting"
+    onClick={()=>setReplay(n=>n+1)}>
+    <svg key={replay} className="handdraw-svg" viewBox="0 0 660 165"
+      role="img" aria-label="Serazul Hoque written with a pen"
       xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <clipPath id={clipId}>
-          <rect x="0" y="0" width="0" height="170">
-            <animate attributeName="width" from="0" to="650" dur="3.5s" fill="freeze" calcMode="spline" keySplines=".42 0 .58 1" />
-          </rect>
-        </clipPath>
-        <filter id={glowId} x="-400%" y="-400%" width="900%" height="900%">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        <filter id="signature-green-glow" x="-300%" y="-300%" width="700%" height="700%">
+          <feGaussianBlur stdDeviation="13" result="diffuse"/>
+          <feGaussianBlur stdDeviation="5" result="core"/>
+          <feMerge><feMergeNode in="diffuse"/><feMergeNode in="core"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g transform="rotate(-5 325 90)">
-        <text x="16" y="117" textLength="615" lengthAdjust="spacing"
-          className="signature-lettering" clipPath={`url(#${clipId})`}>Serazul Hoque</text>
-        <circle cy="90" r="3.8" fill="#00FF41" filter={`url(#${glowId})`}>
-          <animate attributeName="cx" from="16" to="635" dur="3.5s" fill="freeze" calcMode="spline" keySplines=".42 0 .58 1" />
-          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.03;.96;1" dur="3.5s" fill="freeze"/>
-        </circle>
+      <g transform="translate(0 115) rotate(-4 300 0)">
+        {signaturePenStrokes.map((stroke,i)=><g key={i}
+          transform={`translate(${stroke.x} 0) scale(0.126 -0.126)`}>
+          <path d={stroke.d} className="handdraw-stroke" pathLength="100"
+            style={{animationDelay:`${stroke.delay}s`,animationDuration:`${stroke.duration}s`}}/>
+          {!reducedMotion&&<circle r="21" cx="0" cy="0" fill="#00FF41"
+            filter="url(#signature-green-glow)" opacity="0">
+            <animateMotion path={stroke.d} begin={`${stroke.delay}s`}
+              dur={`${stroke.duration}s`} calcMode="paced" fill="freeze"/>
+            <animate attributeName="opacity" begin={`${stroke.delay}s`}
+              dur={`${stroke.duration}s`} values="0;1;1;0"
+              keyTimes="0;0.08;0.92;1" fill="freeze"/>
+          </circle>}
+        </g>)}
       </g>
     </svg>
   </button>;
