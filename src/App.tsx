@@ -374,6 +374,13 @@ const signaturePenStrokes: Array<{d:string;x:number;delay:number;duration:number
 function HandwrittenSignature(){
   const [replay,setReplay]=useState(0);
   const reducedMotion=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  // The pen writes for 3.5 seconds, holds the completed signature, then repeats.
+  // Respect the user's reduced-motion setting, and clean up when this page unmounts.
+  useEffect(()=>{
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    const interval=window.setInterval(()=>setReplay(value=>value+1),5000);
+    return ()=>window.clearInterval(interval);
+  },[]);
   return <button type="button" className="handdraw-signature"
     aria-label="Replay the handwritten Serazul Hoque signature" title="Replay handwriting"
     onClick={()=>setReplay(n=>n+1)}>
