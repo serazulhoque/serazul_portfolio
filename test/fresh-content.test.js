@@ -36,6 +36,6 @@ test("published content and design come from one uncached database refresh", asy
 
 test("desktop About Me introduction is one readable column", async () => {
   const css = await source("src/globals.css");
-  assert.match(css, /\\.about-columns\\{column-count:1;max-width:760px/);
-  assert.doesNotMatch(css, /\\.about-columns\\{column-count:2/);
+  assert.ok(css.includes(".about-columns{column-count:1;max-width:760px"));
+  assert.ok(!css.includes(".about-columns{column-count:2"));
 });
