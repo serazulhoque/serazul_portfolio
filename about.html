@@ -28,7 +28,7 @@ html[data-site-fresh="error"] #site-content-error{
 <script>
 window.__portfolioFreshRequest=fetch(
   "https://krtnmzfucyfgalxvnuwj.supabase.co/rest/v1/rpc/get_portfolio_public_content",
-  {headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"},cache:"no-store",credentials:"omit"}
+  {headers:{apikey:"sb_publishable_JBm0UjGe5L4S2FfLxwimGw_E0PTjx0N"},cache:"no-store",credentials:"omit",signal:AbortSignal.timeout(7000)}
 ).then(response=>response.ok?response.json():null).catch(()=>null);
 </script>
 <script>try{var t=localStorage.getItem("serazul-theme");document.documentElement.dataset.theme=t==="dark"||t==="light"?t:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}</script>
