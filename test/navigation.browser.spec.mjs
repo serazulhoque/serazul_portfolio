@@ -78,7 +78,8 @@ test("direct URLs serve prerendered HTML, old HTML output is removed, and contac
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://serazulh.com" + route.slice(0, -1));
   }
   await page.getByRole("button",{name:"SEND TO ME"}).click();
-  await expect(page.locator('a[href="mailto:hello@serazulh.com"]')).toBeVisible();
+  await expect(page.locator('#contact-mail-panel')).toBeVisible();
+  await expect(page.getByLabel("Your email")).toBeVisible();
 
   for (const oldPath of ["about.html","gallery.html"]) {
     expect(existsSync(join(process.cwd(),"dist",oldPath))).toBe(false);
@@ -109,8 +110,8 @@ for (const [mode, width, height] of [
     await expect(start).toHaveClass(/home-about-content/);
     await expect(start.locator(".about-section")).toBeVisible();
     await expect(start.locator(".about-main h1")).toBeVisible();
-    await expect(start.locator('[data-edit-key="about_paragraph_one"]')).not.toBeEmpty();
-    await expect(start.locator('[data-edit-key="about_paragraph_two"]')).not.toBeEmpty();
+    // The introduction now uses one dashboard field and one readable column.
+    await expect(start.locator('[data-edit-key="about_introduction"]').first()).not.toBeEmpty();
     await expect(start.locator(".home-about-portrait .hero-photo")).toBeVisible();
     await expect(start.locator("#education")).toHaveCount(1);
     await expect(start.locator("#experience")).toHaveCount(1);
