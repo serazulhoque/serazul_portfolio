@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import "./portfolio-assistant.css";
+import { getProfilePhoto } from "./profile-photo";
 
 type Message = { role: "visitor" | "guide"; text: string; id?: string; sources?: {title:string;url:string}[] };
 type PreparedAnswer = {
@@ -24,12 +25,9 @@ export default function PortfolioAssistant({standalone=false}:{standalone?:boole
   const field = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if(!open)return;
-    const controller=new AbortController();
-    fetch("https://serazul-backend.vercel.app/api/public/profile",{signal:controller.signal,credentials:"omit",cache:"default"})
-      .then(response=>response.ok?response.json():Promise.reject())
-      .then(data=>{if(!controller.signal.aborted && typeof data.url==="string" && /^https:\/\//.test(data.url))setProfilePhoto(data.url);})
-      .catch(()=>{});
-    return ()=>controller.abort();
+    let active=true;
+    void getProfilePhoto().then(url=>{if(active&&url)setProfilePhoto(url);});
+    return ()=>{active=false;};
   },[open]);
   useEffect(() => {
     if(!open)return;
