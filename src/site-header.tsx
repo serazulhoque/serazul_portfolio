@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import "./profile-photo-viewer.css";
+import { getProfilePhoto } from "./profile-photo";
 
 function MenuIcon({ close = false }: { close?: boolean }) {
   return <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d={close ? "M8 8 20 20M20 8 8 20" : "M5 8h18M5 14h18M5 20h18"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>;
@@ -43,18 +44,11 @@ export default function SiteHeader() {
   const [profilePhoto, setProfilePhoto] = useState("");
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("https://serazul-backend.vercel.app/api/public/profile", {
-      signal: controller.signal, credentials: "omit", cache: "no-store"
-    }).then(response => {
-      if (!response.ok) throw new Error("Profile unavailable");
-      return response.json();
-    }).then(data => {
-      if (!controller.signal.aborted && typeof data.url === "string" && /^https:\/\//.test(data.url)) {
-        setProfilePhoto(data.url);
-      }
-    }).catch(() => {/* The placeholder remains when no photo has been assigned. */});
-    return () => controller.abort();
+    let active = true;
+    void getProfilePhoto().then(url => {
+      if (active && url) setProfilePhoto(url);
+    });
+    return () => { active = false; };
   }, []);
 
   const isAboutPage = typeof window !== "undefined" && ["/aboutme","/aboutme/"].includes(window.location.pathname);
