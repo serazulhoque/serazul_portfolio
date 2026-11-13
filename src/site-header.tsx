@@ -45,7 +45,7 @@ export default function SiteHeader() {
   useEffect(() => {
     const controller = new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/profile", {
-      signal: controller.signal, credentials: "omit", cache: "default"
+      signal: controller.signal, credentials: "omit", cache: "no-store"
     }).then(response => {
       if (!response.ok) throw new Error("Profile unavailable");
       return response.json();
