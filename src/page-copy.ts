@@ -1,10 +1,4 @@
-import snapshot from "./site-snapshot.json" with { type: "json" };
-import { useEffect, useState } from "react";
-import {
-  DATA_URL,
-  PUBLIC_HEADERS,
-  requestJSON
-} from "./public-api.ts";
+import { useLiveSite } from "./live-site";
 
 type PageSections = {
   hero_line_one: string;
@@ -54,35 +48,6 @@ export function parsePageCopy(value: unknown): PageSections | null {
 }
 
 export function useLivePageCopy() {
-  const [copy, setCopy] = useState<PageSections | null>(() => parsePageCopy(snapshot.pageCopy));
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function load() {
-      try {
-        const rows = await requestJSON<unknown[]>(
-          DATA_URL + "/page_sections?select=*&id=eq.1",
-          {
-            signal: controller.signal,
-            headers: PUBLIC_HEADERS,
-          },
-        );
-        const next = parsePageCopy(Array.isArray(rows) ? rows[0] : null);
-        if (!next) throw new Error("Saved page text unavailable");
-        if (controller.signal.aborted) return;
-        setCopy(current => current && Object.keys(next).every(key => current[key as keyof typeof next] === next[key as keyof typeof next]) ? current : next);
-      } catch {
-        // Preserve the last published build snapshot if a live refresh fails.
-        // Never blank already-visible content because of a transient outage.
-      }
-    }
-    // Page copy is small and often updated from the dashboard: refresh just
-    // after hydration, without waiting for all images to finish loading.
-    const timer = window.setTimeout(() => void load(), 100);
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, []);
-  return copy;
+  const { pageCopy } = useLiveSite();
+  return parsePageCopy(pageCopy);
 }
