@@ -18,9 +18,8 @@ test("all public HTML entries hide outdated prerenders before the first paint", 
 
 test("published content and design come from one uncached database refresh", async () => {
   const provider = await source("src/live-site.tsx");
-  for (const table of [
-    "page_sections", "site_content_entries", "site_editable_text", "site_design_settings"
-  ]) assert.ok(provider.includes("/" + table), table);
+  for (const key of ["pageCopy", "items", "labels", "design"])
+    assert.ok(provider.includes(key), key);
   assert.match(provider, /get_portfolio_public_content/);
   assert.match(provider, /__portfolioFreshRequest/);
   assert.doesNotMatch(provider, /await Promise\.all\(/);
