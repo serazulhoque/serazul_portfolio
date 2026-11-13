@@ -1,6 +1,4 @@
-import snapshot from "./site-snapshot.json" with { type: "json" };
-import {useEffect,useState} from "react";
-import {DATA_URL,PUBLIC_HEADERS,refreshAfterFirstPaint} from "./public-api";
+import {useLiveSite} from "./live-site";
 
 export const HOME_SECTIONS=["explorations","home_stories","blog","publications","contact","visitor_wall","closing"] as const;
 export type HomeSection=typeof HOME_SECTIONS[number];
@@ -63,34 +61,10 @@ export function parseLayout(value:unknown):LayoutConfig {
     styles
   };
 }
-// Share one settings request between the page layout and design effects.
-let settingsPromise:Promise<Record<string,unknown>>|null=null;
-export function loadDesignSettings(){
-  if(!settingsPromise)settingsPromise=fetch(DATA_URL+"/site_design_settings?select=*&id=eq.1",{
-    credentials:"omit",cache:"no-store",headers:PUBLIC_HEADERS,signal:AbortSignal.timeout(8000)
-  }).then(response=>response.ok?response.json():Promise.reject())
-    .then(data=>Array.isArray(data)&&data[0]&&typeof data[0]==="object"?data[0]:{})
-    .catch(()=>({}));
-  return settingsPromise;
-}
-let pending:Promise<LayoutConfig>|null=null;
-export function loadSiteLayout(){
-  if(!pending)pending=loadDesignSettings().then(data=>parseLayout(data.layout_config ?? snapshot.layout));
-  return pending;
-}
+// Layout and content are published together from one fresh database read.
 export function useSiteLayout(){
-  const [layout,setLayout]=useState<LayoutConfig>(() => parseLayout(snapshot.layout));
-  useEffect(()=>{
-    const controller=new AbortController();
-    refreshAfterFirstPaint(()=>{
-      void loadSiteLayout().then(value=>{
-        if(!controller.signal.aborted)
-          setLayout(previous=>JSON.stringify(previous)===JSON.stringify(value)?previous:value);
-      });
-    },controller.signal);
-    return ()=>controller.abort();
-  },[]);
-  return layout;
+  const {design}=useLiveSite();
+  return parseLayout(design.layout_config);
 }
 export function sectionOrder(config:LayoutConfig,key:HomeSection){
   const index=config.home_sections.indexOf(key);
