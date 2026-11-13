@@ -11,6 +11,7 @@ import VisitorWall from "./visitor-wall";
 import ContactOptions from "./contact-options";
 import VisitAnalytics from "./visit-analytics";
 import {useSiteContent,textValue,ContentStories,type SiteEntry} from "./site-content";
+import {LiveSiteProvider} from "./live-site";
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
@@ -540,7 +541,7 @@ export default function App() {
       window.removeEventListener("pageshow", sync);
     };
   }, []);
-  return <>
+  return <LiveSiteProvider>
     <SiteDesign />
     {/^\/blog(?:\/.*)?$/.test(path)
       ? <BlogPage /> : /^\/askme\/?$/.test(path)
@@ -548,6 +549,6 @@ export default function App() {
       ? <Gallery /> : ["/aboutme", "/aboutme/"].includes(path)
       ? <AboutPage /> : ["/get-in-touch", "/get-in-touch/"].includes(path)
       ? <ContactPage /> : <Home />}
-  </>;
+  </LiveSiteProvider>;
 }
 
