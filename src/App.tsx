@@ -366,19 +366,20 @@ function Home() {
 // Bespoke slanted copperplate-style monoline paths inspired by the user's video.
 // Each path follows the pen's trajectory; timing is sequenced in HandwrittenSignature.
 const handwrittenStrokes = [
-  {d:"M 59 31 C 49 20 28 24 23 38 C 15 56 48 54 47 67 C 45 84 15 97 10 86 C 7 77 25 68 38 66", weight:1.2},
-  {d:"M 48 78 C 56 80 70 68 70 62 C 69 56 57 60 55 70 C 52 84 67 84 77 72", weight:.7},
-  {d:"M 75 79 C 79 68 84 59 85 63 C 85 68 81 76 85 72 C 91 61 98 57 101 61", weight:.7},
-  {d:"M 102 73 C 110 54 124 54 121 64 C 119 73 106 82 106 75 C 110 66 123 58 121 64 C 118 72 123 80 131 71", weight:.9},
-  {d:"M 132 61 C 143 61 152 58 157 56 C 149 65 139 75 133 84 C 141 79 153 73 159 73", weight:.8},
-  {d:"M 163 62 C 157 77 160 85 168 80 C 177 75 181 63 180 62 C 175 77 177 82 190 71", weight:.8},
-  {d:"M 189 76 C 200 64 211 34 212 23 C 212 17 207 26 207 39 C 208 59 202 77 214 73", weight:.7},
-  {d:"M 242 81 C 254 68 267 46 274 28 C 276 22 273 20 269 28 C 264 38 257 62 253 77 M 264 57 C 277 52 290 51 299 49 M 292 29 C 287 49 275 73 273 77", weight:1.3},
-  {d:"M 287 75 C 297 55 312 54 313 62 C 316 71 298 87 292 78 C 290 72 300 60 309 62", weight:.8},
-  {d:"M 314 82 C 322 76 331 63 337 59 C 342 56 337 74 333 82 C 331 89 340 76 345 71 M 334 78 C 337 89 335 102 330 105 C 322 109 317 105 323 98 C 329 92 345 83 355 75", weight:1.2},
-  {d:"M 353 63 C 347 80 349 84 356 81 C 365 76 369 64 368 62 C 363 77 366 82 378 71", weight:.8},
-  {d:"M 378 76 C 388 76 399 67 400 61 C 401 56 389 60 386 70 C 382 84 397 83 409 72", weight:.8},
-  {d:"M 405 75 C 431 86 446 74 462 68", weight:.5}
+  {d:"M 18 95 C 28 68 48 55 59 60 C 71 64 72 81 64 98 C 54 117 32 122 22 118 C 9 113 19 99 34 91 C 46 84 56 75 60 61 C 63 49 64 34 73 25 C 83 14 97 15 100 24 C 106 39 87 50 77 55", weight:1.62},
+  {d:"M 69 61 C 66 75 59 94 54 110 C 50 122 49 130 51 132 C 58 135 70 109 82 90", weight:0.69},
+  {d:"M 80 89 C 95 84 102 70 102 69 C 98 66 88 74 85 85 C 82 93 89 99 107 83", weight:0.72},
+  {d:"M 104 87 C 112 71 120 67 123 70 C 127 75 115 86 119 85 C 129 71 138 69 141 74", weight:0.68},
+  {d:"M 141 81 C 146 69 157 65 164 68 C 169 71 164 81 155 87 C 148 92 146 86 151 78 C 157 69 166 67 166 71 C 165 79 167 83 174 83 C 179 83 183 75 187 72", weight:0.87},
+  {d:"M 187 72 C 198 69 206 66 216 60 C 207 71 194 85 190 91 C 205 82 213 79 219 79", weight:0.62},
+  {d:"M 221 67 C 213 80 215 86 222 84 C 232 81 238 65 239 63 C 233 79 236 82 244 78", weight:0.7},
+  {d:"M 243 77 C 250 68 261 46 265 31 C 269 16 262 22 259 34 C 255 50 253 66 251 79 C 250 86 256 87 270 74", weight:0.9},
+  {d:"M 279 90 C 297 69 307 39 312 19 C 315 9 310 15 306 27 C 297 53 290 76 287 84 C 292 73 313 61 337 58", weight:1.22},
+  {d:"M 344 19 C 338 42 329 64 319 82 C 317 86 328 75 338 73", weight:0.65},
+  {d:"M 343 72 C 348 61 356 55 363 55 C 371 55 371 63 368 70 C 365 79 357 83 353 81 C 348 79 352 66 361 61 C 366 59 373 62 378 69", weight:0.77},
+  {d:"M 376 69 C 387 53 397 49 399 53 C 402 60 389 72 389 75 C 395 71 406 56 412 55 C 416 55 413 69 408 76 C 402 88 397 102 393 111 C 387 123 376 128 373 124 C 367 117 380 105 391 98 C 400 92 413 86 423 71", weight:1.2},
+  {d:"M 419 63 C 415 76 419 80 425 76 C 435 68 440 56 441 54 C 436 66 438 71 446 69", weight:0.67},
+  {d:"M 443 69 C 455 66 462 52 466 51 C 463 56 450 75 457 75 C 466 73 477 59 481 56", weight:0.77}
 ];
 function HandwrittenSignature(){
   const sum = handwrittenStrokes.reduce((n,s)=>n+s.weight,0);
@@ -404,7 +405,7 @@ function HandwrittenSignature(){
     .handdraw-dot-${i}{animation:hand-pen-${i} 7.4s linear infinite}
   `).join("\n");
   return <span className="handdraw-signature" role="img" aria-label="Serazul Hoque, written stroke by stroke like a pen signature">
-    <svg viewBox="0 0 500 130" className="handdraw-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 500 145" className="handdraw-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
       {handwrittenStrokes.map((stroke,i)=><path key={i} className={`handdraw-stroke handdraw-path-${i}`} d={stroke.d} pathLength="100" />)}
       {handwrittenStrokes.map((stroke,i)=><circle key={i} className={`handdraw-glow handdraw-dot-${i}`} r="3.2" style={{offsetPath:`path("${stroke.d}")`}} />)}
     </svg>
