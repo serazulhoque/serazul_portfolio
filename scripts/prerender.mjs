@@ -6,11 +6,18 @@ const placeholder = '<div id="root"></div>';
 if (!html.includes(placeholder)) throw new Error("Missing prerender root.");
 const renderedHome=render();
 const snapshot=JSON.parse(await readFile(new URL("../src/site-snapshot.json",import.meta.url),"utf8"));
-// The homepage now begins with the published About Me introduction.
+// The homepage now begins with the published About Me introduction. Check
+// each real paragraph: the renderer wraps blank-line-separated text in <p> tags.
+const aboutParagraphs=[
+  snapshot?.pageCopy?.about_paragraph_one,
+  snapshot?.pageCopy?.about_paragraph_two
+].filter(text=>typeof text==="string").flatMap(text=>
+  text.split(/\n\s*\n/).map(paragraph=>paragraph.trim()).filter(Boolean)
+);
 if(!snapshot?.pageCopy?.about_line_one ||
    !renderedHome.includes(snapshot.pageCopy.about_line_one) ||
-   !renderedHome.includes(snapshot.pageCopy.about_paragraph_one) ||
-   !renderedHome.includes(snapshot.pageCopy.about_paragraph_two))
+   !aboutParagraphs.length ||
+   aboutParagraphs.some(paragraph=>!renderedHome.includes(paragraph)))
   throw new Error("Homepage About Me content was not included in initial HTML");
 // Embed published custom text sizes/colors in the initial HTML. Otherwise
 // field styles arrive only after a later API call and headings visibly jump.
