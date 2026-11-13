@@ -381,36 +381,54 @@ const handwrittenStrokes = [
   {d:"M 419 63 C 415 76 419 80 425 76 C 435 68 440 56 441 54 C 436 66 438 71 446 69", weight:0.67},
   {d:"M 443 69 C 455 66 462 52 466 51 C 463 56 450 75 457 75 C 466 73 477 59 481 56", weight:0.77}
 ];
+// Write each genuine SVG centerline in sequence, not by wiping text across the screen.
+// The path length controls both the solid ink and the emerald pen tip.
 function HandwrittenSignature(){
-  const sum = handwrittenStrokes.reduce((n,s)=>n+s.weight,0);
-  let elapsed = 0;
-  const timing = handwrittenStrokes.map((s)=>{
-    const start = 4+elapsed/sum*72;
-    elapsed += s.weight;
-    return {start,end:4+elapsed/sum*72};
+  const [replay,setReplay] = useState(0);
+  const totalWeight = handwrittenStrokes.reduce((sum,stroke)=>sum+stroke.weight,0);
+  let elapsed=0;
+  const strokes=handwrittenStrokes.map(stroke=>{
+    const start=elapsed;
+    const duration=3.5*stroke.weight/totalWeight;
+    elapsed+=duration;
+    return {...stroke,start,duration};
   });
-  const animations = timing.map(({start,end},i)=>`
-    @keyframes hand-letter-${i}{
-      0%,${start.toFixed(3)}%{stroke-dashoffset:100;opacity:1}
-      ${end.toFixed(3)}%,88%{stroke-dashoffset:0;opacity:1}
-      96%,100%{stroke-dashoffset:0;opacity:0}
-    }
-    @keyframes hand-pen-${i}{
-      0%,${Math.max(0,start-.05).toFixed(3)}%{offset-distance:0%;opacity:0}
-      ${start.toFixed(3)}%{offset-distance:0%;opacity:1}
-      ${end.toFixed(3)}%{offset-distance:100%;opacity:1}
-      ${Math.min(100,end+.05).toFixed(3)}%,100%{offset-distance:100%;opacity:0}
-    }
-    .handdraw-path-${i}{animation:hand-letter-${i} 7.4s linear infinite}
-    .handdraw-dot-${i}{animation:hand-pen-${i} 7.4s linear infinite}
-  `).join("\n");
-  return <span className="handdraw-signature" role="img" aria-label="Serazul Hoque, written stroke by stroke like a pen signature">
-    <svg viewBox="0 0 500 145" className="handdraw-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-      {handwrittenStrokes.map((stroke,i)=><path key={i} className={`handdraw-stroke handdraw-path-${i}`} d={stroke.d} pathLength="100" />)}
-      {handwrittenStrokes.map((stroke,i)=><circle key={i} className={`handdraw-glow handdraw-dot-${i}`} r="3.2" style={{offsetPath:`path("${stroke.d}")`}} />)}
+
+  return <button
+    type="button"
+    className="handdraw-signature"
+    aria-label="Replay the handwritten Serazul Hoque signature"
+    title="Click to replay the signature"
+    onClick={()=>setReplay(n=>n+1)}
+  >
+    <svg key={replay} viewBox="0 0 500 145" className="handdraw-svg" role="img"
+      aria-label="Serazul Hoque handwritten signature" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="signature-emerald-glow" x="-350%" y="-350%" width="800%" height="800%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="wideGlow"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.7" result="innerGlow"/>
+          <feMerge>
+            <feMergeNode in="wideGlow"/>
+            <feMergeNode in="innerGlow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <g transform="rotate(-8 250 73)">
+        {strokes.map((stroke,i)=><path key={i} className="handdraw-stroke"
+          d={stroke.d} pathLength="100"
+          style={{animationDelay:`${stroke.start}s`,animationDuration:`${stroke.duration}s`}}/>)}
+        {strokes.map((stroke,i)=><circle key={i} className="handdraw-glow"
+          r="3.8" cx="0" cy="0" fill="#00FF41" filter="url(#signature-emerald-glow)">
+          <animateMotion begin={`${stroke.start}s`} dur={`${stroke.duration}s`}
+            path={stroke.d} rotate="auto" fill="freeze" calcMode="paced"/>
+          <animate attributeName="opacity" begin={`${stroke.start}s`}
+            dur={`${stroke.duration}s`} values="0;1;1;0"
+            keyTimes="0;0.04;0.94;1" fill="freeze"/>
+        </circle>)}
+      </g>
     </svg>
-    <style>{animations}</style>
-  </span>;
+  </button>;
 }
 
 function DesignerSignature() {
