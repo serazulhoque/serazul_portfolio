@@ -21,31 +21,49 @@ const initial: LiveSiteData = {
 const SiteContext = createContext<LiveSiteData>(initial);
 export const useLiveSite = () => useContext(SiteContext);
 
-// This is a single, authoritative fetch for all dashboard-managed public data.
-// Unlike build-time snapshots, successful requests reflect the database now.
+// The head begins the request while the browser downloads the React bundle.
+// Reuse that request here to avoid starting the network round-trip after hydration.
+declare global {
+  interface Window {
+    __portfolioFreshRequest?: Promise<unknown>;
+  }
+}
+const PORTFOLIO_URL = DATA_URL + "/rpc/get_portfolio_public_content";
+
 async function getFreshSiteData(signal: AbortSignal): Promise<LiveSiteData> {
-  const [page, entries, labels, design] = await Promise.all([
-    requestJSON<unknown>(DATA_URL + "/page_sections?select=*&id=eq.1", { headers: PUBLIC_HEADERS, signal }),
-    requestJSON<unknown>(DATA_URL +
-      "/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300",
-      { headers: PUBLIC_HEADERS, signal }),
-    requestJSON<unknown>(DATA_URL + "/site_editable_text?select=key,value&limit=100",
-      { headers: PUBLIC_HEADERS, signal }),
-    requestJSON<unknown>(DATA_URL + "/site_design_settings?select=*&id=eq.1",
-      { headers: PUBLIC_HEADERS, signal })
-  ]);
-  if (!Array.isArray(page) || !page[0] || typeof page[0].hero_line_one !== "string" ||
-      !Array.isArray(entries) || !Array.isArray(labels) ||
-      !Array.isArray(design) || !design[0] || typeof design[0] !== "object") {
+  const prefetched = window.__portfolioFreshRequest;
+  window.__portfolioFreshRequest = undefined;
+  let result = prefetched ? await prefetched : null;
+  if (!result)
+    result = await requestJSON<unknown>(PORTFOLIO_URL, {
+      headers: PUBLIC_HEADERS, signal
+    }, 10000);
+  if (signal.aborted) throw new Error("Cancelled");
+  if (!result || typeof result !== "object" || Array.isArray(result))
+    throw new Error("Published content is unavailable.");
+
+  const data = result as Record<string, unknown>;
+  const page = data.pageCopy;
+  const items = data.items;
+  const labels = data.labels;
+  const design = data.design;
+  if (!page || typeof page !== "object" || Array.isArray(page) ||
+      typeof (page as Record<string, unknown>).hero_line_one !== "string" ||
+      !Array.isArray(items) ||
+      !labels || typeof labels !== "object" || Array.isArray(labels) ||
+      !design || typeof design !== "object" || Array.isArray(design))
     throw new Error("Published content is incomplete.");
-  }
-  const text: Record<string, string> = {};
-  for (const item of labels) {
-    if (item && typeof item.key === "string" && typeof item.value === "string")
-      text[item.key] = item.value;
-  }
-  return { pageCopy: page[0], items: entries, labels: text,
-    design: design[0] as Record<string, unknown>, fresh: true };
+
+  const publicLabels: Record<string, string> = {};
+  for (const [key, value] of Object.entries(labels))
+    if (typeof value === "string") publicLabels[key] = value;
+  return {
+    pageCopy: page,
+    items,
+    labels: publicLabels,
+    design: design as Record<string, unknown>,
+    fresh: true
+  };
 }
 
 export function LiveSiteProvider({ children }: { children: ReactNode }) {
@@ -68,23 +86,12 @@ export function LiveSiteProvider({ children }: { children: ReactNode }) {
     let active = true;
     async function refresh() {
       document.documentElement.dataset.siteFresh = "loading";
-      const message = document.getElementById("site-content-loading");
-      if (message) message.textContent = "Loading the latest website content…";
       try {
         const next = await getFreshSiteData(controller.signal);
         if (active && !controller.signal.aborted) setData(next);
       } catch {
         if (active && !controller.signal.aborted) {
           document.documentElement.dataset.siteFresh = "error";
-          if (message) {
-            message.replaceChildren();
-            const note = document.createElement("p");
-            note.textContent = "The latest content could not be loaded. The older version is being hidden.";
-            const retryLink = document.createElement("a");
-            retryLink.href = window.location.href;
-            retryLink.textContent = "Try again";
-            message.append(note, retryLink);
-          }
         }
       }
     }
