@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { requestJSON, readCache, writeCache } from "../src/public-api.ts";
-import { parsePageCopy } from "../src/page-copy-utils.ts";
+import { parsePageCopy, aboutIntroductionParagraphs } from "../src/page-copy-utils.ts";
 
 const copy = {
   hero_line_one: "Engineering",
@@ -96,4 +96,15 @@ test("unmount cancellation reaches the network request", async (t) => {
   });
   controller.abort();
   await assert.rejects(pending, { name: "AbortError" });
+});
+
+test("About Me flows in reading order and preserves separately written paragraphs", () => {
+  const sections = {
+    about_paragraph_one: "First paragraph.\\n\\nSecond paragraph.",
+    about_paragraph_two: "Third paragraph.\\n\\nFourth paragraph.",
+  };
+  assert.deepEqual(aboutIntroductionParagraphs(sections), [
+    "First paragraph.", "Second paragraph.", "Third paragraph.", "Fourth paragraph.",
+  ]);
+  assert.deepEqual(aboutIntroductionParagraphs(null), []);
 });
