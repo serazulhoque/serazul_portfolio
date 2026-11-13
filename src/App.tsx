@@ -22,7 +22,7 @@ function HeroPhoto() {
   useEffect(()=>{
     const controller=new AbortController();
     fetch("https://serazul-backend.vercel.app/api/public/homepage-photo",{
-      signal:controller.signal,credentials:"omit",cache:"default"
+      signal:controller.signal,credentials:"omit",cache:"no-store"
     }).then(response=>{
       if(!response.ok)throw new Error("Photo unavailable");
       return response.json();
