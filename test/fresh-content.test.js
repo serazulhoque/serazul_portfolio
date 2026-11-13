@@ -33,3 +33,9 @@ test("published content and design come from one uncached database refresh", asy
   assert.doesNotMatch(await source("src/site-layout.ts"), /refreshAfterFirstPaint/);
   assert.doesNotMatch(await source("src/site-content.tsx"), /refreshAfterFirstPaint/);
 });
+
+test("desktop About Me introduction is one readable column", async () => {
+  const css = await source("src/globals.css");
+  assert.match(css, /\\.about-columns\\{column-count:1;max-width:760px/);
+  assert.doesNotMatch(css, /\\.about-columns\\{column-count:2/);
+});
