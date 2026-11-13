@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import {
   DATA_URL,
   PUBLIC_HEADERS,
-  requestJSON,
-  refreshAfterFirstPaint
+  requestJSON
 } from "./public-api.ts";
 
 type PageSections = {
@@ -77,8 +76,13 @@ export function useLivePageCopy() {
         // Never blank already-visible content because of a transient outage.
       }
     }
-    refreshAfterFirstPaint(() => void load(), controller.signal);
-    return () => controller.abort();
+    // Page copy is small and often updated from the dashboard: refresh just
+    // after hydration, without waiting for all images to finish loading.
+    const timer = window.setTimeout(() => void load(), 100);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
   }, []);
   return copy;
 }
