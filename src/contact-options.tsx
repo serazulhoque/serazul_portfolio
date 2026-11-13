@@ -109,12 +109,6 @@ export default function ContactOptions() {
           {sending ? "Sending…" : "Send message"}
         </button>
         <p className="contact-mail-feedback" role="status" aria-live="polite">{feedback}</p>
-        <p className="contact-mail-privacy">
-          This form uses a third-party service, FormSubmit, to forward your message by email.
-          Please don’t send sensitive information. <a href="https://formsubmit.co/privacy.pdf"
-          target="_blank" rel="noopener noreferrer">Privacy details</a>.
-          Or <a href={"mailto:"+CONTACT_EMAIL}>open your email app</a>.
-        </p>
       </form>
     </div>}
   </div>;
