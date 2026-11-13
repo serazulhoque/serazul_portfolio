@@ -9,7 +9,9 @@ test("all public HTML entries hide outdated prerenders before the first paint", 
     const html = await source(path);
     assert.ok(html.includes('document.documentElement.dataset.siteFresh="loading"'), path);
     assert.ok(html.includes('html[data-site-fresh="loading"] #root'), path);
-    assert.ok(html.includes('id="site-content-loading"'), path);
+    assert.ok(html.includes('id="site-content-error"'), path);
+    assert.ok(html.includes("get_portfolio_public_content"), path);
+    assert.doesNotMatch(html, /Loading the latest website content/i, path);
     assert.ok(html.indexOf('dataset.siteFresh="loading"') < html.indexOf('<div id="root">'), path);
   }
 });
@@ -19,7 +21,10 @@ test("published content and design come from one uncached database refresh", asy
   for (const table of [
     "page_sections", "site_content_entries", "site_editable_text", "site_design_settings"
   ]) assert.ok(provider.includes("/" + table), table);
-  assert.match(provider, /await Promise\.all\(/);
+  assert.match(provider, /get_portfolio_public_content/);
+  assert.match(provider, /__portfolioFreshRequest/);
+  assert.doesNotMatch(provider, /await Promise\.all\(/);
+  assert.doesNotMatch(provider, /site-content-loading/);
   assert.match(provider, /data-site-fresh|dataset\.siteFresh/);
   assert.match(provider, /dataset\.siteFresh = "ready"/);
   assert.match(provider, /dataset\.siteFresh = "error"/);
