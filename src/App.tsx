@@ -362,6 +362,54 @@ function Home() {
   </>;
 }
 
+
+const handwrittenStrokes = [
+  {d:"M 59 31 C 49 20 28 24 23 38 C 15 56 48 54 47 67 C 45 84 15 97 10 86 C 7 77 25 68 38 66", weight:1.2},
+  {d:"M 48 78 C 56 80 70 68 70 62 C 69 56 57 60 55 70 C 52 84 67 84 77 72", weight:.7},
+  {d:"M 75 79 C 79 68 84 59 85 63 C 85 68 81 76 85 72 C 91 61 98 57 101 61", weight:.7},
+  {d:"M 102 73 C 110 54 124 54 121 64 C 119 73 106 82 106 75 C 110 66 123 58 121 64 C 118 72 123 80 131 71", weight:.9},
+  {d:"M 132 61 C 143 61 152 58 157 56 C 149 65 139 75 133 84 C 141 79 153 73 159 73", weight:.8},
+  {d:"M 163 62 C 157 77 160 85 168 80 C 177 75 181 63 180 62 C 175 77 177 82 190 71", weight:.8},
+  {d:"M 189 76 C 200 64 211 34 212 23 C 212 17 207 26 207 39 C 208 59 202 77 214 73", weight:.7},
+  {d:"M 242 81 C 254 68 267 46 274 28 C 276 22 273 20 269 28 C 264 38 257 62 253 77 M 264 57 C 277 52 290 51 299 49 M 292 29 C 287 49 275 73 273 77", weight:1.3},
+  {d:"M 287 75 C 297 55 312 54 313 62 C 316 71 298 87 292 78 C 290 72 300 60 309 62", weight:.8},
+  {d:"M 314 82 C 322 76 331 63 337 59 C 342 56 337 74 333 82 C 331 89 340 76 345 71 M 334 78 C 337 89 335 102 330 105 C 322 109 317 105 323 98 C 329 92 345 83 355 75", weight:1.2},
+  {d:"M 353 63 C 347 80 349 84 356 81 C 365 76 369 64 368 62 C 363 77 366 82 378 71", weight:.8},
+  {d:"M 378 76 C 388 76 399 67 400 61 C 401 56 389 60 386 70 C 382 84 397 83 409 72", weight:.8},
+  {d:"M 405 75 C 431 86 446 74 462 68", weight:.5}
+];
+function HandwrittenSignature(){
+  const sum = handwrittenStrokes.reduce((n,s)=>n+s.weight,0);
+  let elapsed = 0;
+  const timing = handwrittenStrokes.map((s)=>{
+    const start = 4+elapsed/sum*72;
+    elapsed += s.weight;
+    return {start,end:4+elapsed/sum*72};
+  });
+  const animations = timing.map(({start,end},i)=>`
+    @keyframes hand-letter-${i}{
+      0%,${start.toFixed(3)}%{stroke-dashoffset:100;opacity:1}
+      ${end.toFixed(3)}%,88%{stroke-dashoffset:0;opacity:1}
+      96%,100%{stroke-dashoffset:0;opacity:0}
+    }
+    @keyframes hand-pen-${i}{
+      0%,${Math.max(0,start-.05).toFixed(3)}%{offset-distance:0%;opacity:0}
+      ${start.toFixed(3)}%{offset-distance:0%;opacity:1}
+      ${end.toFixed(3)}%{offset-distance:100%;opacity:1}
+      ${Math.min(100,end+.05).toFixed(3)}%,100%{offset-distance:100%;opacity:0}
+    }
+    .handdraw-path-${i}{animation:hand-letter-${i} 7.4s linear infinite}
+    .handdraw-dot-${i}{animation:hand-pen-${i} 7.4s linear infinite}
+  `).join("\n");
+  return <span className="handdraw-signature" role="img" aria-label="Serazul Hoque, written stroke by stroke like a pen signature">
+    <svg viewBox="0 0 500 130" className="handdraw-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      {handwrittenStrokes.map((stroke,i)=><path key={i} className={`handdraw-stroke handdraw-path-${i}`} d={stroke.d} pathLength="100" />)}
+      {handwrittenStrokes.map((stroke,i)=><circle key={i} className={`handdraw-glow handdraw-dot-${i}`} r="3.2" style={{offsetPath:`path("${stroke.d}")`}} />)}
+    </svg>
+    <style>{animations}</style>
+  </span>;
+}
+
 function DesignerSignature() {
   return <div className="designer-signature wrap" aria-label="Designed by Serazul Hoque">
     <span className="designer-signature-line" aria-hidden="true" />
@@ -457,7 +505,7 @@ function AboutContent({items,entriesLoaded,labels,labelsLoaded,layout,copy,home=
               <p key={index} data-edit-key="about_introduction" style={styleFor(layout,"about","body")}>{paragraph}</p>
             ))}
           </div>
-          <div className="about-signature"><div className="about-signature-stack"><span className="ink-signature" role="img" aria-label="Animated handwritten signature of Serazul Hoque"><span className="ink-signature-words">Serazul Hoque</span><span className="ink-signature-tip" aria-hidden="true" /></span></div><span>STUDENT · CURIOUS BY DEFAULT</span></div>
+          <div className="about-signature"><div className="about-signature-stack"><HandwrittenSignature /></div><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
       {home&&<div className="home-about-portrait wrap"><HeroPhoto /></div>}
