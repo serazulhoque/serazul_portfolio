@@ -28,7 +28,7 @@ export default function Gallery(){
         if(!Array.isArray(rows))throw new Error("Invalid gallery response");
         const images=await Promise.all(rows.map(async item=>{
           try{
-            const r=await fetch(MEDIA+encodeURIComponent(item.media_id),{signal:controller.signal});
+            const r=await fetch(MEDIA+encodeURIComponent(item.media_id),{signal:controller.signal,cache:"no-store"});
             if(!r.ok)return null;
             const data=await r.json();
             return typeof data.url==="string"?{...item,url:data.url,alt:data.alt}:null;
