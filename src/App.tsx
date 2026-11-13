@@ -449,7 +449,15 @@ function AboutContent({items,entriesLoaded,labels,labelsLoaded,layout,copy,home=
         <div className="section-label"><span>{t("about_label","01 / A LITTLE CONTEXT")}</span><span className="small-line" /></div>
         <div className="about-main">
           <Heading style={styleFor(layout,"about","title")}><span data-edit-key="about_line_one">{copy?.about_line_one}</span><br /><em data-edit-key="about_line_two">{copy?.about_line_two}</em></Heading>
-          <div className="about-columns"><p data-edit-key="about_paragraph_one" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_one}</p><p data-edit-key="about_paragraph_two" style={styleFor(layout,"about","body")}>{copy?.about_paragraph_two}</p></div>
+          <div className="about-columns">
+            {(["about_paragraph_one", "about_paragraph_two"] as const).map(key => (
+              <div className="about-column-text" key={key}>
+                {(copy?.[key] ?? "").split(/\n\s*\n/).map(paragraph => paragraph.trim()).filter(Boolean).map((paragraph, index) => (
+                  <p key={index} data-edit-key={key} style={styleFor(layout,"about","body")}>{paragraph}</p>
+                ))}
+              </div>
+            ))}
+          </div>
           <div className="about-signature"><span className="handwriting">Serazul.</span><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
