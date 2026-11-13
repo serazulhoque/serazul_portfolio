@@ -365,67 +365,40 @@ function Home() {
 
 // Bespoke slanted copperplate-style monoline paths inspired by the user's video.
 // Each path follows the pen's trajectory; timing is sequenced in HandwrittenSignature.
-// Original flowing signature artwork, inspired by Harris Signature and Crystal Sky;
-// independent pen-centerline vectors, not font outlines or embedded font files.
-const handwrittenStrokes = [
-  {d:"M 91 26 C 82 12 52 16 36 31 C 21 46 25 62 44 63 C 63 64 68 74 56 88 C 46 102 27 110 18 103 C 12 98 21 84 43 82 C 56 80 73 85 85 94",weight:1.65},
-  {d:"M 80 92 C 89 89 102 82 102 74 C 102 69 92 73 88 82 C 81 99 95 100 108 85",weight:0.75},
-  {d:"M 106 94 C 113 79 122 74 123 79 C 123 86 114 98 120 93 C 129 81 136 77 143 82",weight:0.73},
-  {d:"M 143 92 C 151 78 166 75 168 81 C 171 90 151 104 148 96 C 146 88 160 76 168 81 C 166 91 171 96 182 86",weight:0.94},
-  {d:"M 183 82 C 194 81 205 78 213 74 C 202 85 188 103 186 105 C 199 98 213 92 224 91",weight:0.69},
-  {d:"M 225 80 C 219 95 219 102 228 98 C 239 94 244 77 245 76 C 238 92 242 98 251 92",weight:0.72},
-  {d:"M 250 94 C 262 81 276 49 279 36 C 283 21 275 31 273 44 C 268 70 264 92 268 96 C 271 99 281 92 288 86",weight:0.96},
-  {d:"M 322 97 C 333 82 345 51 351 28 C 355 14 351 12 347 24 C 338 49 329 79 325 94 C 334 86 348 79 365 77",weight:1.15},
-  {d:"M 376 26 C 372 49 359 80 351 95 C 348 101 360 90 372 86",weight:0.74},
-  {d:"M 371 91 C 375 78 384 71 392 71 C 402 70 405 79 401 87 C 397 98 387 101 381 98 C 375 95 383 78 394 76 C 401 74 406 82 412 89",weight:0.93},
-  {d:"M 413 88 C 421 74 430 71 436 76 C 441 82 435 93 430 102 C 423 116 412 129 403 128 C 393 127 404 113 421 106 C 434 100 446 92 451 84",weight:1.14},
-  {d:"M 449 78 C 442 94 448 100 455 96 C 466 89 471 74 471 73 C 464 91 468 96 478 91",weight:0.77},
-  {d:"M 477 92 C 486 88 496 81 500 75 C 503 69 492 73 488 82 C 482 99 495 103 513 89",weight:0.81},
-  {d:"M 494 106 C 511 108 527 103 545 96",weight:0.42}
-];
+// The lettering uses a professional open-source signature script rather than guessed pen paths.
+// The SVG remains inline and draws with a replayable emerald writing highlight.
 function HandwrittenSignature(){
-  const [replay,setReplay] = useState(0);
-  const totalWeight = handwrittenStrokes.reduce((sum,stroke)=>sum+stroke.weight,0);
-  let elapsed=0;
-  const strokes=handwrittenStrokes.map(stroke=>{
-    const start=elapsed;
-    const duration=3.5*stroke.weight/totalWeight;
-    elapsed+=duration;
-    return {...stroke,start,duration};
-  });
-
+  const [replay,setReplay]=useState(0);
+  const clipId="signature-writing-clip";
+  const glowId="signature-pen-glow";
   return <button
     type="button"
     className="handdraw-signature"
-    aria-label="Replay the handwritten Serazul Hoque signature"
-    title="Click to replay the signature"
+    aria-label="Replay Serazul Hoque handwritten signature"
+    title="Replay signature"
     onClick={()=>setReplay(n=>n+1)}
   >
-    <svg key={replay} viewBox="0 0 560 150" className="handdraw-svg" role="img"
-      aria-label="Serazul Hoque handwritten signature" xmlns="http://www.w3.org/2000/svg">
+    <svg key={replay} viewBox="0 0 650 170" className="handdraw-svg"
+      role="img" aria-label="Serazul Hoque handwritten signature"
+      xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <filter id="signature-emerald-glow" x="-350%" y="-350%" width="800%" height="800%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="wideGlow"/>
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.7" result="innerGlow"/>
-          <feMerge>
-            <feMergeNode in="wideGlow"/>
-            <feMergeNode in="innerGlow"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
+        <clipPath id={clipId}>
+          <rect x="0" y="0" width="0" height="170">
+            <animate attributeName="width" from="0" to="650" dur="3.5s" fill="freeze" calcMode="spline" keySplines=".42 0 .58 1" />
+          </rect>
+        </clipPath>
+        <filter id={glowId} x="-400%" y="-400%" width="900%" height="900%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g transform="rotate(-6 280 75)">
-        {strokes.map((stroke,i)=><path key={i} className="handdraw-stroke"
-          d={stroke.d} pathLength="100"
-          style={{animationDelay:`${stroke.start}s`,animationDuration:`${stroke.duration}s`}}/>)}
-        {strokes.map((stroke,i)=><circle key={i} className="handdraw-glow" opacity="0"
-          r="3.8" cx="0" cy="0" fill="#00FF41" filter="url(#signature-emerald-glow)">
-          <animateMotion begin={`${stroke.start}s`} dur={`${stroke.duration}s`}
-            path={stroke.d} rotate="auto" fill="freeze" calcMode="paced"/>
-          <animate attributeName="opacity" begin={`${stroke.start}s`}
-            dur={`${stroke.duration}s`} values="0;1;1;0"
-            keyTimes="0;0.04;0.94;1" fill="freeze"/>
-        </circle>)}
+      <g transform="rotate(-5 325 90)">
+        <text x="16" y="117" textLength="615" lengthAdjust="spacing"
+          className="signature-lettering" clipPath={`url(#${clipId})`}>Serazul Hoque</text>
+        <circle cy="90" r="3.8" fill="#00FF41" filter={`url(#${glowId})`}>
+          <animate attributeName="cx" from="16" to="635" dur="3.5s" fill="freeze" calcMode="spline" keySplines=".42 0 .58 1" />
+          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.03;.96;1" dur="3.5s" fill="freeze"/>
+        </circle>
       </g>
     </svg>
   </button>;
