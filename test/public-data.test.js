@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { requestJSON, readCache, writeCache } from "../src/public-api.ts";
-import { parsePageCopy } from "../src/page-copy.ts";
+import { parsePageCopy } from "../src/page-copy-utils.ts";
 
 const copy = {
   hero_line_one: "Engineering",
