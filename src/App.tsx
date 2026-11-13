@@ -418,7 +418,7 @@ function HandwrittenSignature(){
         {strokes.map((stroke,i)=><path key={i} className="handdraw-stroke"
           d={stroke.d} pathLength="100"
           style={{animationDelay:`${stroke.start}s`,animationDuration:`${stroke.duration}s`}}/>)}
-        {strokes.map((stroke,i)=><circle key={i} className="handdraw-glow"
+        {strokes.map((stroke,i)=><circle key={i} className="handdraw-glow" opacity="0"
           r="3.8" cx="0" cy="0" fill="#00FF41" filter="url(#signature-emerald-glow)">
           <animateMotion begin={`${stroke.start}s`} dur={`${stroke.duration}s`}
             path={stroke.d} rotate="auto" fill="freeze" calcMode="paced"/>
