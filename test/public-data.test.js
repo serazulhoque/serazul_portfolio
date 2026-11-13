@@ -100,8 +100,8 @@ test("unmount cancellation reaches the network request", async (t) => {
 
 test("About Me flows in reading order and preserves separately written paragraphs", () => {
   const sections = {
-    about_paragraph_one: "First paragraph.\\n\\nSecond paragraph.",
-    about_paragraph_two: "Third paragraph.\\n\\nFourth paragraph.",
+    about_paragraph_one: "First paragraph.\n\nSecond paragraph.",
+    about_paragraph_two: "Third paragraph.\n\nFourth paragraph.",
   };
   assert.deepEqual(aboutIntroductionParagraphs(sections), [
     "First paragraph.", "Second paragraph.", "Third paragraph.", "Fourth paragraph.",
