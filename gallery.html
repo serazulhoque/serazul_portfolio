@@ -2,6 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<script>document.documentElement.dataset.siteFresh="loading";</script>
+<style>
+#site-content-loading{display:none}
+html[data-site-fresh="loading"] #root,html[data-site-fresh="error"] #root{visibility:hidden}
+html[data-site-fresh="loading"] #site-content-loading,html[data-site-fresh="error"] #site-content-loading{
+display:block;position:fixed;z-index:999;top:36%;left:50%;transform:translateX(-50%);
+box-sizing:border-box;width:min(90vw,480px);padding:24px;
+background:var(--paper,#fffefa);color:var(--ink,#21332c);font:16px/1.6 Georgia,serif;
+text-align:center;border-radius:8px;border:1px solid #d7dfd2}
+#site-content-loading a{display:inline-block;margin-top:12px;color:inherit;text-decoration:underline}
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=yes" />
 <title>Gallery — Serazul Hoque</title>
 <meta name="description" content="Browse Serazul Hoque’s personal photo gallery." />
@@ -21,6 +32,7 @@
 </script>
 </head>
 <body>
+<div id="site-content-loading" role="status" aria-live="polite">Loading the latest website content…</div>
 <div id="root"></div>
 <script type="module" src="/src/main.tsx"></script>
 </body>
