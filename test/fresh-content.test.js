@@ -11,6 +11,7 @@ test("all public HTML entries hide outdated prerenders before the first paint", 
     assert.ok(html.includes('html[data-site-fresh="loading"] #root'), path);
     assert.ok(html.includes('id="site-content-error"'), path);
     assert.ok(html.includes("get_portfolio_public_content"), path);
+    assert.ok(html.includes("AbortSignal.timeout(7000)"), path);
     assert.doesNotMatch(html, /Loading the latest website content/i, path);
     assert.ok(html.indexOf('dataset.siteFresh="loading"') < html.indexOf('<div id="root">'), path);
   }
