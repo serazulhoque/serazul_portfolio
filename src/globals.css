@@ -85,12 +85,33 @@
 }
 
 
-/* Continuous handwritten signature below the static name. */
+/* Thin, slanted signature lettering and continuous draw-replay.
+   Based on the provided pen-writing reference, without embedding that video. */
 .about-signature-stack{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
-.drawn-signature{display:block;width:min(315px,80vw);height:auto;margin-top:3px;overflow:visible;color:#202923}
+.drawn-signature{display:block;width:min(310px,80vw);height:auto;margin-top:2px;overflow:visible;color:#1b211e}
 html[data-theme="dark"] .drawn-signature{color:#fff}
-.drawn-signature-text{font-family:"Herr Von Muellerhoff","Segoe Script",cursive;font-size:64px;font-style:normal;font-weight:400;letter-spacing:0;fill:currentColor;stroke:currentColor;stroke-width:.18px;transform:rotate(-4deg);transform-origin:130px 44px;animation:signature-write 5.5s linear infinite}
-.drawn-signature-flourish{stroke-dasharray:260;stroke-dashoffset:260;animation:signature-flourish 5.5s linear infinite}
-@keyframes signature-write{0%,8%{clip-path:inset(0 100% 0 0)}72%,91%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 100% 0 0)}}
-@keyframes signature-flourish{0%,67%{stroke-dashoffset:260;opacity:1}84%,91%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:260;opacity:0}}
-@media(prefers-reduced-motion:reduce){.drawn-signature-text,.drawn-signature-flourish{animation:none;clip-path:none;stroke-dashoffset:0}}
+.drawn-signature-text{
+  font-family:"Qwigley","Herr Von Muellerhoff",cursive;
+  font-size:75px;font-style:normal;font-weight:400;letter-spacing:-1px;
+  fill:currentColor;stroke:currentColor;stroke-width:.08px;
+  transform:rotate(-4deg);transform-origin:150px 46px;
+  animation:signature-pen-write 4.7s linear infinite;
+}
+.drawn-signature-flourish{
+  stroke-dasharray:250;stroke-dashoffset:250;
+  animation:signature-pen-finish 4.7s linear infinite;
+}
+@keyframes signature-pen-write{
+  0%,3%{clip-path:inset(0 100% 0 0);opacity:1}
+  62%,88%{clip-path:inset(0 0 0 0);opacity:1}
+  91%,100%{clip-path:inset(0 0 0 0);opacity:0}
+}
+@keyframes signature-pen-finish{
+  0%,58%{stroke-dashoffset:250;opacity:1}
+  75%,88%{stroke-dashoffset:0;opacity:1}
+  91%,100%{stroke-dashoffset:0;opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .drawn-signature-text{animation:none;clip-path:none;opacity:1}
+  .drawn-signature-flourish{animation:none;stroke-dashoffset:0;opacity:1}
+}
