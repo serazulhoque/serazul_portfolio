@@ -457,7 +457,7 @@ function AboutContent({items,entriesLoaded,labels,labelsLoaded,layout,copy,home=
               <p key={index} data-edit-key="about_introduction" style={styleFor(layout,"about","body")}>{paragraph}</p>
             ))}
           </div>
-          <div className="about-signature"><div className="about-signature-stack"><svg className="drawn-signature" viewBox="0 0 430 125" role="img" aria-label="Animated handwritten signature of Serazul Hoque"><path className="drawn-signature-flourish" d="M112 36 C84 -1 23 22 27 51 C31 73 87 58 87 87 C87 111 29 122 9 104 C-5 89 42 66 104 69" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><text x="85" y="76" className="drawn-signature-text">Serazul Hoque</text><path className="drawn-signature-flourish" d="M134 92 C165 105 217 82 256 88 C286 93 309 94 333 88 C367 80 400 83 424 85 M319 97 C352 94 382 94 402 96" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /><circle className="drawn-signature-flourish" cx="412" cy="96" r="1.8" fill="currentColor" stroke="none" /></svg></div><span>STUDENT · CURIOUS BY DEFAULT</span></div>
+          <div className="about-signature"><div className="about-signature-stack"><span className="ink-signature" role="img" aria-label="Animated handwritten signature of Serazul Hoque"><span className="ink-signature-words">Serazul Hoque</span><span className="ink-signature-tip" aria-hidden="true" /></span></div><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
       {home&&<div className="home-about-portrait wrap"><HeroPhoto /></div>}
