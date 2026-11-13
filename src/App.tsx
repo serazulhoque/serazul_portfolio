@@ -365,24 +365,24 @@ function Home() {
 
 // Bespoke slanted copperplate-style monoline paths inspired by the user's video.
 // Each path follows the pen's trajectory; timing is sequenced in HandwrittenSignature.
+// Original flowing signature artwork, inspired by Harris Signature and Crystal Sky;
+// independent pen-centerline vectors, not font outlines or embedded font files.
 const handwrittenStrokes = [
-  {d:"M 18 95 C 28 68 48 55 59 60 C 71 64 72 81 64 98 C 54 117 32 122 22 118 C 9 113 19 99 34 91 C 46 84 56 75 60 61 C 63 49 64 34 73 25 C 83 14 97 15 100 24 C 106 39 87 50 77 55", weight:1.62},
-  {d:"M 69 61 C 66 75 59 94 54 110 C 50 122 49 130 51 132 C 58 135 70 109 82 90", weight:0.69},
-  {d:"M 80 89 C 95 84 102 70 102 69 C 98 66 88 74 85 85 C 82 93 89 99 107 83", weight:0.72},
-  {d:"M 104 87 C 112 71 120 67 123 70 C 127 75 115 86 119 85 C 129 71 138 69 141 74", weight:0.68},
-  {d:"M 141 81 C 146 69 157 65 164 68 C 169 71 164 81 155 87 C 148 92 146 86 151 78 C 157 69 166 67 166 71 C 165 79 167 83 174 83 C 179 83 183 75 187 72", weight:0.87},
-  {d:"M 187 72 C 198 69 206 66 216 60 C 207 71 194 85 190 91 C 205 82 213 79 219 79", weight:0.62},
-  {d:"M 221 67 C 213 80 215 86 222 84 C 232 81 238 65 239 63 C 233 79 236 82 244 78", weight:0.7},
-  {d:"M 243 77 C 250 68 261 46 265 31 C 269 16 262 22 259 34 C 255 50 253 66 251 79 C 250 86 256 87 270 74", weight:0.9},
-  {d:"M 279 90 C 297 69 307 39 312 19 C 315 9 310 15 306 27 C 297 53 290 76 287 84 C 292 73 313 61 337 58", weight:1.22},
-  {d:"M 344 19 C 338 42 329 64 319 82 C 317 86 328 75 338 73", weight:0.65},
-  {d:"M 343 72 C 348 61 356 55 363 55 C 371 55 371 63 368 70 C 365 79 357 83 353 81 C 348 79 352 66 361 61 C 366 59 373 62 378 69", weight:0.77},
-  {d:"M 376 69 C 387 53 397 49 399 53 C 402 60 389 72 389 75 C 395 71 406 56 412 55 C 416 55 413 69 408 76 C 402 88 397 102 393 111 C 387 123 376 128 373 124 C 367 117 380 105 391 98 C 400 92 413 86 423 71", weight:1.2},
-  {d:"M 419 63 C 415 76 419 80 425 76 C 435 68 440 56 441 54 C 436 66 438 71 446 69", weight:0.67},
-  {d:"M 443 69 C 455 66 462 52 466 51 C 463 56 450 75 457 75 C 466 73 477 59 481 56", weight:0.77}
+  {d:"M 91 26 C 82 12 52 16 36 31 C 21 46 25 62 44 63 C 63 64 68 74 56 88 C 46 102 27 110 18 103 C 12 98 21 84 43 82 C 56 80 73 85 85 94",weight:1.65},
+  {d:"M 80 92 C 89 89 102 82 102 74 C 102 69 92 73 88 82 C 81 99 95 100 108 85",weight:0.75},
+  {d:"M 106 94 C 113 79 122 74 123 79 C 123 86 114 98 120 93 C 129 81 136 77 143 82",weight:0.73},
+  {d:"M 143 92 C 151 78 166 75 168 81 C 171 90 151 104 148 96 C 146 88 160 76 168 81 C 166 91 171 96 182 86",weight:0.94},
+  {d:"M 183 82 C 194 81 205 78 213 74 C 202 85 188 103 186 105 C 199 98 213 92 224 91",weight:0.69},
+  {d:"M 225 80 C 219 95 219 102 228 98 C 239 94 244 77 245 76 C 238 92 242 98 251 92",weight:0.72},
+  {d:"M 250 94 C 262 81 276 49 279 36 C 283 21 275 31 273 44 C 268 70 264 92 268 96 C 271 99 281 92 288 86",weight:0.96},
+  {d:"M 322 97 C 333 82 345 51 351 28 C 355 14 351 12 347 24 C 338 49 329 79 325 94 C 334 86 348 79 365 77",weight:1.15},
+  {d:"M 376 26 C 372 49 359 80 351 95 C 348 101 360 90 372 86",weight:0.74},
+  {d:"M 371 91 C 375 78 384 71 392 71 C 402 70 405 79 401 87 C 397 98 387 101 381 98 C 375 95 383 78 394 76 C 401 74 406 82 412 89",weight:0.93},
+  {d:"M 413 88 C 421 74 430 71 436 76 C 441 82 435 93 430 102 C 423 116 412 129 403 128 C 393 127 404 113 421 106 C 434 100 446 92 451 84",weight:1.14},
+  {d:"M 449 78 C 442 94 448 100 455 96 C 466 89 471 74 471 73 C 464 91 468 96 478 91",weight:0.77},
+  {d:"M 477 92 C 486 88 496 81 500 75 C 503 69 492 73 488 82 C 482 99 495 103 513 89",weight:0.81},
+  {d:"M 494 106 C 511 108 527 103 545 96",weight:0.42}
 ];
-// Write each genuine SVG centerline in sequence, not by wiping text across the screen.
-// The path length controls both the solid ink and the emerald pen tip.
 function HandwrittenSignature(){
   const [replay,setReplay] = useState(0);
   const totalWeight = handwrittenStrokes.reduce((sum,stroke)=>sum+stroke.weight,0);
@@ -401,7 +401,7 @@ function HandwrittenSignature(){
     title="Click to replay the signature"
     onClick={()=>setReplay(n=>n+1)}
   >
-    <svg key={replay} viewBox="0 0 500 145" className="handdraw-svg" role="img"
+    <svg key={replay} viewBox="0 0 560 150" className="handdraw-svg" role="img"
       aria-label="Serazul Hoque handwritten signature" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="signature-emerald-glow" x="-350%" y="-350%" width="800%" height="800%">
@@ -414,7 +414,7 @@ function HandwrittenSignature(){
           </feMerge>
         </filter>
       </defs>
-      <g transform="rotate(-8 250 73)">
+      <g transform="rotate(-6 280 75)">
         {strokes.map((stroke,i)=><path key={i} className="handdraw-stroke"
           d={stroke.d} pathLength="100"
           style={{animationDelay:`${stroke.start}s`,animationDuration:`${stroke.duration}s`}}/>)}
