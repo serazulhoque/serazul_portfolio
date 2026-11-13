@@ -88,7 +88,7 @@
 /* Thin, slanted signature lettering and continuous draw-replay.
    Based on the provided pen-writing reference, without embedding that video. */
 .about-signature-stack{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
-.drawn-signature{display:block;width:min(310px,80vw);height:auto;margin-top:2px;overflow:visible;color:#1b211e}
+.drawn-signature{display:block;width:min(410px,86vw);height:auto;margin-top:2px;overflow:visible;color:#1b211e}
 html[data-theme="dark"] .drawn-signature{color:#fff}
 .drawn-signature-text{
   font-family:"Qwigley","Herr Von Muellerhoff",cursive;
@@ -98,7 +98,7 @@ html[data-theme="dark"] .drawn-signature{color:#fff}
   animation:signature-pen-write 4.7s linear infinite;
 }
 .drawn-signature-flourish{
-  stroke-dasharray:250;stroke-dashoffset:250;
+  stroke-dasharray:900;stroke-dashoffset:900;
   animation:signature-pen-finish 4.7s linear infinite;
 }
 @keyframes signature-pen-write{
