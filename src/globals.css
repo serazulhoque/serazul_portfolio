@@ -140,3 +140,15 @@ html[data-theme="dark"] .ink-signature{color:#f7f9f3}
   .ink-signature-words{animation:none;clip-path:none;opacity:1}
   .ink-signature-tip{display:none}
 }
+
+
+/* Actual vector pen paths, revealed by path-length rather than by a text mask. */
+.handdraw-signature{display:block;width:min(430px,88vw);max-width:100%;height:auto;color:#1b211e}
+html[data-theme="dark"] .handdraw-signature{color:#fff}
+.handdraw-svg{display:block;width:100%;height:auto;overflow:visible}
+.handdraw-stroke{fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100}
+.handdraw-glow{fill:#92ff48;filter:drop-shadow(0 0 3px #65ff24) drop-shadow(0 0 7px #38ec25);opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){
+  .handdraw-signature .handdraw-stroke{animation:none!important;stroke-dashoffset:0;opacity:1}
+  .handdraw-signature .handdraw-glow{animation:none!important;opacity:0}
+}
