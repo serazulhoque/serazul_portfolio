@@ -1,12 +1,6 @@
-import snapshot from "./site-snapshot.json" with { type: "json" };
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import {styleFor,type LayoutConfig} from "./site-layout";
-import {
-  DATA_URL,
-  PUBLIC_HEADERS,
-  requestJSON,
-  refreshAfterFirstPaint
-} from "./public-api";
+import {useLiveSite} from "./live-site";
 
 export type SiteEntry = {
   id: string;
@@ -44,51 +38,14 @@ function isLabels(value: unknown): value is Record<string, string> {
   );
 }
 export function useSiteContent(): SiteData {
-  const [items, setItems] = useState<SiteEntry[]>(() => snapshot.items.filter(isEntry) as SiteEntry[]);
-  const [entriesLoaded, setEntriesLoaded] = useState(snapshot.pageCopy !== null);
-  const [labels, setLabels] = useState<Record<string, string>>(() => isLabels(snapshot.labels) ? snapshot.labels : {});
-  const [labelsLoaded, setLabelsLoaded] = useState(snapshot.pageCopy !== null);
-  useEffect(() => {
-    const controller = new AbortController();
-    refreshAfterFirstPaint(() => {
-    requestJSON<unknown>(
-      DATA_URL +
-        "/site_content_entries?select=id,section,kind,title,subtitle,body,date_label,sort_order&is_published=eq.true&order=sort_order.asc,created_at.asc&limit=300",
-      { signal: controller.signal, cache: "no-store", headers: PUBLIC_HEADERS },
-    )
-      .then((data) => {
-        if (controller.signal.aborted || !Array.isArray(data)) return;
-        const valid = data.filter(isEntry);
-        setItems(previous => JSON.stringify(previous) === JSON.stringify(valid) ? previous : valid);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!controller.signal.aborted) setEntriesLoaded(true);
-      });
-    requestJSON<unknown>(
-      DATA_URL + "/site_editable_text?select=key,value&limit=100",
-      { signal: controller.signal, cache: "no-store", headers: PUBLIC_HEADERS },
-    )
-      .then((data) => {
-        if (controller.signal.aborted || !Array.isArray(data)) return;
-        const values: Record<string, string> = {};
-        for (const item of data)
-          if (
-            item &&
-            typeof item.key === "string" &&
-            typeof item.value === "string"
-          )
-            values[item.key] = item.value;
-        setLabels(previous => JSON.stringify(previous) === JSON.stringify(values) ? previous : values);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!controller.signal.aborted) setLabelsLoaded(true);
-      });
-    }, controller.signal);
-    return () => controller.abort();
-  }, []);
-  return { items, entriesLoaded, labels, labelsLoaded };
+  const {items: rawItems, labels: rawLabels, fresh} = useLiveSite();
+  const items = useMemo(() =>
+    Array.isArray(rawItems) ? rawItems.filter(isEntry) : [],
+  [rawItems]) as SiteEntry[];
+  const labels = useMemo(() =>
+    isLabels(rawLabels) ? rawLabels : {},
+  [rawLabels]);
+  return { items, entriesLoaded: fresh, labels, labelsLoaded: fresh };
 }
 export function textValue(
   values: Record<string, string>,
