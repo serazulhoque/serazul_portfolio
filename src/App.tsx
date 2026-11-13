@@ -456,7 +456,7 @@ function AboutContent({items,entriesLoaded,labels,labelsLoaded,layout,copy,home=
               <p key={index} data-edit-key="about_introduction" style={styleFor(layout,"about","body")}>{paragraph}</p>
             ))}
           </div>
-          <div className="about-signature"><div className="about-signature-stack"><span className="handwriting">Serazul.</span><svg className="drawn-signature" viewBox="0 0 275 70" role="img" aria-label="Animated handwritten signature of Serazul Hoque"><text x="9" y="46" className="drawn-signature-text">Serazul Hoque</text><path className="drawn-signature-flourish" d="M25 55 C83 62 170 37 244 52 C251 54 258 56 265 54" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg></div><span>STUDENT · CURIOUS BY DEFAULT</span></div>
+          <div className="about-signature"><div className="about-signature-stack"><span className="handwriting">Serazul.</span><svg className="drawn-signature" viewBox="0 0 315 86" role="img" aria-label="Animated handwritten signature of Serazul Hoque"><text x="10" y="58" className="drawn-signature-text">Serazul Hoque</text><path className="drawn-signature-flourish" d="M25 55 C83 62 170 37 244 52 C251 54 258 56 265 54" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg></div><span>STUDENT · CURIOUS BY DEFAULT</span></div>
         </div>
       </section>
       {home&&<div className="home-about-portrait wrap"><HeroPhoto /></div>}
