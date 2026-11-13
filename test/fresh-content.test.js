@@ -1,0 +1,31 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const source = async (path) => readFile(new URL("../" + path, import.meta.url), "utf8");
+
+test("all public HTML entries hide outdated prerenders before the first paint", async () => {
+  for (const path of ["index.html", "about.html", "gallery.html"]) {
+    const html = await source(path);
+    assert.ok(html.includes('document.documentElement.dataset.siteFresh="loading"'), path);
+    assert.ok(html.includes('html[data-site-fresh="loading"] #root'), path);
+    assert.ok(html.includes('id="site-content-loading"'), path);
+    assert.ok(html.indexOf('dataset.siteFresh="loading"') < html.indexOf('<div id="root">'), path);
+  }
+});
+
+test("published content and design come from one uncached database refresh", async () => {
+  const provider = await source("src/live-site.tsx");
+  for (const table of [
+    "page_sections", "site_content_entries", "site_editable_text", "site_design_settings"
+  ]) assert.ok(provider.includes("/" + table), table);
+  assert.match(provider, /await Promise\.all\(/);
+  assert.match(provider, /data-site-fresh|dataset\.siteFresh/);
+  assert.match(provider, /dataset\.siteFresh = "ready"/);
+  assert.match(provider, /dataset\.siteFresh = "error"/);
+  assert.match(provider, /visibilitychange/);
+  assert.match(await source("src/public-api.ts"), /cache: "no-store"/);
+  assert.match(await source("src/site-design.tsx"), /useLayoutEffect/);
+  assert.doesNotMatch(await source("src/site-layout.ts"), /refreshAfterFirstPaint/);
+  assert.doesNotMatch(await source("src/site-content.tsx"), /refreshAfterFirstPaint/);
+});
